@@ -5,10 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#080d18">
     <meta
+      id="page-description"
       name="description"
-      content="Alpinoxi Client is an open-source Minecraft launcher built with Rust."
+      content="Rust ile geliştirilen açık kaynaklı Minecraft başlatıcısı Alpinoxi Client."
+      data-tr-content="Rust ile geliştirilen açık kaynaklı Minecraft başlatıcısı Alpinoxi Client."
+      data-en-content="Alpinoxi Client is an open-source Minecraft launcher built with Rust."
     >
-    <title>Alpinoxi Client — Minecraft, your way</title>
+    <title
+      id="page-title"
+      data-tr="Alpinoxi Client — Minecraft, senin tarzın"
+      data-en="Alpinoxi Client — Minecraft, your way"
+    >Alpinoxi Client — Minecraft, senin tarzın</title>
     <link rel="icon" type="image/svg+xml" href="assets/alpinoxi-mark.svg">
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
@@ -16,13 +23,25 @@
   <body>
     <div class="page-shell">
       <header class="site-header">
-        <a class="brand" href="#" aria-label="Alpinoxi Client">
+        <a
+          class="brand"
+          href="#"
+          aria-label="Alpinoxi Client"
+          data-tr-aria-label="Alpinoxi Client ana sayfa"
+          data-en-aria-label="Alpinoxi Client home"
+        >
           <img src="assets/alpinoxi-mark.svg" alt="" width="42" height="42">
           <span>Alpinoxi<span class="brand-light">Client</span></span>
         </a>
-        <nav class="main-nav" aria-label="Main navigation">
+        <nav
+          class="main-nav"
+          aria-label="Ana gezinme"
+          data-tr-aria-label="Ana gezinme"
+          data-en-aria-label="Main navigation"
+        >
           <a href="#features" data-tr="Özellikler" data-en="Features">Özellikler</a>
           <a href="#accounts" data-tr="Hesaplar" data-en="Accounts">Hesaplar</a>
+          <a href="#skins" data-tr="Skinler" data-en="Skins">Skinler</a>
           <a href="#about" data-tr="Hakkında" data-en="About">Hakkında</a>
         </nav>
         <div class="header-actions">
@@ -81,7 +100,12 @@
             >Ücretsiz · Açık kaynak · Rust tabanlı</p>
           </div>
 
-          <div class="hero-art" aria-label="Alpinoxi Client account options">
+          <div
+            class="hero-art"
+            aria-label="Alpinoxi Client hesap seçenekleri"
+            data-tr-aria-label="Alpinoxi Client hesap seçenekleri"
+            data-en-aria-label="Alpinoxi Client account options"
+          >
             <div class="orbit orbit-one"></div>
             <div class="orbit orbit-two"></div>
             <div class="glow"></div>
@@ -129,7 +153,13 @@
           </div>
         </section>
 
-        <section class="feature-strip" id="features" aria-label="Highlights">
+        <section
+          class="feature-strip"
+          id="features"
+          aria-label="Öne çıkan özellikler"
+          data-tr-aria-label="Öne çıkan özellikler"
+          data-en-aria-label="Highlights"
+        >
           <article class="feature-item">
             <span class="feature-number">01</span>
             <div>
@@ -182,7 +212,7 @@
               <span class="account-card-index">A / 03</span>
               <div class="account-card-icon icon-offline" aria-hidden="true">A</div>
               <h3 data-tr="Çevrimdışı" data-en="Offline">Çevrimdışı</h3>
-              <p data-tr="Desteklenen sunucular dışında, yerel oyuncu adıyla hesap oluştur." data-en="Create a local player identity with a chosen username.">Desteklenen sunucular dışında, yerel oyuncu adıyla hesap oluştur.</p>
+              <p data-tr="Yerel oyuncu adıyla hesap oluştur ve bu hesap için kişisel skin kullan." data-en="Create a local player identity and use a custom skin for that account.">Yerel oyuncu adıyla hesap oluştur ve bu hesap için kişisel skin kullan.</p>
             </article>
             <article class="account-card">
               <span class="account-card-index">A / 04</span>
@@ -190,6 +220,69 @@
               <h3 data-tr="Özel sunucu" data-en="Custom server">Özel sunucu</h3>
               <p data-tr="Uyumlu özel Yggdrasil kimlik doğrulama sunucularını kullan." data-en="Use a compatible custom Yggdrasil authentication server.">Uyumlu özel Yggdrasil kimlik doğrulama sunucularını kullan.</p>
             </article>
+          </div>
+        </section>
+
+        <section class="skin-section" id="skins" aria-labelledby="skin-title">
+          <div class="skin-copy">
+            <p class="eyebrow" data-tr="ÇEVRİMDIŞI HESAPLARA ÖZEL" data-en="FOR OFFLINE ACCOUNTS">ÇEVRİMDIŞI HESAPLARA ÖZEL</p>
+            <h2 id="skin-title">
+              <span data-tr="Görünüşün" data-en="Make it">Görünüşün</span>
+              <span class="title-accent" data-tr="sana ait." data-en="your own.">sana ait.</span>
+            </h2>
+            <p
+              class="skin-description"
+              data-tr="Çevrimdışı hesabına yerel bir PNG skin seç, önizle ve model türünü belirle. Skin dosyan çevrimdışı hesabında yerel olarak kullanılır."
+              data-en="Choose a local PNG skin for your offline account, preview it, and select the model type. The skin is used locally with that offline account."
+            >Çevrimdışı hesabına yerel bir PNG skin seç, önizle ve model türünü belirle. Skin dosyan çevrimdışı hesabında yerel olarak kullanılır.</p>
+            <ul class="skin-benefits">
+              <li>
+                <span>01</span>
+                <span data-tr="PNG dosyasından skin seç" data-en="Choose a skin from a PNG file">PNG dosyasından skin seç</span>
+              </li>
+              <li>
+                <span>02</span>
+                <span data-tr="Classic veya Slim modelini kullan" data-en="Use the Classic or Slim model">Classic veya Slim modelini kullan</span>
+              </li>
+              <li>
+                <span>03</span>
+                <span data-tr="İstediğinde varsayılan görünüme dön" data-en="Restore the default appearance whenever you like">İstediğinde varsayılan görünüme dön</span>
+              </li>
+            </ul>
+            <p class="skin-scope" data-tr="Yalnızca seçili çevrimdışı hesap için" data-en="Only for the selected offline account">Yalnızca seçili çevrimdışı hesap için</p>
+          </div>
+
+          <div
+            class="skin-preview"
+            role="img"
+            aria-label="Yerel skin önizleme kartı"
+            data-tr-aria-label="Yerel skin önizleme kartı"
+            data-en-aria-label="Local skin preview card"
+          >
+            <div class="skin-preview-header">
+              <span data-tr="YEREL SKIN" data-en="LOCAL SKIN">YEREL SKIN</span>
+              <span class="skin-preview-state">
+                <i aria-hidden="true"></i>
+                <span data-tr="ÇEVRİMDIŞI" data-en="OFFLINE">ÇEVRİMDIŞI</span>
+              </span>
+            </div>
+            <div class="skin-avatar-stage">
+              <div class="pixel-avatar" aria-hidden="true">
+                <span class="avatar-head"></span>
+                <span class="avatar-body"></span>
+                <span class="avatar-arm avatar-arm-left"></span>
+                <span class="avatar-arm avatar-arm-right"></span>
+                <span class="avatar-leg avatar-leg-left"></span>
+                <span class="avatar-leg avatar-leg-right"></span>
+              </div>
+              <span class="skin-orbit skin-orbit-one"></span>
+              <span class="skin-orbit skin-orbit-two"></span>
+            </div>
+            <div class="skin-preview-footer">
+              <span data-tr="MODEL" data-en="MODEL">MODEL</span>
+              <span class="model-chip">CLASSIC</span>
+              <span class="model-chip model-chip-muted">SLIM</span>
+            </div>
           </div>
         </section>
 
@@ -223,19 +316,25 @@
       </main>
 
       <footer class="site-footer">
-        <a class="footer-brand" href="#" aria-label="Alpinoxi Client">
+        <a
+          class="footer-brand"
+          href="#"
+          aria-label="Alpinoxi Client ana sayfa"
+          data-tr-aria-label="Alpinoxi Client ana sayfa"
+          data-en-aria-label="Alpinoxi Client home"
+        >
           <img src="assets/alpinoxi-mark.svg" alt="" width="28" height="28">
           <span>Alpinoxi Client</span>
         </a>
-        <p data-tr="OneLauncher / OneClient tabanlı bağımsız bir topluluk projesi." data-en="An independent community project based on OneLauncher / OneClient.">OneLauncher / OneClient tabanlı bağımsız bir topluluk projesi.</p>
+        <p data-tr="Polyfrost'un açık kaynaklı launcher projesinden türetilmiş bağımsız bir topluluk projesi." data-en="An independent community project derived from Polyfrost's open-source launcher.">Polyfrost'un açık kaynaklı launcher projesinden türetilmiş bağımsız bir topluluk projesi.</p>
         <a
           class="footer-link"
           href="https://github.com/Polyfrost/OneLauncher"
           target="_blank"
           rel="noopener noreferrer"
-          data-tr="Polyfrost OneLauncher kaynak projesi"
-          data-en="Polyfrost OneLauncher upstream project"
-        >Polyfrost OneLauncher kaynak projesi</a>
+          data-tr="Polyfrost kaynak projesi"
+          data-en="Polyfrost source project"
+        >Polyfrost kaynak projesi</a>
       </footer>
       <p class="disclaimer" data-tr="Alpinoxi Client, Polyfrost tarafından desteklenmez veya onaylanmaz." data-en="Alpinoxi Client is not affiliated with or endorsed by Polyfrost.">Alpinoxi Client, Polyfrost tarafından desteklenmez veya onaylanmaz.</p>
     </div>
