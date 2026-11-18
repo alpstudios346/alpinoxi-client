@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#080d18">
+    <meta name="theme-color" content="#070d1b">
     <meta
       id="page-description"
       name="description"
@@ -102,9 +102,9 @@
 
           <div
             class="hero-art"
-            aria-label="Alpinoxi Client hesap seçenekleri"
-            data-tr-aria-label="Alpinoxi Client hesap seçenekleri"
-            data-en-aria-label="Alpinoxi Client account options"
+            aria-label="Alpinoxi Client başlatıcı arayüzü önizlemesi"
+            data-tr-aria-label="Alpinoxi Client başlatıcı arayüzü önizlemesi"
+            data-en-aria-label="Alpinoxi Client launcher interface preview"
           >
             <div class="orbit orbit-one"></div>
             <div class="orbit orbit-two"></div>
@@ -112,35 +112,59 @@
             <div class="launcher-card">
               <div class="card-topline">
                 <span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-                <span data-tr="HESAP SEÇENEKLERİ" data-en="ACCOUNT OPTIONS">HESAP SEÇENEKLERİ</span>
+                <span data-tr="ALPINOXI CLIENT ÖNİZLEMESİ" data-en="ALPINOXI CLIENT PREVIEW">ALPINOXI CLIENT ÖNİZLEMESİ</span>
               </div>
-              <div class="card-brand">
-                <img src="assets/alpinoxi-mark.svg" alt="" width="76" height="76">
-                <div>
-                  <strong>Alpinoxi</strong>
-                  <span>CLIENT</span>
-                </div>
-              </div>
-              <div class="account-list">
-                <div class="account-row">
-                  <span class="account-icon microsoft" aria-hidden="true">M</span>
-                  <span>Microsoft</span>
-                  <span class="row-arrow" aria-hidden="true">↗</span>
-                </div>
-                <div class="account-row">
-                  <span class="account-icon elyby" aria-hidden="true">E</span>
-                  <span>Ely.by</span>
-                  <span class="row-arrow" aria-hidden="true">↗</span>
-                </div>
-                <div class="account-row">
-                  <span class="account-icon offline" aria-hidden="true">A</span>
-                  <span data-tr="Çevrimdışı hesap" data-en="Offline account">Çevrimdışı hesap</span>
-                  <span class="row-arrow" aria-hidden="true">↗</span>
-                </div>
-                <div class="account-row">
-                  <span class="account-icon custom" aria-hidden="true">+</span>
-                  <span data-tr="Özel sunucu" data-en="Custom server">Özel sunucu</span>
-                  <span class="row-arrow" aria-hidden="true">↗</span>
+              <div class="launcher-shell">
+                <aside class="launcher-sidebar">
+                  <div class="launcher-mini-brand">
+                    <img src="assets/alpinoxi-mark.svg" alt="" width="25" height="25">
+                    <span>ALPINOXI</span>
+                  </div>
+                  <div class="launcher-menu">
+                    <div class="launcher-menu-item is-active">
+                      <span class="menu-glyph" aria-hidden="true">⌂</span>
+                      <span data-tr="Ana sayfa" data-en="Home">Ana sayfa</span>
+                    </div>
+                    <div class="launcher-menu-item">
+                      <span class="menu-glyph" aria-hidden="true">◉</span>
+                      <span data-tr="Hesaplar" data-en="Accounts">Hesaplar</span>
+                    </div>
+                    <div class="launcher-menu-item">
+                      <span class="menu-glyph" aria-hidden="true">✦</span>
+                      <span data-tr="Skinler" data-en="Skins">Skinler</span>
+                    </div>
+                  </div>
+                  <div class="launcher-mini-profile">
+                    <span class="mini-profile-avatar">A</span>
+                    <span data-tr="Hesap" data-en="Account">Hesap</span>
+                  </div>
+                </aside>
+                <div class="launcher-main">
+                  <div class="launcher-main-heading">
+                    <div>
+                      <span class="launcher-overline" data-tr="BAŞLATICI" data-en="LAUNCHER">BAŞLATICI</span>
+                      <strong data-tr="Alpinoxi'ye hoş geldin" data-en="Welcome to Alpinoxi">Alpinoxi'ye hoş geldin</strong>
+                    </div>
+                    <span class="launcher-ready">
+                      <i aria-hidden="true"></i>
+                      <span data-tr="HAZIR" data-en="READY">HAZIR</span>
+                    </span>
+                  </div>
+                  <div class="launcher-game-card">
+                    <div class="game-cube" aria-hidden="true">M</div>
+                    <span class="launcher-overline" data-tr="OYUNUNU SEÇ" data-en="YOUR GAME">OYUNUNU SEÇ</span>
+                    <strong>Minecraft</strong>
+                    <span class="game-subtitle" data-tr="Dünyana dönmeye hazır mısın?" data-en="Ready to jump back in?">Dünyana dönmeye hazır mısın?</span>
+                    <div class="mock-play-button">
+                      <span data-tr="Oyna" data-en="Play">Oyna</span>
+                      <span aria-hidden="true">→</span>
+                    </div>
+                  </div>
+                  <div class="launcher-account-row">
+                    <span class="account-icon microsoft" aria-hidden="true">M</span>
+                    <span data-tr="Seçili hesap" data-en="Selected account">Seçili hesap</span>
+                    <strong>Microsoft</strong>
+                  </div>
                 </div>
               </div>
               <div class="card-footer">
