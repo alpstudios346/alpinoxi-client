@@ -110,70 +110,59 @@
             <div class="orbit orbit-two"></div>
             <div class="glow"></div>
             <div class="launcher-card">
-              <div class="card-topline">
-                <span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-                <span data-tr="ALPINOXI CLIENT ÖNİZLEMESİ" data-en="ALPINOXI CLIENT PREVIEW">ALPINOXI CLIENT ÖNİZLEMESİ</span>
+              <div class="launcher-topbar">
+                <div class="launcher-brand">
+                  <img src="assets/alpinoxi-mark.svg" alt="" width="24" height="24">
+                  <span>ALPINOXI</span>
+                </div>
+                <nav class="launcher-nav" aria-label="Başlatıcı gezinmesi" data-tr-aria-label="Başlatıcı gezinmesi" data-en-aria-label="Launcher navigation">
+                  <span class="launcher-nav-item is-active" data-tr="Ana sayfa" data-en="Home">Ana sayfa</span>
+                  <span class="launcher-nav-item" data-tr="Sürümler" data-en="Versions">Sürümler</span>
+                  <span class="launcher-nav-item" data-tr="Keşfet" data-en="Browse">Keşfet</span>
+                  <span class="launcher-nav-item" data-tr="Gardırop" data-en="Wardrobe">Gardırop</span>
+                </nav>
+                <div class="launcher-toolbar">
+                  <span class="launcher-icon-button" aria-hidden="true">
+                    <svg viewBox="0 0 20 20"><circle cx="8" cy="7" r="3"></circle><path d="M2.5 17v-1.5A3.5 3.5 0 0 1 6 12h4a3.5 3.5 0 0 1 3.5 3.5V17M14 4.5a3 3 0 0 1 0 5.8M15 12h.5a3 3 0 0 1 3 3v2"></path></svg>
+                  </span>
+                  <span class="launcher-icon-button launcher-notification" aria-hidden="true">
+                    <svg viewBox="0 0 20 20"><path d="M16 7a6 6 0 0 0-12 0c0 7-2 7-2 9h16c0-2-2-2-2-9M8 19h4"></path></svg><i></i>
+                  </span>
+                  <span class="launcher-profile-button" aria-hidden="true">A<small>⚙</small></span>
+                  <span class="launcher-window-controls" aria-hidden="true"><i>−</i><i>□</i><i>×</i></span>
+                </div>
               </div>
-              <div class="launcher-shell">
-                <aside class="launcher-sidebar">
-                  <div class="launcher-mini-brand">
-                    <img src="assets/alpinoxi-mark.svg" alt="" width="25" height="25">
-                    <span>ALPINOXI</span>
-                  </div>
-                  <div class="launcher-menu">
-                    <div class="launcher-menu-item is-active">
-                      <span class="menu-glyph" aria-hidden="true">⌂</span>
-                      <span data-tr="Ana sayfa" data-en="Home">Ana sayfa</span>
-                    </div>
-                    <div class="launcher-menu-item">
-                      <span class="menu-glyph" aria-hidden="true">◉</span>
-                      <span data-tr="Hesaplar" data-en="Accounts">Hesaplar</span>
-                    </div>
-                    <div class="launcher-menu-item">
-                      <span class="menu-glyph" aria-hidden="true">✦</span>
-                      <span data-tr="Skinler" data-en="Skins">Skinler</span>
-                    </div>
-                  </div>
-                  <div class="launcher-mini-profile">
-                    <span class="mini-profile-avatar">A</span>
-                    <span data-tr="Hesap" data-en="Account">Hesap</span>
-                  </div>
-                </aside>
-                <div class="launcher-main">
-                  <div class="launcher-main-heading">
-                    <div>
-                      <span class="launcher-overline" data-tr="BAŞLATICI" data-en="LAUNCHER">BAŞLATICI</span>
-                      <strong data-tr="Alpinoxi'ye hoş geldin" data-en="Welcome to Alpinoxi">Alpinoxi'ye hoş geldin</strong>
-                    </div>
-                    <span class="launcher-ready">
-                      <i aria-hidden="true"></i>
-                      <span data-tr="HAZIR" data-en="READY">HAZIR</span>
-                    </span>
-                  </div>
-                  <div class="launcher-game-card">
-                    <div class="game-cube" aria-hidden="true">M</div>
-                    <span class="launcher-overline" data-tr="OYUNUNU SEÇ" data-en="YOUR GAME">OYUNUNU SEÇ</span>
-                    <strong>Minecraft</strong>
-                    <span class="game-subtitle" data-tr="Dünyana dönmeye hazır mısın?" data-en="Ready to jump back in?">Dünyana dönmeye hazır mısın?</span>
-                    <div class="mock-play-button">
+              <div class="launcher-home">
+                <div class="launcher-instance">
+                  <span class="launcher-overline" data-tr="ETKİN SÜRÜM" data-en="ACTIVE VERSION">ETKİN SÜRÜM</span>
+                  <strong class="launcher-instance-title">1.8.9 Fabric</strong>
+                  <span class="launcher-instance-subtitle">AlpinoxiClient · Minecraft</span>
+                  <div class="launcher-instance-actions">
+                    <span class="mock-play-button">
+                      <span aria-hidden="true">▶</span>
                       <span data-tr="Oyna" data-en="Play">Oyna</span>
-                      <span aria-hidden="true">→</span>
-                    </div>
+                    </span>
+                    <span class="launcher-settings-button" aria-hidden="true">⚙</span>
                   </div>
-                  <div class="launcher-account-row">
-                    <span class="account-icon microsoft" aria-hidden="true">M</span>
-                    <span data-tr="Seçili hesap" data-en="Selected account">Seçili hesap</span>
-                    <strong>Microsoft</strong>
+                </div>
+                <div class="launcher-recents">
+                  <div class="launcher-recents-heading">
+                    <span data-tr="Son oynananlar" data-en="Recently played">Son oynananlar</span>
+                    <span data-tr="SÜRÜMLER" data-en="VERSIONS">SÜRÜMLER</span>
+                  </div>
+                  <div class="launcher-recent-cards">
+                    <div class="launcher-recent-card">
+                      <span class="recent-version-icon">1.8</span>
+                      <span><strong>1.8.9 Fabric</strong><small data-tr="Minecraft sürümü" data-en="Minecraft version">Minecraft sürümü</small></span>
+                    </div>
+                    <div class="launcher-recent-card launcher-recent-more">
+                      <span class="recent-version-icon">＋</span>
+                      <span><strong data-tr="Daha fazlası" data-en="More versions">Daha fazlası</strong><small data-tr="Tüm sürümlere göz at" data-en="Browse all versions">Tüm sürümlere göz at</small></span>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="card-footer">
-                <span class="card-footer-line"></span>
-                <span data-tr="Seçim senin." data-en="Your choice.">Seçim senin.</span>
-              </div>
             </div>
-            <span class="floating-chip chip-top"><span></span> RUST</span>
-            <span class="floating-chip chip-bottom" data-tr="HESABINI SEÇ" data-en="CHOOSE YOUR ACCOUNT">HESABINI SEÇ</span>
           </div>
         </section>
 

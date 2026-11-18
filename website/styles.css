@@ -319,150 +319,163 @@ h1 > span,
 }
 
 .launcher-card {
-  width: min(410px, 100%);
-  padding: 14px 15px 13px;
+  width: min(480px, 100%);
+  overflow: hidden;
   border: 1px solid rgba(135, 174, 245, 0.24);
   border-radius: 12px;
   background: linear-gradient(145deg, rgba(14, 28, 53, 0.98), rgba(8, 16, 33, 0.98));
   box-shadow: 0 28px 90px rgba(0, 0, 0, 0.42), 0 0 44px rgba(39, 101, 226, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  transform: rotate(-2deg);
 }
 
-.card-topline {
+.launcher-topbar {
   display: flex;
+  min-height: 48px;
   align-items: center;
-  justify-content: space-between;
-  padding-bottom: 12px;
+  gap: 8px;
+  padding: 0 11px;
   border-bottom: 1px solid var(--line);
-  color: #8398bf;
-  font: 9px var(--mono);
-  letter-spacing: 0.08em;
 }
 
-.window-dots {
+.launcher-brand {
   display: flex;
-  gap: 4px;
-}
-
-.window-dots i {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #506078;
-}
-
-.window-dots i:first-child {
-  background: #ff6d74;
-}
-
-.window-dots i:nth-child(2) {
-  background: #ffc667;
-}
-
-.window-dots i:nth-child(3) {
-  background: #66dda4;
-}
-
-.launcher-shell {
-  display: grid;
-  min-height: 263px;
-  grid-template-columns: 96px minmax(0, 1fr);
-}
-
-.launcher-sidebar {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  padding: 13px 9px 10px 0;
-  border-right: 1px solid rgba(151, 185, 241, 0.13);
-}
-
-.launcher-mini-brand {
-  display: flex;
+  flex: 0 0 auto;
   align-items: center;
-  gap: 6px;
-  color: #dce8ff;
+  gap: 5px;
+  color: #e6efff;
   font-size: 8px;
   font-weight: 800;
-  letter-spacing: 0.045em;
+  letter-spacing: 0.02em;
 }
 
-.launcher-mini-brand img {
+.launcher-brand img {
   border-radius: 7px;
   box-shadow: 0 4px 12px rgba(47, 119, 255, 0.24);
 }
 
-.launcher-menu {
-  display: grid;
-  gap: 5px;
-  margin-top: 24px;
+.launcher-nav {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  justify-content: center;
+  gap: 2px;
 }
 
-.launcher-menu-item {
-  display: flex;
-  min-height: 30px;
+.launcher-nav-item {
+  display: inline-flex;
+  min-height: 27px;
   align-items: center;
-  gap: 7px;
+  justify-content: center;
   padding: 0 6px;
   border: 1px solid transparent;
   border-radius: 5px;
   color: #91a4c6;
-  font-size: 8px;
+  font-size: 7px;
+  white-space: nowrap;
 }
 
-.launcher-menu-item.is-active {
+.launcher-nav-item.is-active {
   border-color: rgba(84, 146, 255, 0.2);
   background: linear-gradient(100deg, rgba(56, 115, 230, 0.24), rgba(51, 105, 207, 0.09));
   color: #d6e5ff;
 }
 
-.menu-glyph {
-  width: 14px;
-  color: #8ab8ff;
-  font-size: 12px;
-  text-align: center;
-}
-
-.launcher-mini-profile {
+.launcher-toolbar {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
-  gap: 6px;
-  margin-top: auto;
-  padding-top: 10px;
-  border-top: 1px solid rgba(151, 185, 241, 0.11);
-  color: #a9bad8;
-  font-size: 8px;
-  font-weight: 600;
+  gap: 4px;
 }
 
-.mini-profile-avatar {
+.launcher-icon-button,
+.launcher-profile-button {
   display: grid;
-  width: 20px;
-  height: 20px;
+  width: 19px;
+  height: 22px;
   place-items: center;
+  color: #a8bbdc;
+  font-size: 11px;
+}
+
+.launcher-icon-button svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.4;
+}
+
+.launcher-notification {
+  position: relative;
+}
+
+.launcher-notification i {
+  position: absolute;
+  top: 3px;
+  right: 2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #72aaff;
+}
+
+.launcher-profile-button {
+  position: relative;
+  width: 22px;
+  height: 22px;
   border: 1px solid rgba(121, 172, 255, 0.3);
-  border-radius: 6px;
+  border-radius: 7px;
   background: rgba(67, 126, 243, 0.22);
-  color: #b7d3ff;
+  color: #c4d9ff;
   font: 8px var(--mono);
 }
 
-.launcher-main {
-  min-width: 0;
-  padding: 12px 0 8px 13px;
+.launcher-profile-button small {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  display: grid;
+  width: 10px;
+  height: 10px;
+  place-items: center;
+  border: 1px solid rgba(151, 185, 241, 0.3);
+  border-radius: 4px;
+  background: #142747;
+  color: #a8bbdc;
+  font-size: 6px;
 }
 
-.launcher-main-heading {
+.launcher-window-controls {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 7px;
-  margin-bottom: 12px;
+  gap: 2px;
+  margin-left: 3px;
+  padding-left: 5px;
+  border-left: 1px solid rgba(151, 185, 241, 0.13);
+  color: #9cb0d2;
 }
 
-.launcher-main-heading > div {
+.launcher-window-controls i {
   display: grid;
-  gap: 4px;
+  width: 11px;
+  height: 18px;
+  place-items: center;
+  font: normal 9px var(--mono);
+}
+
+.launcher-home {
+  display: grid;
+  min-height: 277px;
+  grid-template-rows: 1fr auto;
+  padding: 15px 18px 13px;
+}
+
+.launcher-instance {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
 }
 
 .launcher-overline {
@@ -471,194 +484,132 @@ h1 > span,
   letter-spacing: 0.1em;
 }
 
-.launcher-main-heading strong {
-  color: #edf4ff;
-  font-size: 10px;
-  letter-spacing: -0.02em;
-}
-
-.launcher-ready {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: 5px;
-  color: #9bc4ff;
-  font: 7px var(--mono);
-}
-
-.launcher-ready i {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #62a1ff;
-  box-shadow: 0 0 9px rgba(98, 161, 255, 0.8);
-}
-
-.launcher-game-card {
-  position: relative;
-  display: flex;
-  min-height: 167px;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 12px;
-  overflow: hidden;
-  border: 1px solid rgba(103, 154, 255, 0.2);
-  border-radius: 8px;
-  background:
-    radial-gradient(ellipse at 100% 0%, rgba(61, 128, 255, 0.25), transparent 55%),
-    linear-gradient(135deg, rgba(24, 48, 91, 0.93), rgba(12, 27, 55, 0.98));
-}
-
-.launcher-game-card::after {
-  position: absolute;
-  top: -34px;
-  right: -25px;
-  width: 105px;
-  height: 105px;
-  border: 1px solid rgba(133, 179, 255, 0.12);
-  border-radius: 50%;
-  box-shadow: 0 0 0 12px rgba(133, 179, 255, 0.025), 0 0 0 26px rgba(133, 179, 255, 0.02);
-  content: "";
-}
-
-.game-cube {
-  display: grid;
-  width: 28px;
-  height: 28px;
-  margin-bottom: 8px;
-  place-items: center;
-  border: 1px solid rgba(167, 206, 255, 0.35);
-  border-radius: 7px;
-  background: linear-gradient(145deg, #5faaff, #3565df);
-  box-shadow: 0 5px 15px rgba(46, 111, 255, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.24);
-  color: #f3f8ff;
-  font: 700 12px var(--mono);
-}
-
-.launcher-game-card > strong {
-  margin-top: 4px;
+.launcher-instance-title {
+  margin-top: 7px;
   color: #f0f5ff;
-  font-size: 15px;
-  letter-spacing: -0.045em;
+  font-size: 21px;
+  font-weight: 750;
+  letter-spacing: -0.055em;
 }
 
-.game-subtitle {
-  margin-top: 3px;
+.launcher-instance-subtitle {
+  margin-top: 4px;
   color: #a4b7d8;
-  font-size: 8px;
+  font-size: 9px;
 }
 
-.mock-play-button {
-  position: relative;
-  z-index: 1;
+.launcher-instance-actions {
   display: flex;
-  min-height: 28px;
   align-items: center;
-  justify-content: space-between;
-  gap: 22px;
-  margin-top: 10px;
-  padding: 0 10px;
+  gap: 7px;
+  margin-top: 13px;
+}
+
+.mock-play-button,
+.launcher-settings-button {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 13px;
   border: 1px solid rgba(162, 202, 255, 0.3);
   border-radius: 5px;
   background: linear-gradient(105deg, #3479ed, #559fff);
   box-shadow: 0 5px 15px rgba(33, 100, 235, 0.24);
   color: #fff;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 800;
 }
 
-.launcher-account-row {
-  display: grid;
-  grid-template-columns: 22px 1fr auto;
-  align-items: center;
-  gap: 7px;
-  margin-top: 9px;
-  color: #94a8ca;
-  font-size: 8px;
+.launcher-settings-button {
+  width: 30px;
+  padding: 0;
+  border-color: rgba(151, 185, 241, 0.18);
+  background: rgba(255, 255, 255, 0.045);
+  box-shadow: none;
+  color: #c0d0eb;
+  font-size: 12px;
 }
 
-.launcher-account-row strong {
-  color: #d5e2f8;
-  font-size: 8px;
-}
-
-.account-icon {
-  display: grid;
-  width: 22px;
-  height: 22px;
-  flex: 0 0 22px;
-  place-items: center;
-  border-radius: 6px;
-  font: 700 10px var(--mono);
-}
-
-.microsoft {
-  background: rgba(103, 167, 255, 0.14);
-  color: #85b8ff;
-}
-
-.elyby {
-  background: rgba(207, 120, 255, 0.13);
-  color: #d291ff;
-}
-
-.offline {
-  background: rgba(105, 226, 190, 0.12);
-  color: #80e5c4;
-}
-
-.custom {
-  background: rgba(255, 205, 115, 0.12);
-  color: #ffcf82;
-}
-
-.card-footer {
+.launcher-recents-heading {
   display: flex;
   align-items: center;
-  gap: 9px;
-  margin-top: 10px;
-  color: #7e91aa;
-  font: 9px var(--mono);
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: #cbd9f1;
+  font-size: 8px;
+  font-weight: 700;
 }
 
-.card-footer-line {
-  width: 20px;
-  height: 1px;
-  background: var(--cyan);
-}
-
-.floating-chip {
-  position: absolute;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 9px 11px;
-  border: 1px solid rgba(175, 201, 239, 0.16);
-  border-radius: 6px;
-  background: rgba(11, 18, 30, 0.88);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
-  color: #aab9cf;
-  font: 9px var(--mono);
+.launcher-recents-heading > span:last-child {
+  color: #8299be;
+  font: 6px var(--mono);
   letter-spacing: 0.08em;
 }
 
-.chip-top {
-  top: 54px;
-  right: 2px;
+.launcher-recent-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
 }
 
-.chip-top span {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--cyan);
-  box-shadow: 0 0 9px var(--cyan);
+.launcher-recent-card {
+  display: flex;
+  min-width: 0;
+  min-height: 49px;
+  align-items: center;
+  gap: 7px;
+  padding: 6px;
+  border: 1px solid rgba(151, 185, 241, 0.13);
+  border-radius: 6px;
+  background: rgba(18, 35, 64, 0.65);
 }
 
-.chip-bottom {
-  bottom: 47px;
-  left: -9px;
-  color: #8ca4c3;
+.recent-version-icon {
+  display: grid;
+  width: 27px;
+  height: 29px;
+  flex: 0 0 27px;
+  place-items: center;
+  border: 1px solid rgba(110, 163, 255, 0.22);
+  border-radius: 5px;
+  background: linear-gradient(145deg, rgba(56, 112, 220, 0.35), rgba(27, 50, 91, 0.56));
+  color: #bdd5ff;
+  font: 7px var(--mono);
+}
+
+.launcher-recent-card > span:last-child {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.launcher-recent-card strong,
+.launcher-recent-card small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.launcher-recent-card strong {
+  color: #dce7fa;
+  font-size: 7px;
+}
+
+.launcher-recent-card small {
+  color: #8498ba;
+  font-size: 6px;
+}
+
+.launcher-recent-more {
+  background: rgba(13, 27, 49, 0.54);
+}
+
+.launcher-recent-more .recent-version-icon {
+  border-style: dashed;
+  background: transparent;
+  color: #94b9f4;
 }
 
 .feature-strip {
@@ -1334,25 +1285,60 @@ h1 > span,
   }
 
   .launcher-card {
-    width: min(340px, calc(100% - 16px));
+    width: 100%;
   }
 
-  .launcher-shell {
-    grid-template-columns: 82px minmax(0, 1fr);
+  .launcher-topbar {
+    min-height: 43px;
+    gap: 4px;
+    padding: 0 7px;
   }
 
-  .launcher-sidebar {
-    padding-right: 7px;
+  .launcher-brand {
+    gap: 4px;
+    font-size: 6px;
   }
 
-  .launcher-menu-item {
-    gap: 5px;
-    padding: 0 4px;
-    font-size: 7.5px;
+  .launcher-brand img {
+    width: 20px;
+    height: 20px;
   }
 
-  .launcher-main {
-    padding-left: 9px;
+  .launcher-nav {
+    gap: 0;
+  }
+
+  .launcher-nav-item {
+    min-height: 24px;
+    padding: 0 3px;
+    font-size: 6px;
+  }
+
+  .launcher-toolbar {
+    gap: 2px;
+  }
+
+  .launcher-icon-button:first-child {
+    display: none;
+  }
+
+  .launcher-window-controls {
+    gap: 0;
+    margin-left: 1px;
+    padding-left: 3px;
+  }
+
+  .launcher-window-controls i {
+    width: 9px;
+  }
+
+  .launcher-home {
+    min-height: 252px;
+    padding: 12px 13px 10px;
+  }
+
+  .launcher-instance-title {
+    font-size: 19px;
   }
 
   .orbit-one {
@@ -1363,16 +1349,6 @@ h1 > span,
   .orbit-two {
     width: 370px;
     height: 240px;
-  }
-
-  .chip-top {
-    top: 22px;
-    right: -2px;
-  }
-
-  .chip-bottom {
-    bottom: 15px;
-    left: -2px;
   }
 
   .feature-strip {
