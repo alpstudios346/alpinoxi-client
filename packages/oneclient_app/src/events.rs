@@ -517,8 +517,6 @@ pub async fn start_launcher(
         .unwrap_or_default();
 
     let settings = state.settings.read().clone();
-    let auto_update = settings.auto_update;
-
     let mut station = station;
     {
         let mut guard = station.write_channel(AppChannel::Launcher);
@@ -540,7 +538,6 @@ pub async fn start_launcher(
     }
 
     crate::hooks::invalidate_profile_queries().await;
-    crate::updater::spawn_update_check(auto_update, state.services.events.clone());
     Ok(())
 }
 

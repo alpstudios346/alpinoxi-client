@@ -6,6 +6,7 @@ pub mod dependents;
 pub mod error;
 pub mod fabric_version;
 pub mod local_manifest;
+pub mod managed_mods;
 pub mod metadata_cache;
 pub mod provider;
 pub mod release_migration;
@@ -29,18 +30,19 @@ pub use dependencies::{
     DependencyResolution, ModInstallTarget, ResolvedDependency, artifact_mod_id,
     find_mod_for_cluster, pick_version, resolve_required, resolves_dependencies,
 };
+pub use dependents::{
+    DependentPackage, DisableImpact, DisableRoot, disable_impact, ensure_cluster_dependencies,
+};
 pub use error::{PackageError, PackageResult};
 pub use file_identity::{FileIdentity, curseforge_fingerprint};
 pub use local_manifest::{
     JarDependencies, JarManifest, read_jar_bundled_mod_ids, read_jar_dependencies, read_jar_icon,
     read_jar_loader, read_jar_manifest,
 };
+pub use managed_mods::apply_alpinoxi_mod_policy;
 pub use metadata_cache::{
     CachedPackageMeta, cached_project_detail, fetch_package_meta, get_version_cached,
     read_cached_package_meta,
-};
-pub use dependents::{
-    DependentPackage, DisableImpact, DisableRoot, disable_impact, ensure_cluster_dependencies,
 };
 pub use oneclient_common::domain::{ContentType, GameLoader, HashAlgorithm, ProviderId};
 pub use provider::{PackageProvider, PackageProviderRegistry};

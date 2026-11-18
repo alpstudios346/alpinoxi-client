@@ -1,13 +1,15 @@
-<div align="center">
+<p align="center">
+  <img src=".github/media/RepoBanner.png" alt="Alpinoxi Client repository banner" width="100%">
+</p>
 
-<img src=".github/media/RepoBanner.png" alt="Repository Banner" />
+<p align="center">
+  <img src="packages/oneclient_app/assets/logo.svg" alt="Alpinoxi Client logo" width="390">
+</p>
 
-# AlpinoxiClient  |  AlpinoxiLauncher
+<p align="center">
+  <img src="packages/oneclient_app/assets/icons/alpinoxi-mark.svg" alt="Alpinoxi Client icon without wordmark" width="128">
+</p>
 
-Alpinoxi Client, which features open-source code.
+EN: Alpinoxi Client is a lightweight, Rust-based launcher developed by Turkish creators. Although it is referred to as a "client," it currently lacks HUD features, as it is still in its initial version. These missing elements will be added soon.
 
-This is a launcher—a stripped-down, performance-focused version of the "OneClient" launcher, with elements like "Polyplus" permanently removed. It is not affiliated with or verified by Polyfrost and is built entirely upon the Essential mod; consequently, features such as friend lists are handled within the game itself. Furthermore, requirements like a Microsoft account—even for offline mode—have been removed, and support for the ely.by skin system has been added.
-
-This program is unsigned because it is a fork of another application.
-
-If you would like to use the application's source code to compile it manually (since the first beta is not yet ready), you can find all the steps on the Polyfrost GitHub account.
+TR: Alpinoxi Client, Türk'ler tarafından yazılmış Rust tabanlı hafif bir launcher. Şu anda client deniliyor ama maalesefki HUD özellikleri yok, çünkü ilk sürüm. Yakında bu eksiklikler tamamlanacak.

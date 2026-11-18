@@ -1,0 +1,21 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build AlpinoxiClient executable",
+			"type": "shell",
+			"command": "C:\\Users\\User\\.cargo\\bin\\cargo.exe",
+			"args": [
+				"build",
+				"--release",
+				"--bin",
+				"alpinoxi_client"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$rustc"
+			],
+			"group": "build"
+		}
+	]
+}

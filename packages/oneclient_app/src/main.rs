@@ -18,14 +18,14 @@ use oneclient_app::{
 use std::cell::Cell;
 use tokio::runtime::Builder;
 
-struct OneClientApp {
+struct AlpinoxiApp {
     needs_location: bool,
     start_maximized: bool,
     boot_launch: Cell<Option<String>>,
     boot_share: Cell<Option<String>>,
 }
 
-impl App for OneClientApp {
+impl App for AlpinoxiApp {
     fn render(&self) -> impl IntoElement {
         let needs_location = self.needs_location;
 
@@ -58,7 +58,6 @@ impl App for OneClientApp {
 
             if !needs_location {
                 let startup = actions.clone();
-                let rescue_bus = events_bus.clone();
                 spawn_in_window(async move {
                     match events::start_launcher(station, events_bus).await {
                         // Must follow startup `sync_bundles` needs the launcher handle and firing
@@ -71,7 +70,6 @@ impl App for OneClientApp {
                         }
                         Err(err) => {
                             events::report_startup_failure(&station, &err);
-                            oneclient_app::updater::spawn_update_check(false, rescue_bus);
                         }
                     }
                 });
@@ -236,7 +234,7 @@ fn main() {
     let start_maximized = settings.start_maximized;
     let show_tray_icon = settings.show_tray_icon;
 
-    let window_config = WindowConfig::new_app(OneClientApp {
+    let window_config = WindowConfig::new_app(AlpinoxiApp {
         needs_location,
         start_maximized,
         boot_launch: Cell::new(cli.launch.clone()),

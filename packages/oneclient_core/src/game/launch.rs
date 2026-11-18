@@ -61,7 +61,29 @@ pub async fn launch_cluster_with(
     extra_jvm_arg: Option<&str>,
     bundle_budget: Option<Duration>,
 ) -> LauncherResult<LaunchedGame> {
-    tracing::info!(cluster_id, search_for_java, "launching cluster");
+    let offline = crate::launch_mode::resolve(state, cluster_id, false).await?;
+    launch_cluster_with_mode(
+        state,
+        cluster_id,
+        account,
+        search_for_java,
+        extra_jvm_arg,
+        offline,
+        bundle_budget,
+    )
+    .await
+}
+
+pub async fn launch_cluster_with_mode(
+    state: &Arc<LauncherState>,
+    cluster_id: i64,
+    account: &MinecraftAccount,
+    search_for_java: bool,
+    extra_jvm_arg: Option<&str>,
+    offline: bool,
+    bundle_budget: Option<Duration>,
+) -> LauncherResult<LaunchedGame> {
+    tracing::info!(cluster_id, search_for_java, offline, "launching cluster");
 
     // Parallel clusters or not a cluster runs only once a second game would
     // share its directory and its slot in the process manager
@@ -73,13 +95,21 @@ pub async fn launch_cluster_with(
         return Err(GameError::AlreadyRunning(cluster_id).into());
     }
 
-    let result = start(
-        state,
-        cluster_id,
-        account,
-        search_for_java,
-        extra_jvm_arg,
-        bundle_budget,
+    let mut launch_account = account.clone();
+    if offline {
+        launch_account.access_token.clear();
+    }
+    let result = oneclient_net::offline::scope(
+        offline,
+        start(
+            state,
+            cluster_id,
+            &launch_account,
+            search_for_java,
+            extra_jvm_arg,
+            offline,
+            bundle_budget,
+        ),
     )
     .await;
 
@@ -108,6 +138,7 @@ async fn start(
     account: &MinecraftAccount,
     search_for_java: bool,
     extra_jvm_arg: Option<&str>,
+    offline: bool,
     bundle_budget: Option<Duration>,
 ) -> LauncherResult<LaunchedGame> {
     let events = state.services.events.clone();
@@ -188,7 +219,8 @@ async fn start(
         format!("Launching {}", existing.name),
     );
 
-    if existing.uses_bundles()
+    if !offline
+        && existing.uses_bundles()
         && let Err(err) = crate::clusters::apply_bundle_java_override(
             state,
             cluster_id,
@@ -203,6 +235,8 @@ async fn start(
 
     let cluster = if existing.stage == ClusterStage::Ready {
         existing
+    } else if offline {
+        return Err(GameError::OfflineMissing("the installed instance".into()).into());
     } else {
         stage(LaunchStage::Downloading);
         match crate::clusters::prepare_cluster_locked(
@@ -223,7 +257,8 @@ async fn start(
             }
         }
     };
-    if cluster.uses_bundles()
+    if !offline
+        && cluster.uses_bundles()
         && let Err(err) = oneclient_content::bundles::install_cluster_bundles(
             cluster_id,
             state.bundles.as_ref(),
@@ -235,11 +270,27 @@ async fn start(
     {
         tracing::warn!(cluster_id, error = %err, "failed to install bundle content");
     }
-    let cluster = match crate::clusters::auto_update_loader(state, &cluster).await {
-        Ok(updated) => updated.unwrap_or(cluster),
-        Err(err) => {
-            tracing::warn!(cluster_id, error = %err, "failed to update the loader");
-            cluster
+    if let Err(err) = oneclient_content::packages::apply_alpinoxi_mod_policy(
+        cluster_id,
+        offline || account.is_offline() || account.is_elyby(),
+        offline,
+        &state.services.content(),
+    )
+    .await
+    {
+        progress.finish();
+        stage(LaunchStage::Exited);
+        return Err(err.into());
+    }
+    let cluster = if offline {
+        cluster
+    } else {
+        match crate::clusters::auto_update_loader(state, &cluster).await {
+            Ok(updated) => updated.unwrap_or(cluster),
+            Err(err) => {
+                tracing::warn!(cluster_id, error = %err, "failed to update the loader");
+                cluster
+            }
         }
     };
 
@@ -311,6 +362,8 @@ async fn start(
         .await?
     {
         runtime
+    } else if offline {
+        return Err(GameError::OfflineMissing("a compatible Java runtime".into()).into());
     } else {
         let major = version_info
             .java_version
@@ -327,10 +380,12 @@ async fn start(
     // Stats every library and the asset tree, the same work `plan_downloads`
     // already keeps off the runtime threads. `block_in_place` because
     // `VersionInfo` is not `Clone` and the sweep only reads it
-    let missing = tokio::task::block_in_place(|| {
-        game_files_missing(&version_info, &java.os_arch, updated)
-    });
+    let missing =
+        tokio::task::block_in_place(|| game_files_missing(&version_info, &java.os_arch, updated));
     match missing {
+        Ok(true) if offline => {
+            return Err(GameError::OfflineMissing("required game files".into()).into());
+        }
         Ok(true) => {
             tracing::info!(cluster_id, "missing game files; repairing");
             let _ = state
@@ -418,13 +473,30 @@ async fn start(
 
     let arg_map = version_info.arguments.clone().unwrap_or_default();
 
-    let classpaths = arguments::classpaths(
+    let mut classpaths = arguments::classpaths(
         &libraries,
         &version_info.libraries,
         &client_jar,
         &java.os_arch,
         updated,
     )?;
+
+    let local_skin = crate::local_skin::launch_files(account).await?;
+    if let Some((jar, _, _)) = &local_skin {
+        classpaths.push(if cfg!(windows) { ';' } else { ':' });
+        classpaths.push_str(&jar.to_string_lossy());
+    }
+    let preview_agent =
+        if account.authlib_url().is_some() && state.settings.read().preview_compatibility {
+            super::elyby::preview_jar(&cluster.mc_version).await?
+        } else {
+            None
+        };
+    if let Some(jar) = &preview_agent {
+        // Fabric's isolated mod loader must be able to resolve the preview bridge.
+        classpaths.push(if cfg!(windows) { ';' } else { ':' });
+        classpaths.push_str(&jar.to_string_lossy());
+    }
 
     let mut jvm_args = arguments::java_arguments(
         arg_map.get(&ArgumentType::Jvm).map(Vec::as_slice),
@@ -439,6 +511,23 @@ async fn start(
         &java.os_arch,
         java.major,
     )?;
+
+    if let Some((jar, skin, slim)) = local_skin {
+        jvm_args.push(format!("-javaagent:{}", jar.display()));
+        jvm_args.push("-Doneforall.localSkin.offlineAccount=true".into());
+        jvm_args.push(format!("-Doneforall.localSkin.path={}", skin.display()));
+        jvm_args.push(format!("-Doneforall.localSkin.slim={slim}"));
+        jvm_args.push(format!("-Doneforall.localSkin.uuid={}", account.game_id()));
+        jvm_args.push(format!(
+            "-Doneforall.localSkin.username={}",
+            account.username
+        ));
+        jvm_args.push(format!(
+            "-Doneforall.localSkin.ornithe189={}",
+            cluster.mc_version == "1.8.9"
+                && cluster.mc_loader == oneclient_common::GameLoader::Ornithe
+        ));
+    }
 
     let mods_dir = paths::cluster_mods_dir(&cluster.folder_name)?;
     if let Some(arg) = crate::game::mods_folder_argument(
@@ -460,13 +549,22 @@ async fn start(
     );
 
     oneclient_cluster::logs::censor_username(&account.username);
+    if let Some(auth_url) = account.authlib_url() {
+        jvm_args.push(super::elyby::java_argument(state, auth_url).await?);
+        if let Some(jar) = preview_agent {
+            jvm_args.push(format!("-javaagent:{}", jar.display()));
+            if offline {
+                jvm_args.push("-Doneforall.preview.offline=true".into());
+            }
+        }
+    }
 
     let mut mc_args = arguments::minecraft_arguments(
         arg_map.get(&ArgumentType::Game).map(Vec::as_slice),
         version_info.minecraft_arguments.as_deref(),
         &account.access_token,
         &account.username,
-        account.id,
+        account.game_id(),
         &version.id,
         &version_info.asset_index.id,
         &cwd,
@@ -475,6 +573,13 @@ async fn start(
         profile.resolution.unwrap_or_default(),
         &java.os_arch,
     )?;
+    if account.authlib_url().is_some() {
+        for index in 1..mc_args.len() {
+            if mc_args[index - 1] == "--userType" {
+                mc_args[index] = "mojang".into();
+            }
+        }
+    }
     arguments::append_profile_game_arguments(
         &mut mc_args,
         profile.force_fullscreen,
@@ -516,7 +621,7 @@ async fn start(
         .current_dir(&cwd);
 
     let header = format!(
-        "OneClient {} · {} · {version_name} · Java {}\n\n{}\n\n",
+        "OneForAllLauncher {} · {} · {version_name} · Java {}\n\n{}\n\n",
         env!("CARGO_PKG_VERSION"),
         cluster.name,
         java.major,

@@ -32,7 +32,6 @@ pub mod theme;
 mod transfer;
 pub mod translations;
 mod ui;
-pub mod updater;
 pub(crate) mod utils;
 mod view;
 

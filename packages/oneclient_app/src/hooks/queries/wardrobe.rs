@@ -660,7 +660,7 @@ async fn invalidate_after(action: &WardrobeAction) {
         WardrobeAction::Equip { .. } | WardrobeAction::ParticleColor { .. } => {
             (false, true, true, false, false)
         }
-        WardrobeAction::MojangCape { .. } => (true, false, true, false, false),
+        WardrobeAction::MojangCape { .. } => (true, false, false, false, false),
         WardrobeAction::WearSkin { .. }
         | WardrobeAction::AddSkinFile { .. }
         | WardrobeAction::AddSkinUrl { .. } => (true, false, true, true, false),
@@ -1151,14 +1151,11 @@ async fn run_action(account: &MinecraftAccount, action: &WardrobeAction) -> Resu
             }
             .map_err(mojang_write_failed(account.id))?;
             remember_profile(account, profile.clone()).await;
-            Ok(synced(
-                sync_active_outfit(account, &profile, LookChange::Cape(cape.clone())).await,
-                if cape.is_some() {
-                    tf("oneclient.wardrobe.cape.equipped", &[&name])
-                } else {
-                    tf("oneclient.wardrobe.cape.removed", &[&name])
-                },
-            ))
+            Ok(if cape.is_some() {
+                tf("oneclient.wardrobe.cape.equipped", &[&name])
+            } else {
+                tf("oneclient.wardrobe.cape.removed", &[&name])
+            })
         }
         WardrobeAction::WearSkin {
             url, slim, name, ..

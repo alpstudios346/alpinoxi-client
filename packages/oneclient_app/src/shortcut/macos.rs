@@ -89,21 +89,21 @@ mod tests {
 
     #[test]
     fn an_installed_binary_finds_its_bundle() {
-        let exe = PathBuf::from("/Applications/OneClient.app/Contents/MacOS/oneclient_app");
+        let exe = PathBuf::from("/Applications/AlpinoxiClient.app/Contents/MacOS/alpinoxi_client");
         assert_eq!(
             bundle_root(&exe),
-            Some(PathBuf::from("/Applications/OneClient.app")),
+            Some(PathBuf::from("/Applications/AlpinoxiClient.app")),
         );
     }
 
     #[test]
     fn a_bare_binary_has_no_bundle() {
         assert_eq!(
-            bundle_root(&PathBuf::from("/usr/local/bin/oneclient_app")),
+            bundle_root(&PathBuf::from("/usr/local/bin/alpinoxi_client")),
             None
         );
         assert_eq!(
-            bundle_root(&PathBuf::from("/tmp/target/debug/oneclient_app")),
+            bundle_root(&PathBuf::from("/tmp/target/debug/alpinoxi_client")),
             None,
         );
     }

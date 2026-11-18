@@ -7,7 +7,7 @@ use crate::components::{
     MicrosoftJavaPromptOverlay,
     ModpackConfirmPopup, NotificationCenter, OptionalModsPopup, PackageUpdatePopup,
     ReleaseMigrationPopup, SplashCurtain, StatusBar, Toasts, TooltipHost, UnpublishedImportPopup,
-    UpdatePromptOverlay, use_provide_tooltips,
+    use_provide_tooltips,
 };
 use crate::hooks::{SplashState, use_provide_overlay_claims, use_provide_splash};
 use crate::layout::{HomeArtPrefetch, PendingLaunchDriver, use_ipc_commands};
@@ -44,7 +44,6 @@ impl Component for RootLayout {
             .child(AccountSwitcher)
             .child(ControlCenter)
             .child(Toasts)
-            .child(UpdatePromptOverlay)
             .child(JavaPromptOverlay)
             .child(MicrosoftJavaPromptOverlay)
             // Must stay last it renders whatever the overlays above did not claim

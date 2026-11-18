@@ -214,8 +214,6 @@ pub struct VersionSummary {
     pub file_size: u64,
     #[serde(default)]
     pub dependencies: Vec<VersionDependency>,
-    #[serde(default)]
-    pub blocked: bool,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]

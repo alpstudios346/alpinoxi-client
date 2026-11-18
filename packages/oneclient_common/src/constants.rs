@@ -1,6 +1,6 @@
 pub const DUMMY_REPLACE_NEWLINE: &str = "\n";
 
-pub const MICROSOFT_CLIENT_ID: &str = "9419b7ee-1448-4d1b-b52a-550d8f36ab56";
+pub const MICROSOFT_CLIENT_ID: &str = "00000000402b5328";
 pub const MINECRAFT_SCOPES: &str = "XboxLive.SignIn XboxLive.offline_access";
 pub const CURSEFORGE_API_KEY: &str = "$2a$10$6utA1UNSmFPrE/Lh7b7ndeeGmiOkjKNY8kpFB0fsmE/d42ZAfFgCe";
 pub const DISCORD_CLIENT_ID: &str = "1426999264633946334";
@@ -22,11 +22,9 @@ pub const CRASH_DATA_URL: &str =
 
 pub const DISCORD_URL: &str = "https://discord.com/invite/polyfrost";
 
-pub const SENTRY_DSN: &str = match option_env!("ONECLIENT_SENTRY_DSN") {
+pub const SENTRY_DSN: &str = match option_env!("ONEFORALL_SENTRY_DSN") {
     Some(dsn) => dsn,
-    None => {
-        "https://e7dff7e07427e1a28b9212cfcc8ddc1e@o4511714343124992.ingest.us.sentry.io/4511714354135040"
-    }
+    None => "",
 };
 
 pub const LAUNCHER_LABEL: &str = concat!(

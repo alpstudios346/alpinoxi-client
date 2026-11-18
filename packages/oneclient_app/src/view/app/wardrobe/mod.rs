@@ -1,5 +1,7 @@
+mod local;
+mod minecraft;
 mod page;
 mod parts;
 mod preview;
 
-pub use page::Wardrobe;
+pub use minecraft::Wardrobe;

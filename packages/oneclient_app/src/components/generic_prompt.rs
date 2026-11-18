@@ -11,11 +11,8 @@ use crate::microsoft_java::MICROSOFT_JAVA_CHOICE_INSTALL;
 use crate::notifications::PendingPromptView;
 use crate::theme::{colors, rounded, text_size};
 use crate::ui::border_all_color;
-use crate::updater::UPDATE_CHOICE_INSTALL;
-
 fn claimed_elsewhere(prompt: &PendingPromptView) -> bool {
     prompt.has_choice(JAVA_CHOICE_DOWNLOAD)
-        || prompt.has_choice(UPDATE_CHOICE_INSTALL)
         || prompt.has_choice(MICROSOFT_JAVA_CHOICE_INSTALL)
 }
 
@@ -168,7 +165,6 @@ mod tests {
     fn the_rich_overlays_keep_their_own_prompts() {
         for id in [
             JAVA_CHOICE_DOWNLOAD,
-            UPDATE_CHOICE_INSTALL,
             MICROSOFT_JAVA_CHOICE_INSTALL,
         ] {
             assert!(

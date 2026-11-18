@@ -27,7 +27,23 @@ pub const POLYPLUS: EssentialPackage = EssentialPackage {
     remove_body: || t("oneclient.essential.polyplus.remove_body"),
 };
 
-pub const ESSENTIAL_PACKAGES: &[EssentialPackage] = &[POLYPLUS];
+pub const ESSENTIAL: EssentialPackage = EssentialPackage {
+    provider: ProviderId::Modrinth,
+    project_id: "k2ZPuTBm",
+    name: "Essential",
+    disable_body: || t("oneclient.essential.essential.disable_body"),
+    remove_body: || t("oneclient.essential.essential.remove_body"),
+};
+
+pub const CUSTOM_SKIN_LOADER: EssentialPackage = EssentialPackage {
+    provider: ProviderId::Modrinth,
+    project_id: "idMHQ4n2",
+    name: "CustomSkinLoader",
+    disable_body: || t("oneclient.essential.customskinloader.disable_body"),
+    remove_body: || t("oneclient.essential.customskinloader.remove_body"),
+};
+
+pub const ESSENTIAL_PACKAGES: &[EssentialPackage] = &[ESSENTIAL, CUSTOM_SKIN_LOADER];
 
 pub fn lookup(provider: ProviderId, package_id: &str) -> Option<&'static EssentialPackage> {
     ESSENTIAL_PACKAGES
@@ -40,13 +56,18 @@ mod tests {
     use super::*;
 
     #[test]
-    fn polyplus_is_essential_on_modrinth_only() {
+    fn managed_mods_are_essential_on_modrinth_only() {
         assert_eq!(
-            lookup(ProviderId::Modrinth, "Iw9mZi4a").map(|p| p.name),
-            Some("Poly+")
+            lookup(ProviderId::Modrinth, "k2ZPuTBm").map(|p| p.name),
+            Some("Essential")
         );
-        assert!(lookup(ProviderId::CurseForge, "Iw9mZi4a").is_none());
-        assert!(lookup(ProviderId::Local, "Iw9mZi4a").is_none());
+        assert_eq!(
+            lookup(ProviderId::Modrinth, "idMHQ4n2").map(|p| p.name),
+            Some("CustomSkinLoader")
+        );
+        assert!(lookup(ProviderId::CurseForge, "k2ZPuTBm").is_none());
+        assert!(lookup(ProviderId::Local, "k2ZPuTBm").is_none());
+        assert!(lookup(ProviderId::Modrinth, "Iw9mZi4a").is_none());
     }
 
     #[test]

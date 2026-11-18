@@ -6,12 +6,11 @@ resolver = "3"
 
 [workspace.package]
 authors = [
-  "Polyfrost",
-  "Polyfrost Contributors",
+  "Alpinoxi contributors",
 ]
 documentation = "https://github.com/Polyfrost/OneLauncher"
 edition = "2024"
-homepage = "https://polyfrost.org/projects/oneclient"
+homepage = "https://github.com/Polyfrost/OneLauncher"
 license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/Polyfrost/OneLauncher"

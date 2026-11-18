@@ -790,7 +790,9 @@ pub async fn download_version_info(
     };
 
     if let Some(cached) = cached {
-        if oneclient_net::status::current().online
+        if loader.is_some()
+            && !oneclient_net::offline::active()
+            && oneclient_net::status::current().online
             && VERSION_INFO_REFRESHED.lock().unwrap().insert(path.clone())
         {
             let ctx = ctx.clone();
@@ -825,7 +827,9 @@ pub async fn download_version_info(
 
     let info = fetch_version_info(ctx, progress, version, loader, &version_id).await?;
     polyio::write_json_atomic(&path, &info).await?;
-    VERSION_INFO_REFRESHED.lock().unwrap().insert(path);
+    if loader.is_some() {
+        VERSION_INFO_REFRESHED.lock().unwrap().insert(path);
+    }
     Ok(info)
 }
 

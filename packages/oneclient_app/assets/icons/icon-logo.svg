@@ -1,7 +1,23 @@
-<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M35.0354 10.6199H30.9125C26.1812 10.6199 21.8092 13.1414 19.4435 17.2347L10.2109 33.2097C9.89473 33.7567 9.62082 34.3208 9.38916 34.8972L22.5061 32.4833C27.8025 31.5085 31.9468 27.3686 32.9225 22.0775L35.0354 10.6199Z" fill="currentColor"/>
-<path d="M9.37051 44.7052C9.60608 45.2979 9.8862 45.8775 10.2109 46.4393L19.4435 62.4143C21.8092 66.5076 26.1812 69.0292 30.9125 69.0292H35.0434L32.9225 57.5283C31.9468 52.2373 27.8025 48.0973 22.5061 47.1225L9.37051 44.7052Z" fill="currentColor"/>
-<path d="M45.456 69.0292H49.3779C54.1092 69.0292 58.4812 66.5076 60.8469 62.4143L70.0795 46.4393C70.3966 45.8907 70.6712 45.3249 70.9033 44.7467L57.9933 47.1225C52.6968 48.0973 48.5526 52.2373 47.5769 57.5283L45.456 69.0292Z" fill="currentColor"/>
-<path d="M70.8845 34.8557C70.6564 34.2937 70.3881 33.7436 70.0795 33.2097L60.8469 17.2347C58.4812 13.1414 54.1092 10.6199 49.3779 10.6199H45.4639L47.5769 22.0775C48.5526 27.3686 52.6968 31.5085 57.9933 32.4833L70.8845 34.8557Z" fill="currentColor"/>
-<path d="M40.1206 11.766C40.1379 11.6124 40.3614 11.6124 40.3787 11.766L41.3999 20.8379C42.4408 30.0839 49.7344 37.3875 58.9875 38.4493L69.66 39.6741C69.8134 39.6917 69.8134 39.9142 69.66 39.9318L58.9875 41.1565C49.7345 42.2183 42.4408 49.5219 41.3999 58.768L40.3787 67.8398C40.3614 67.9935 40.1379 67.9935 40.1206 67.8398L39.1009 58.7822C38.0593 49.5296 30.7564 42.2232 21.4959 41.1688L10.6321 39.9318C10.4786 39.9143 10.4786 39.6915 10.6321 39.674L21.4958 38.437C30.7564 37.3826 38.0593 30.0762 39.1009 20.8236L40.1206 11.766Z" fill="currentColor"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">AlpinoxiClient mountain and launch mark</title>
+  <defs>
+    <linearGradient id="background" x1="52" y1="28" x2="458" y2="484" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E9F0FC"/>
+    </linearGradient>
+    <linearGradient id="mountain" x1="256" y1="88" x2="256" y2="420" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5DE6FF"/>
+      <stop offset=".48" stop-color="#27A8EF"/>
+      <stop offset="1" stop-color="#3159D8"/>
+    </linearGradient>
+    <linearGradient id="play" x1="240" y1="281" x2="284" y2="333" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2196E8"/>
+      <stop offset="1" stop-color="#52D9FA"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="488" height="488" rx="124" fill="url(#background)"/>
+  <rect x="13" y="13" width="486" height="486" rx="123" fill="none" stroke="#C7D6EE" stroke-width="2"/>
+  <path d="M78 420 215 123 225 107Q236 88 256 88t31 19l10 16 137 297h-90l-88-198-88 198H78Z" fill="url(#mountain)"/>
+  <path d="m229 122 27-31 27 31-19-7-8 13-8-13-19 7Z" fill="#F4FDFF"/>
+  <path d="m240 281 44 26-44 26v-52Z" fill="url(#play)"/>
 </svg>

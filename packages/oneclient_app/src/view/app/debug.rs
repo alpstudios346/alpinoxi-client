@@ -98,11 +98,6 @@ impl Component for Debug {
                     ))
                     .child(divider())
                     .child(section(
-                        "Launcher Auto Update",
-                        vec![LauncherUpdateSimulator.into_element()],
-                    ))
-                    .child(divider())
-                    .child(section(
                         "Connectivity Status Bar",
                         vec![StatusBarSimulator.into_element()],
                     ))
@@ -402,7 +397,6 @@ struct ClusterList;
 
 impl Component for ClusterList {
     fn render(&self) -> impl IntoElement {
-        let dispatch = use_dispatch();
         let active_id = use_active_cluster_id();
         let clusters = settled_or_loading(&use_clusters()).unwrap_or_default();
 
@@ -419,7 +413,6 @@ impl Component for ClusterList {
 
         for cluster in clusters {
             let cluster_id = cluster.id;
-            let launch = dispatch.clone();
             let mut active_id = active_id;
             let loader_version = cluster
                 .mc_loader_version
@@ -460,10 +453,13 @@ impl Component for ClusterList {
                             .horizontal()
                             .spacing(8.)
                             .child(
-                                Button::new()
-                                    .primary()
-                                    .on_press(move |_| launch.launch_cluster(cluster_id))
-                                    .text("Launch"),
+                                crate::components::InstanceLaunchButton {
+                                    cluster_id,
+                                    button: Button::new().primary(),
+                                    label: crate::i18n::t("oneclient.app.launch.launch"),
+                                    enabled: true,
+                                    grow: false,
+                                },
                             )
                             .child(
                                 Button::new()
@@ -980,59 +976,6 @@ impl Component for ReleaseMigrationSimulator {
                             .on_press(move |_| {
                                 if let Some(id) = selected_id {
                                     queue.queue_release_migration(id);
-                                }
-                            }),
-                    ),
-            )
-            .into_element()
-    }
-}
-
-#[derive(PartialEq)]
-struct LauncherUpdateSimulator;
-
-impl Component for LauncherUpdateSimulator {
-    fn render(&self) -> impl IntoElement {
-        rect()
-            .vertical()
-            .width(Size::fill())
-            .spacing(10.)
-            .child(
-                label()
-                    .text("Drives the real auto-update UX (prompt → download progress → \"restart to apply\") against a fake release, with no network or disk. \"Simulate Manual Update Toast\" shows the notify-only toast that non-AppImage Linux installs get. \"Check for Updates Now\" runs the real check against the release feed.")
-                    .font_size(text_size(13.))
-                    .color(colors::fg_secondary()),
-            )
-            .child(
-                rect()
-                    .horizontal()
-                    .width(Size::fill())
-                    .spacing(12.)
-                    .child(
-                        Button::new()
-                            .primary()
-                            .child(Icon::new(IconType::DownloadCloud02).size(16.))
-                            .text("Simulate Auto Update")
-                            .on_press(|_| crate::updater::spawn_simulated_update()),
-                    )
-                    .child(
-                        Button::new()
-                            .secondary()
-                            .child(Icon::new(IconType::LinkExternal01).size(16.))
-                            .text("Simulate Manual Update Toast")
-                            .on_press(|_| crate::updater::simulate_manual_update_toast()),
-                    )
-                    .child(
-                        Button::new()
-                            .secondary()
-                            .child(Icon::new(IconType::RefreshCw01).size(16.))
-                            .text("Check for Updates Now")
-                            .on_press(|_| {
-                                if let Ok(state) = crate::launcher::state() {
-                                    crate::updater::spawn_update_check(
-                                        false,
-                                        state.services.events.clone(),
-                                    );
                                 }
                             }),
                     ),
