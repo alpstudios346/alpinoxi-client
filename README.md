@@ -2,7 +2,7 @@
   <img src=".github/media/RepoBanner.png" alt="Alpinoxi Client repository banner" width="100%">
 </p>
 
-## 🇬🇧 English
+## English
 
 ### About Alpinoxi Client
 
@@ -20,7 +20,7 @@ The project is still in development, and **the first beta has not been published
 
 For source-build guidance, see the [Polyfrost OneLauncher repository](https://github.com/Polyfrost/OneLauncher). Contributions and fork ideas are welcome; proposed changes are reviewed for project scope and licensing.
 
-## 🇹🇷 Türkçe
+## Türkçe
 
 ### Alpinoxi Client hakkında
 
