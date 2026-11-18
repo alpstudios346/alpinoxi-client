@@ -708,6 +708,31 @@ h1 > span,
   letter-spacing: 0.025em;
 }
 
+.skin-runtime-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin: 13px 0 0;
+  padding: 12px 13px;
+  border: 1px solid rgba(133, 166, 218, 0.13);
+  border-radius: 7px;
+  background: linear-gradient(110deg, rgba(102, 228, 255, 0.055), rgba(99, 136, 255, 0.035));
+  color: #a4b4ca;
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.runtime-badge {
+  flex: 0 0 auto;
+  padding: 4px 6px;
+  border: 1px solid rgba(102, 228, 255, 0.24);
+  border-radius: 4px;
+  background: rgba(102, 228, 255, 0.07);
+  color: #9cecff;
+  font: 8px var(--mono);
+  letter-spacing: 0.04em;
+}
+
 .skin-preview {
   position: relative;
   width: min(100%, 360px);
@@ -868,6 +893,61 @@ h1 > span,
   border-color: var(--line);
   background: transparent;
   color: #74839a;
+}
+
+.microsoft-skin-note {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border: 1px solid rgba(167, 193, 229, 0.14);
+  border-radius: 9px;
+  background: linear-gradient(100deg, rgba(17, 28, 44, 0.78), rgba(11, 18, 30, 0.72));
+}
+
+.microsoft-skin-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  place-items: center;
+  border: 1px solid rgba(102, 160, 255, 0.22);
+  border-radius: 10px;
+  background: rgba(102, 160, 255, 0.09);
+  color: #91bbff;
+  font: 10px var(--mono);
+}
+
+.microsoft-skin-copy {
+  flex: 1;
+}
+
+.microsoft-skin-copy .eyebrow {
+  margin: 0 0 5px;
+  color: #92a5bf;
+  font-size: 9px;
+}
+
+.microsoft-skin-copy > p:last-child {
+  margin: 0;
+  color: #b1bfd2;
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.microsoft-skin-link {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  color: #9deaff;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.microsoft-skin-link:hover {
+  color: #d3f8ff;
 }
 
 @keyframes avatar-float {
@@ -1165,6 +1245,20 @@ h1 > span,
 
   .skin-preview {
     width: min(100%, 360px);
+  }
+
+  .microsoft-skin-note {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 15px;
+  }
+
+  .microsoft-skin-copy {
+    flex-basis: calc(100% - 55px);
+  }
+
+  .microsoft-skin-link {
+    margin-left: 52px;
   }
 
   .account-card {
