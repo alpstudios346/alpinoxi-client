@@ -13,7 +13,6 @@ path = "src/main.rs"
 
 [dependencies]
 alpinoxi_core.workspace = true
-alpinoxi_ingame.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 tao.workspace = true

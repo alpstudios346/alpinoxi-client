@@ -63,11 +63,16 @@ pub const SNAPSHOT_VERSION: u32 = 1;
 impl BridgeSnapshot {
     /// Builds the snapshot from the settings the launcher is editing right now.
     pub fn from_settings(settings: &Settings, chat_channel: &str) -> Self {
-        let heap_mib = alpinoxi_core::launcher::LaunchPlan::from_profile(
-            settings.memory,
-            settings.system_memory_mib,
+        // `LaunchPlan` reports the heap as a `u32`; the snapshot says `u16`,
+        // which covers every machine that can run the game.
+        let heap_mib = u16::try_from(
+            alpinoxi_core::launcher::LaunchPlan::from_profile(
+                settings.memory,
+                settings.system_memory_mib,
+            )
+            .mebibytes,
         )
-        .mebibytes;
+        .unwrap_or(u16::MAX);
 
         Self {
             version: SNAPSHOT_VERSION,

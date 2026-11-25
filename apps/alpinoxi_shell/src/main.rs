@@ -37,15 +37,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // The whole page is inlined, so the window opens with no file next to the
     // exe to find, and no relative path that can break.
-    let webview = WebViewBuilder::new(&window)
+    let webview = WebViewBuilder::new()
         .with_html(Cow::Borrowed(page::INDEX_HTML))
         .with_devtools(cfg!(debug_assertions))
-        .with_ipc_handler(move |message: String| {
+        // wry hands the page's `window.ipc.postMessage(...)` over as a request
+        // whose body is the JSON command.
+        .with_ipc_handler(move |request: wry::http::Request<String>| {
             // Every command goes through one door: the page can ask questions
             // and change settings, and never anything else.
-            let _ = state.handle(&message);
+            let _ = state.handle(request.body());
         })
-        .build()?;
+        .build(&window)?;
 
     event_loop.run(move |event, _, control_flow| {
         *control_flow = ControlFlow::Wait;
@@ -57,17 +59,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 state.save();
                 *control_flow = ControlFlow::Exit;
             }
-            Event::WindowEvent {
-                event: WindowEvent::Resized(_),
-                ..
-            } => {
-                let _ = webview.set_bounds(wry::Rect {
-                    position: wry::dpi::Position::Logical(wry::dpi::LogicalPosition::new(0.0, 0.0)),
-                    size: wry::dpi::Size::Physical(
-                        window.inner_size().to_physical(window.scale_factor()),
-                    ),
-                });
-            }
+            // The webview fills the window, so a resize needs no work: wry
+            // keeps it pinned to the client area.
             _ => (),
         }
     });
