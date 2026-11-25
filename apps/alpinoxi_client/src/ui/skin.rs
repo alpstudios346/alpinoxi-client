@@ -36,7 +36,11 @@ fn preview_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
         let size = Vec2::new(ui.available_width(), 320.0);
         let (rect, _) = ui.allocate_exact_size(size, egui::Sense::hover());
         let painter = ui.painter();
-        painter.rect_filled(rect, CornerRadius::same(14.0), Color32::from_rgb(9, 18, 34));
+        painter.rect_filled(
+            rect,
+            CornerRadius::same(14.0 as u8),
+            Color32::from_rgb(9, 18, 34),
+        );
         let checker = 12.0;
         let mut y = rect.top();
         let mut row = 0;
@@ -164,7 +168,7 @@ fn options_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
         egui::Frame::new()
             .fill(theme::BG_PANEL)
             .stroke(Stroke::new(1.0, theme::BORDER))
-            .corner_radius(CornerRadius::same(10.0))
+            .corner_radius(CornerRadius::same(10.0 as u8))
             .inner_margin(egui::Margin::same(12))
             .show(ui, |ui| {
                 ui.set_width(ui.available_width());

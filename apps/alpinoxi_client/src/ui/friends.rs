@@ -73,7 +73,7 @@ fn list_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
             };
             egui::Frame::new()
                 .fill(theme::BG_PANEL)
-                .corner_radius(CornerRadius::same(10.0))
+                .corner_radius(CornerRadius::same(10.0 as u8))
                 .inner_margin(egui::Margin::symmetric(10, 8))
                 .show(ui, |ui| {
                     ui.set_width(ui.available_width());
@@ -156,7 +156,7 @@ fn chat_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
 
         egui::Frame::new()
             .fill(theme::BG_PANEL)
-            .corner_radius(CornerRadius::same(10.0))
+            .corner_radius(CornerRadius::same(10.0 as u8))
             .inner_margin(egui::Margin::same(10))
             .show(ui, |ui| {
                 ui.set_width(ui.available_width());

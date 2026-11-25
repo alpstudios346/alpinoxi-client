@@ -24,7 +24,7 @@ pub fn card(ui: &mut egui::Ui, add: impl FnOnce(&mut egui::Ui)) {
     egui::Frame::new()
         .fill(theme::BG_CARD)
         .stroke(Stroke::new(1.0, theme::BORDER))
-        .corner_radius(CornerRadius::same(theme::RADIUS))
+        .corner_radius(CornerRadius::same(theme::RADIUS_U8))
         .inner_margin(egui::Margin::same(16))
         .show(ui, |ui| {
             ui.set_width(width - 34.0);
@@ -54,7 +54,7 @@ pub fn primary_button(ui: &mut egui::Ui, text: &str, size: Vec2) -> Response {
             .strong(),
     )
     .fill(theme::ACCENT)
-    .corner_radius(CornerRadius::same(10.0));
+    .corner_radius(CornerRadius::same(10.0 as u8));
     ui.add_sized(size, button)
 }
 
@@ -63,7 +63,7 @@ pub fn ghost_button(ui: &mut egui::Ui, text: &str, size: Vec2) -> Response {
     let button = egui::Button::new(RichText::new(text).color(theme::TEXT))
         .fill(Color32::TRANSPARENT)
         .stroke(Stroke::new(1.0, theme::BORDER))
-        .corner_radius(CornerRadius::same(10.0));
+        .corner_radius(CornerRadius::same(10.0 as u8));
     ui.add_sized(size, button)
 }
 
@@ -79,7 +79,7 @@ pub fn pill(ui: &mut egui::Ui, text: &str, colour: Color32) {
     let (rect, _) = ui.allocate_exact_size(galley.size() + padding * 2.0, Sense::hover());
     ui.painter().rect_filled(
         rect,
-        CornerRadius::same(7.0),
+        CornerRadius::same(7.0 as u8),
         Color32::from_rgba_unmultiplied(colour.r(), colour.g(), colour.b(), 34),
     );
     ui.painter().galley(rect.min + padding, galley, colour);

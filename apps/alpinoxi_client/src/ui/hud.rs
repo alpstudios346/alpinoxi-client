@@ -108,7 +108,7 @@ pub fn show(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
         let painter = ui.painter();
         painter.rect_filled(
             rect,
-            CornerRadius::same(10.0),
+            CornerRadius::same(10.0 as u8),
             egui::Color32::from_rgb(9, 18, 34),
         );
         for element in HudElement::ALL {

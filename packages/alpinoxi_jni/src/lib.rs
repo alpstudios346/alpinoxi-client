@@ -49,7 +49,8 @@ impl BridgeState {
 }
 
 /// HUD layout as the renderer needs it: one row per visible element.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+/// Not `Eq`: it carries `f32` positions, and floats have no total equality.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct HudRow {
     pub id: String,
     pub label: String,
@@ -234,11 +235,11 @@ pub fn skin_model_id(model: &str) -> &'static str {
 
 /// Moves one HUD element to another anchor. Returns `false` for an unknown
 /// element or anchor, so the mod can keep showing the old position.
-pub fn set_anchor(state: &mut BridgeState, element_id: &str, anchor_name: &str) -> bool {
+pub fn set_anchor(state: &mut BridgeState, wanted_id: &str, anchor_name: &str) -> bool {
     let Some(element) = HudElement::ALL
         .iter()
         .copied()
-        .find(|element| element_id(element) == element_id)
+        .find(|element| element_id(*element) == wanted_id)
     else {
         return false;
     };
@@ -255,11 +256,11 @@ pub fn set_anchor(state: &mut BridgeState, element_id: &str, anchor_name: &str) 
 
 /// Toggles one element; returns its new visibility, or `None` if the id is
 /// unknown. Used by the mods' own keybind actions.
-pub fn toggle_element(state: &mut BridgeState, element_id: &str) -> Option<bool> {
+pub fn toggle_element(state: &mut BridgeState, wanted_id: &str) -> Option<bool> {
     let element = HudElement::ALL
         .iter()
         .copied()
-        .find(|element| element_id(element) == element_id)?;
+        .find(|element| element_id(*element) == wanted_id)?;
     Some(state.hud.toggle(element))
 }
 

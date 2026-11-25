@@ -101,7 +101,7 @@ fn provider_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp, provider: AccountProv
             if selected { 1.6 } else { 1.0 },
             if selected { accent } else { theme::BORDER },
         ))
-        .corner_radius(CornerRadius::same(16.0))
+        .corner_radius(CornerRadius::same(16.0 as u8))
         .inner_margin(egui::Margin::same(18))
         .show(ui, |ui| {
             ui.set_width(width - 36.0);
@@ -192,7 +192,7 @@ fn provider_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp, provider: AccountProv
                             .strong(),
                     )
                     .fill(if valid { accent } else { theme::BG_PANEL })
-                    .corner_radius(CornerRadius::same(10.0));
+                    .corner_radius(CornerRadius::same(10.0 as u8));
                     if ui.add_sized([ui.available_width(), 40.0], button).clicked() && valid {
                         clicked = true;
                     }
@@ -231,7 +231,7 @@ fn status_bar(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
     egui::Frame::new()
         .fill(theme::BG_PANEL)
         .stroke(Stroke::new(1.0, theme::BORDER))
-        .corner_radius(CornerRadius::same(12.0))
+        .corner_radius(CornerRadius::same(12.0 as u8))
         .inner_margin(egui::Margin::symmetric(16, 12))
         .show(ui, |ui| {
             ui.set_width(ui.available_width().min(700.0));

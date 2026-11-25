@@ -92,9 +92,12 @@ fn translate(code: KeyCode) -> egui::Key {
         KeyCode::Space => Key::Space,
         KeyCode::Backspace => Key::Backspace,
         KeyCode::Grave => Key::Backtick,
-        KeyCode::LeftShift | KeyCode::RightShift => Key::ShiftLeft,
-        KeyCode::LeftCtrl | KeyCode::RightCtrl => Key::ControlLeft,
-        KeyCode::LeftAlt | KeyCode::RightAlt => Key::AltLeft,
+        // Modifiers are read from `input.modifiers` in `capture`, never polled
+        // as keys: egui has no Shift/Control/Alt variants, and a bind is a key
+        // plus modifier flags, so a lone modifier is not a key.
+        KeyCode::LeftShift | KeyCode::RightShift => Key::Shift,
+        KeyCode::LeftCtrl | KeyCode::RightCtrl => Key::Control,
+        KeyCode::LeftAlt | KeyCode::RightAlt => Key::Alt,
     }
 }
 

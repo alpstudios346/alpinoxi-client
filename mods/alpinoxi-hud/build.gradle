@@ -32,11 +32,14 @@ dependencies {
 sourceSets {
     bridge {
         java.srcDir '../alpinoxi-bridge/src/main/java'
-        compileClasspath += sourceSets.main.compileClasspath
+        // Not `+= main.compileClasspath`: `main` depends on this set's output,
+        // and that turns the two into a cycle Gradle refuses to run.
     }
 }
 
 dependencies {
+    // Minecraft and Fabric, which the bridge's own sources need to compile.
+    bridgeCompileOnly "net.fabricmc:fabric-loader:${project.loader_version}"
     compileOnly sourceSets.bridge.output
 }
 

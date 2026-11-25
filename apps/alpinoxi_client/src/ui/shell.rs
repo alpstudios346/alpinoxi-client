@@ -83,14 +83,14 @@ fn rail(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
             ui.allocate_exact_size(Vec2::new(ui.available_width(), 40.0), egui::Sense::click());
         let painter = ui.painter();
         if selected {
-            painter.rect_filled(rect, CornerRadius::same(10.0), theme::BG_CARD_HOVER);
+            painter.rect_filled(rect, CornerRadius::same(10.0 as u8), theme::BG_CARD_HOVER);
             let bar = egui::Rect::from_min_size(
                 rect.left_top() + Vec2::new(0.0, 8.0),
                 Vec2::new(3.0, rect.height() - 16.0),
             );
-            painter.rect_filled(bar, CornerRadius::same(2.0), theme::ACCENT);
+            painter.rect_filled(bar, CornerRadius::same(2.0 as u8), theme::ACCENT);
         } else if response.hovered() {
-            painter.rect_filled(rect, CornerRadius::same(10.0), theme::BG_CARD);
+            painter.rect_filled(rect, CornerRadius::same(10.0 as u8), theme::BG_CARD);
         }
         let colour = if selected {
             theme::ACCENT
@@ -185,7 +185,7 @@ fn top_bar(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
                 egui::Frame::new()
                     .fill(theme::BG_CARD)
                     .stroke(Stroke::new(1.0, theme::BORDER))
-                    .corner_radius(CornerRadius::same(10.0))
+                    .corner_radius(CornerRadius::same(10.0 as u8))
                     .inner_margin(egui::Margin::symmetric(10, 6))
                     .show(ui, |ui| {
                         ui.horizontal(|ui| {

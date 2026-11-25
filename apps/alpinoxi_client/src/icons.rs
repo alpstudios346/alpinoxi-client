@@ -39,7 +39,7 @@ pub fn paint(painter: &egui::Painter, rect: Rect, icon: Icon, color: Color32) {
                     Pos2::new(c.x - r * 0.72, c.y),
                     Pos2::new(c.x + r * 0.72, c.y + r),
                 ),
-                CornerRadius::same(2.0),
+                CornerRadius::same(2.0 as u8),
                 stroke,
                 egui::StrokeKind::Middle,
             );
@@ -98,13 +98,13 @@ pub fn paint(painter: &egui::Painter, rect: Rect, icon: Icon, color: Color32) {
                 let x = c.x - r * 0.75 + index as f32 * r * 0.5;
                 painter.rect_stroke(
                     Rect::from_center_size(Pos2::new(x, c.y - r * 0.45), Vec2::splat(r * 0.42)),
-                    CornerRadius::same(2.0),
+                    CornerRadius::same(2.0 as u8),
                     stroke,
                     egui::StrokeKind::Middle,
                 );
                 painter.rect_stroke(
                     Rect::from_center_size(Pos2::new(x, c.y + r * 0.45), Vec2::splat(r * 0.42)),
-                    CornerRadius::same(2.0),
+                    CornerRadius::same(2.0 as u8),
                     stroke,
                     egui::StrokeKind::Middle,
                 );
