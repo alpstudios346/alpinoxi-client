@@ -22,7 +22,7 @@ pub use import::{
 };
 pub use hud::{HudAnchor, HudElement, HudSettings, KeyChord, Keybind, KeybindAction, KeybindSet};
 pub use launcher::{
-    Instance, JvmProfile, LaunchPlan, MemoryProfile, MemoryProfileError, PerformanceMod,
+    Instance, LaunchPlan, MemoryProfile, MemoryProfileError, PerformanceMod,
     PERFORMANCE_MODS, SLOGANS,
 };
 pub use skin::{Skin, SkinModel, SkinSource};

@@ -3,6 +3,10 @@ plugins {
     id 'maven-publish'
 }
 
+// Loom ships as a Gradle plugin from Fabric's own Maven, not from the Gradle
+// Plugin Portal, so the repository has to be declared in settings.gradle.
+// Each mod folder is its own project, hence one settings file per folder.
+
 version = project.mod_version
 group = project.maven_group
 

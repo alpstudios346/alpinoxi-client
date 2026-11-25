@@ -9,4 +9,5 @@ description = "Alpinoxi domain model: accounts, skins, friends, HUD and launch p
 
 [dependencies]
 serde.workspace = true
+serde_json.workspace = true
 thiserror.workspace = true
