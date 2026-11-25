@@ -49,7 +49,7 @@ cargo test --workspace
 
 ## Open source
 
-The new Alpinoxi source is available under the [MIT License](LICENSE). Third-party mods remain the work of their respective authors: Alpinoxi will link to compatible official releases and keep their licences visible instead of copying or rebranding them.
+The new Alpinoxi source and the Alpinoxi-owned artwork in this repository are dedicated to the public domain under [CC0 1.0](LICENSE). You may use, modify, redistribute or commercialise them without asking permission. Third-party mods remain the work of their respective authors: Alpinoxi will link to compatible official releases and keep their licences visible instead of copying or rebranding them.
 
 Alpinoxi Client is not affiliated with Mojang, Microsoft or Ely.by.
 
