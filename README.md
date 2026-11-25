@@ -1,39 +1,68 @@
 <p align="center">
-  <img src=".github/media/RepoBanner.png" alt="Alpinoxi Client repository banner" width="100%">
+  <img src=".github/media/RepoBanner.png" alt="Alpinoxi Client — Rust-based launcher for Minecraft" width="100%">
 </p>
 
-## English
+<p align="center">
+  <strong>A lightweight, open-source Rust launcher for Minecraft Java Edition.</strong>
+</p>
 
-### About Alpinoxi Client
+<p align="center">
+  <a href="https://github.com/alpstudios346/alpinoxi-client/releases">Releases</a> ·
+  <a href="CONTRIBUTING.md">Contributing</a> ·
+  <a href="ATTRIBUTION.md">Attribution</a> ·
+  <a href="docs/ALPINOXI_ROADMAP.md">Roadmap</a>
+</p>
 
-Alpinoxi Client is an independent, lightweight Minecraft launcher built with Rust and based on the open-source OneLauncher/OneClient project. It focuses on account choice, including offline player identities, Microsoft, Ely.by, and custom Yggdrasil authentication.
+## Alpinoxi Client
 
-Some resource-intensive or upstream-specific features are not included. In-game social features are provided by the Essential mod; **Alpinoxi Client does not include a built-in HUD.**
+Alpinoxi Client is an independent Minecraft launcher maintained by AlpinoxiGD. It is written in Rust and built from the open-source OneLauncher/OneClient codebase under the GPL-3.0-only licence. The launcher is designed to be responsive and modest in memory use; Minecraft itself continues to run in its own Java process with memory selected per instance.
 
-> **Independent project:** Alpinoxi Client is **not affiliated with, endorsed by, or verified by Polyfrost**.
+### Accounts and skins
 
-### Project status
+The current codebase supports Microsoft accounts, Ely.by and offline player profiles. Microsoft sign-in must use the official Microsoft/Minecraft authentication flow. Ely.by is configured with the `alpinoxi-client` client ID. Offline profiles are only for servers that deliberately permit offline-mode accounts; they do not bypass Microsoft authentication on online-mode servers.
 
-The project is still in development, and **the first beta has not been published yet**. Check [GitHub Releases](https://github.com/alpstudios346/alpinoxi-client/releases) for official downloads when they become available.
+Account tokens and passwords must never be committed, printed in logs or stored in documentation. See the project rules in `AGENTS.md` when contributing to authentication or skin code.
 
-### Building and contributing
+### In development
 
-For source-build guidance, see the [Polyfrost OneLauncher repository](https://github.com/Polyfrost/OneLauncher). Contributions and fork ideas are welcome; proposed changes are reviewed for project scope and licensing.
+The first public beta has not been released. The planned Alpinoxi experience includes a polished skin wardrobe, HUD and keybind settings, social/chat features, curated mod and resource-pack downloads, and separately published Alpinoxi performance work. These are roadmap items, not claims about the current build; see [the roadmap](docs/ALPINOXI_ROADMAP.md) for scope and safeguards.
+
+## Build from source
+
+Prerequisites:
+
+- Rust **1.97+**
+- Python 3
+- JDK **17+** with `javac`
+
+```sh
+cargo +stable build --locked -p oneclient_app --bin oneforall_app
+```
+
+Run the focused checks relevant to a change:
+
+```sh
+cargo +stable test --locked -p oneclient_auth
+cargo +stable test --locked -p oneclient_common -p oneclient_core
+cargo +stable fmt --all -- --check
+cargo +stable clippy --locked -p oneclient_auth -p oneclient_core -p oneclient_app --all-targets
+python3 -B -m unittest discover -s distribution -p 'test_*.py'
+```
+
+Packaging and platform details remain under `distribution/`. Do not publish an installer before its exact commit has been built, scanned and manually tested.
+
+## Open source and attribution
+
+Alpinoxi Client is GPL-3.0-only. This repository keeps the upstream notices and third-party credits required by the source and its dependencies—read [ATTRIBUTION.md](ATTRIBUTION.md) before redistributing a build.
+
+Alpinoxi does not rebrand or republish third-party performance mods as its own work. Compatible upstream mods may be offered as clearly attributed dependencies when their licences permit it. Alpinoxi-authored performance modules will be released with source, licence, benchmarks and compatibility notes.
+
+Alpinoxi Client is not affiliated with, endorsed by or verified by Polyfrost, Microsoft, Mojang or Ely.by.
 
 ## Türkçe
 
-### Alpinoxi Client hakkında
+Alpinoxi Client, AlpinoxiGD tarafından geliştirilen, Minecraft Java Edition için hafif ve açık kaynaklı bir Rust başlatıcısıdır. Kod tabanı GPL-3.0-only lisanslı açık kaynak OneLauncher/OneClient projesinden türetilmiştir; gerekli kaynak ve üçüncü taraf atıfları [ATTRIBUTION.md](ATTRIBUTION.md) içinde korunur.
 
-Alpinoxi Client, açık kaynaklı OneLauncher/OneClient projesini temel alan, Rust ile geliştirilmiş bağımsız ve hafif bir Minecraft başlatıcısıdır. Çevrimdışı oyuncu kimliği, Microsoft, Ely.by ve özel Yggdrasil kimlik doğrulaması gibi hesap seçeneklerine odaklanır.
+Microsoft, Ely.by ve çevrimdışı oyuncu profilleri desteklenir. Microsoft hesabı yalnızca resmî Microsoft/Minecraft doğrulama akışıyla kullanılır; Ely.by istemci kimliği `alpinoxi-client` olarak ayarlanır. Çevrimdışı profil, sadece offline-mode kabul eden sunucular içindir ve premium/online-mode doğrulamasını aşmaz.
 
-Kaynak tüketimi yüksek veya upstream projeye özgü bazı özellikler dahil değildir. Oyun içi sosyal özellikler Essential modu tarafından sağlanır; **Alpinoxi Client yerleşik bir HUD içermez.**
-
-> **Bağımsız proje:** Alpinoxi Client, **Polyfrost ile bağlantılı değildir; Polyfrost tarafından onaylanmamış veya doğrulanmamıştır.**
-
-### Proje durumu
-
-Proje geliştirme aşamasındadır ve **ilk beta henüz yayımlanmamıştır**. Resmî indirmeler yayımlandığında [GitHub Releases](https://github.com/alpstudios346/alpinoxi-client/releases) sayfasında yer alacaktır.
-
-### Derleme ve katkı
-
-Kaynak kodunu derlemek için [Polyfrost OneLauncher](https://github.com/Polyfrost/OneLauncher) deposundaki upstream derleme yönergelerine bakabilirsiniz. Katkılar ve fork önerileri memnuniyetle karşılanır; öneriler proje kapsamı ve lisans koşulları açısından değerlendirilir.
+İlk beta henüz yayımlanmadı. Şık skin arayüzü, HUD ve tuş ayarları, arkadaş/sohbet özellikleri, mod-kaynak paketi kataloğu ve açık kaynak Alpinoxi performans modları planlanmaktadır. Bunlar henüz mevcut sürüm özelliği değildir; kapsam için [yol haritasına](docs/ALPINOXI_ROADMAP.md) bakın.
