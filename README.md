@@ -84,3 +84,43 @@ cargo test --workspace
 ```
 
 The launcher itself stays small on purpose: native `egui`, no web view, `lto = "thin"`, `strip`, and no runtime of its own.
+
+## Fabric mods (in `mods/`)
+
+Alpinoxi's own mods are in this repository, under `mods/`. They are small Java
+mods that **render**; every decision comes from the Rust crates, reached through
+`packages/alpinoxi_jni`.
+
+| Mod | What it does | Rust source of truth |
+| --- | --- | --- |
+| `alpinoxi-bridge` | Loads the native library and exposes it to Java | `packages/alpinoxi_jni` |
+| `alpinoxi-hud` | HUD elements, HUD editor, keybinds, friends and chat | `alpinoxi_core::hud`, `alpinoxi_ingame` |
+| `alpinoxi-performance` | Frame-time histogram, 1% lows, bottleneck diagnosis, render-distance governor | `alpinoxi_ingame::perf` |
+
+### Build the native library
+
+```sh
+cargo build -p alpinoxi_jni --release
+```
+
+The result is `alpinoxi_bridge.dll` (Windows), `libalpinoxi_bridge.so` (Linux) or
+`libalpinoxi_bridge.dylib` (macOS). Copy it next to the mod jars, or let the mod
+find it through `-Dalpinoxi.bridge=<path>`.
+
+### Build the mods
+
+Each mod folder is a standalone Gradle project:
+
+```sh
+cd mods/alpinoxi-hud && ./gradlew build
+```
+
+The jars land in `build/libs/`. The mods are **client-side only**: they never
+change what the server sees, so they are safe to use on any server.
+
+### Why the split
+
+A HUD layout, a keybind conflict, a chat rule or a render-distance decision is
+logic, not drawing. Keeping it in Rust means it is covered by `cargo test`, and a
+bug fix ships once to the launcher and to every mod. Java keeps only what must be
+Java: mixins, rendering and the game's own events.

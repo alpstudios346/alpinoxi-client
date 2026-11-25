@@ -4,6 +4,7 @@ members = [
   "packages/alpinoxi_auth_system",
   "packages/alpinoxi_core",
   "packages/alpinoxi_ingame",
+  "packages/alpinoxi_jni",
 ]
 resolver = "2"
 
@@ -20,6 +21,7 @@ homepage = "https://github.com/alpstudios346/alpinoxi-client"
 alpinoxi_core = { path = "packages/alpinoxi_core" }
 alpinoxi_auth_system = { path = "packages/alpinoxi_auth_system" }
 alpinoxi_ingame = { path = "packages/alpinoxi_ingame" }
+alpinoxi_jni = { path = "packages/alpinoxi_jni" }
 eframe = { version = "0.31", default-features = false, features = ["default_fonts", "glow", "x11", "wayland"] }
 image = { version = "0.25", default-features = false, features = ["png"] }
 serde = { version = "1", features = ["derive"] }

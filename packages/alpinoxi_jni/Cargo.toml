@@ -1,0 +1,25 @@
+[package]
+name = "alpinoxi_jni"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "JNI bridge: exposes Alpinoxi's Rust rules to the Fabric mods"
+
+[lib]
+name = "alpinoxi_bridge"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+alpinoxi_core.workspace = true
+alpinoxi_ingame.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+# The JVM entry points sit behind a feature so `cargo test --workspace` stays
+# fast and dependency-free; the release build for the mods turns it on.
+jni = { version = "0.21", default-features = false, optional = true }
+
+[features]
+default = []
+jni-exports = ["dep:jni"]

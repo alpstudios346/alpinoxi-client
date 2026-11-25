@@ -15,9 +15,11 @@ use alpinoxi_core::hud::{HudElement, HudSettings, KeyChord, KeybindAction, Keybi
 use alpinoxi_core::skin::Skin;
 
 pub mod chat;
+pub mod perf;
 pub mod session;
 
 pub use chat::ChatTabs;
+pub use perf::{diagnose, Advice, Bottleneck, FrameHistogram, FrameStats, RenderGovernor};
 pub use session::GameSession;
 
 /// What the renderer must do after a key press.

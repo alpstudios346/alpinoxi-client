@@ -3,3 +3,13 @@
 .env
 .idea/
 .vscode/
+
+# Gradle / Java mod builds
+.gradle/
+build/
+!mods/*/build.gradle*
+!mods/*/gradle.properties
+out/
+*.class
+.idea/
+*.iml

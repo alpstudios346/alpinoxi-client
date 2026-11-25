@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "alpinoxi-bridge",
+  "version": "${version}",
+  "name": "Alpinoxi Bridge",
+  "description": "Loads Alpinoxi's Rust core for the HUD and performance mods.",
+  "authors": ["AlpinoxiGD"],
+  "contact": {
+    "homepage": "https://github.com/alpstudios346/alpinoxi-client",
+    "sources": "https://github.com/alpstudios346/alpinoxi-client"
+  },
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["net.alpinoxi.bridge.AlpinoxiBridge"]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.9",
+    "minecraft": "~1.21.1",
+    "java": ">=21"
+  }
+}
