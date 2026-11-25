@@ -13,3 +13,8 @@ out/
 *.class
 .idea/
 *.iml
+# Compiled jars from mods/jars/build.sh: build output, not source.
+mods/jars/*.jar
+mods/jars/*/classes/
+mods/jars/*.sources
+mods/jars/*.args
