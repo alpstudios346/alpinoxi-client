@@ -22,7 +22,7 @@ use tao::{
     event_loop::{ControlFlow, EventLoop},
     window::WindowBuilder,
 };
-use wry::{WebViewBuilder, WebViewMessage};
+use wry::WebViewBuilder;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let event_loop = EventLoop::new();
@@ -40,11 +40,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let webview = WebViewBuilder::new(&window)
         .with_html(Cow::Borrowed(page::INDEX_HTML))
         .with_devtools(cfg!(debug_assertions))
-        .with_ipc_handler(move |message: WebViewMessage| {
+        .with_ipc_handler(move |message: String| {
             // Every command goes through one door: the page can ask questions
             // and change settings, and never anything else.
-            let reply = state.handle(message.body());
-            let _ = reply;
+            let _ = state.handle(&message);
         })
         .build()?;
 

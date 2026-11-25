@@ -87,8 +87,8 @@ impl LauncherState {
         if let Ok(text) = serde_json::to_string_pretty(&self.settings) {
             let _ = std::fs::write(path, text);
         }
-        let snapshot = bridge::BridgeSnapshot::from_settings(&self.settings, "global");
-        let _ = bridge::write_snapshot(&snapshot);
+        let snapshot = crate::bridge::BridgeSnapshot::from_settings(&self.settings, "global");
+        let _ = crate::bridge::write_snapshot(&snapshot);
     }
 
     /// The heap the game will actually get, capped by this machine.
@@ -133,7 +133,7 @@ impl LauncherState {
                 let Some(element) = HudElement::ALL
                     .iter()
                     .copied()
-                    .find(|element| bridge::element_id(*element) == id)
+                    .find(|element| crate::bridge::element_id(*element) == id)
                 else {
                     return error_json("unknown HUD element");
                 };
@@ -141,7 +141,7 @@ impl LauncherState {
                 self.save();
                 format!("{{\"visible\":{visible}}}")
             }
-            "snapshot" => match serde_json::to_string(&bridge::BridgeSnapshot::from_settings(
+            "snapshot" => match serde_json::to_string(&crate::bridge::BridgeSnapshot::from_settings(
                 &self.settings,
                 "global",
             )) {
@@ -198,7 +198,7 @@ fn action_by_name(name: &str) -> Option<KeybindAction> {
             HudElement::ALL
                 .iter()
                 .copied()
-                .find(|element| bridge::element_id(*element) == other)?,
+                .find(|element| crate::bridge::element_id(*element) == other)?,
         ),
     })
 }
@@ -210,7 +210,7 @@ fn action_name_of(action: KeybindAction) -> String {
         KeybindAction::OpenFriends => "friends".to_owned(),
         KeybindAction::OpenChat => "chat".to_owned(),
         KeybindAction::ToggleSkinPreview => "skin_preview".to_owned(),
-        KeybindAction::ToggleElement(element) => bridge::element_id(element).to_owned(),
+        KeybindAction::ToggleElement(element) => crate::bridge::element_id(element).to_owned(),
     }
 }
 
