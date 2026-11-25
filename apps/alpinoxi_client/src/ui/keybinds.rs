@@ -15,7 +15,11 @@ use crate::ui;
 /// Reads the current keyboard state into a chord, if a non-modifier key is down.
 pub fn capture(ctx: &egui::Context) -> Option<KeyChord> {
     ctx.input(|input| {
-        let (shift, ctrl, alt) = (input.modifiers.shift, input.modifiers.ctrl, input.modifiers.alt);
+        let (shift, ctrl, alt) = (
+            input.modifiers.shift,
+            input.modifiers.ctrl,
+            input.modifiers.alt,
+        );
         for code in KeyCode::ALL {
             if matches!(
                 code,
@@ -154,9 +158,11 @@ pub fn show(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
 
     ui.add_space(8.0);
     ui.label(
-        RichText::new("Defaults: Shift+H HUD editor · F1 toggle HUD · O friends · Y chat · U skin preview")
-            .size(11.5)
-            .color(theme::ACCENT_SOFT),
+        RichText::new(
+            "Defaults: Shift+H HUD editor · F1 toggle HUD · O friends · Y chat · U skin preview",
+        )
+        .size(11.5)
+        .color(theme::ACCENT_SOFT),
     );
     let _ = KeybindAction::OpenHudEditor;
 }

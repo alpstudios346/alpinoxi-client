@@ -150,10 +150,9 @@ pub fn resolve_key(key: &str, mods: u8, keybinds: &KeybindSet) -> String {
 
 fn key_from_name(name: &str) -> Option<KeyCode> {
     let normalised = name.trim().to_ascii_uppercase();
-    KeyCode::ALL
-        .iter()
-        .copied()
-        .find(|code| code.label().to_ascii_uppercase().replace(' ', "_") == normalised.replace(' ', "_"))
+    KeyCode::ALL.iter().copied().find(|code| {
+        code.label().to_ascii_uppercase().replace(' ', "_") == normalised.replace(' ', "_")
+    })
 }
 
 /// Incoming chat line: sanitised, routed to its tab, mention flag applied.
@@ -310,8 +309,15 @@ mod tests {
             "uuid-me",
             "Alpinoxi",
         ));
-        let reply = receive_chat(&mut state, "Notch", "microsoft", "global", "@Alpinoxi hi", 1)
-            .expect("chat should be accepted");
+        let reply = receive_chat(
+            &mut state,
+            "Notch",
+            "microsoft",
+            "global",
+            "@Alpinoxi hi",
+            1,
+        )
+        .expect("chat should be accepted");
         assert!(reply.contains("\"mentions\":1"));
         assert!(receive_chat(&mut state, "Notch", "microsoft", "global", "   ", 2).is_err());
         assert!(receive_chat(&mut state, "Notch", "nonsense", "global", "hi", 3).is_err());
@@ -471,7 +477,8 @@ mod jni_exports {
     ) -> jni::sys::jboolean {
         let element_id = read(&mut env, element_id);
         let anchor = read(&mut env, anchor);
-        STATE.with(|state| set_anchor(&mut state.borrow_mut(), &element_id, &anchor)) as jni::sys::jboolean
+        STATE.with(|state| set_anchor(&mut state.borrow_mut(), &element_id, &anchor))
+            as jni::sys::jboolean
     }
 
     #[no_mangle]
@@ -481,10 +488,12 @@ mod jni_exports {
         element_id: JString,
     ) -> jni::sys::jint {
         let element_id = read(&mut env, element_id);
-        STATE.with(|state| match toggle_element(&mut state.borrow_mut(), &element_id) {
-            Some(visible) => i32::from(visible),
-            None => -1,
-        }) as jni::sys::jint
+        STATE.with(
+            |state| match toggle_element(&mut state.borrow_mut(), &element_id) {
+                Some(visible) => i32::from(visible),
+                None => -1,
+            },
+        ) as jni::sys::jint
     }
 
     #[no_mangle]

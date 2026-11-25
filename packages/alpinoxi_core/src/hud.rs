@@ -52,7 +52,9 @@ impl HudElement {
 
     pub const fn default_anchor(self) -> HudAnchor {
         match self {
-            Self::Fps | Self::Coordinates | Self::ServerAddress | Self::Friends => HudAnchor::TopLeft,
+            Self::Fps | Self::Coordinates | Self::ServerAddress | Self::Friends => {
+                HudAnchor::TopLeft
+            }
             Self::Ping | Self::Clock => HudAnchor::TopRight,
             Self::Keystrokes => HudAnchor::BottomLeft,
             Self::Armor | Self::PotionEffects => HudAnchor::BottomRight,

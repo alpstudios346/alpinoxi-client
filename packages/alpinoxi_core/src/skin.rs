@@ -172,7 +172,10 @@ mod tests {
             Skin::validate_png(&png_header(128, 128)),
             Err(SkinValidationError::BadDimensions(128, 128))
         );
-        assert_eq!(Skin::validate_png(b"not an image"), Err(SkinValidationError::NotPng));
+        assert_eq!(
+            Skin::validate_png(b"not an image"),
+            Err(SkinValidationError::NotPng)
+        );
     }
 
     #[test]

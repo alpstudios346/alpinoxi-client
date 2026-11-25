@@ -10,11 +10,10 @@
 use serde::Deserialize;
 
 use crate::token::TokenSet;
-use crate::{
-    AuthenticationError, ContentType, HttpRequest, HttpResponse, Method,
-};
+use crate::{AuthenticationError, ContentType, HttpRequest, HttpResponse, Method};
 
-pub const DEVICE_CODE_URL: &str = "https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode";
+pub const DEVICE_CODE_URL: &str =
+    "https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode";
 pub const TOKEN_URL: &str = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token";
 pub const XBL_URL: &str = "https://user.auth.xboxlive.com/user/authenticate";
 pub const XSTS_URL: &str = "https://xsts.auth.xboxlive.com/xsts/authorize";
@@ -257,9 +256,7 @@ struct MinecraftProfile {
 }
 
 /// Parses `api.minecraftservices.com/minecraft/profile`.
-pub fn parse_profile(
-    response: &HttpResponse,
-) -> Result<(String, String), AuthenticationError> {
+pub fn parse_profile(response: &HttpResponse) -> Result<(String, String), AuthenticationError> {
     if response.status == 404 {
         return Err(AuthenticationError::NoMinecraftEntitlement);
     }
@@ -321,14 +318,11 @@ mod tests {
 
     #[test]
     fn pending_is_not_an_error() {
-        let outcome = MicrosoftFlow::poll_outcome(&response(
-            400,
-            r#"{"error":"authorization_pending"}"#,
-        ));
+        let outcome =
+            MicrosoftFlow::poll_outcome(&response(400, r#"{"error":"authorization_pending"}"#));
         assert_eq!(outcome, Ok(PollOutcome::Pending));
 
-        let expired =
-            MicrosoftFlow::poll_outcome(&response(400, r#"{"error":"expired_token"}"#));
+        let expired = MicrosoftFlow::poll_outcome(&response(400, r#"{"error":"expired_token"}"#));
         assert_eq!(expired, Err(AuthenticationError::CodeExpired));
     }
 

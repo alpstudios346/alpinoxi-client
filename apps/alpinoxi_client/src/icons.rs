@@ -32,14 +32,8 @@ pub fn paint(painter: &egui::Painter, rect: Rect, icon: Icon, color: Color32) {
     let r = rect.width() * 0.36;
     match icon {
         Icon::Home => {
-            painter.line_segment(
-                [Pos2::new(c.x - r, c.y), Pos2::new(c.x, c.y - r)],
-                stroke,
-            );
-            painter.line_segment(
-                [Pos2::new(c.x, c.y - r), Pos2::new(c.x + r, c.y)],
-                stroke,
-            );
+            painter.line_segment([Pos2::new(c.x - r, c.y), Pos2::new(c.x, c.y - r)], stroke);
+            painter.line_segment([Pos2::new(c.x, c.y - r), Pos2::new(c.x + r, c.y)], stroke);
             painter.rect_stroke(
                 Rect::from_min_max(
                     Pos2::new(c.x - r * 0.72, c.y),
@@ -103,19 +97,13 @@ pub fn paint(painter: &egui::Painter, rect: Rect, icon: Icon, color: Color32) {
             for index in 0..4 {
                 let x = c.x - r * 0.75 + index as f32 * r * 0.5;
                 painter.rect_stroke(
-                    Rect::from_center_size(
-                        Pos2::new(x, c.y - r * 0.45),
-                        Vec2::splat(r * 0.42),
-                    ),
+                    Rect::from_center_size(Pos2::new(x, c.y - r * 0.45), Vec2::splat(r * 0.42)),
                     CornerRadius::same(2.0),
                     stroke,
                     egui::StrokeKind::Middle,
                 );
                 painter.rect_stroke(
-                    Rect::from_center_size(
-                        Pos2::new(x, c.y + r * 0.45),
-                        Vec2::splat(r * 0.42),
-                    ),
+                    Rect::from_center_size(Pos2::new(x, c.y + r * 0.45), Vec2::splat(r * 0.42)),
                     CornerRadius::same(2.0),
                     stroke,
                     egui::StrokeKind::Middle,
@@ -143,14 +131,8 @@ pub fn paint(painter: &egui::Painter, rect: Rect, icon: Icon, color: Color32) {
             ));
         }
         Icon::Plus => {
-            painter.line_segment(
-                [Pos2::new(c.x - r, c.y), Pos2::new(c.x + r, c.y)],
-                stroke,
-            );
-            painter.line_segment(
-                [Pos2::new(c.x, c.y - r), Pos2::new(c.x, c.y + r)],
-                stroke,
-            );
+            painter.line_segment([Pos2::new(c.x - r, c.y), Pos2::new(c.x + r, c.y)], stroke);
+            painter.line_segment([Pos2::new(c.x, c.y - r), Pos2::new(c.x, c.y + r)], stroke);
         }
         Icon::Check => {
             painter.add(egui::Shape::line(
@@ -189,16 +171,19 @@ pub fn paint(painter: &egui::Painter, rect: Rect, icon: Icon, color: Color32) {
             );
         }
         Icon::Arrow => {
+            painter.line_segment([Pos2::new(c.x - r, c.y), Pos2::new(c.x + r, c.y)], stroke);
             painter.line_segment(
-                [Pos2::new(c.x - r, c.y), Pos2::new(c.x + r, c.y)],
+                [
+                    Pos2::new(c.x + r * 0.2, c.y - r * 0.7),
+                    Pos2::new(c.x + r, c.y),
+                ],
                 stroke,
             );
             painter.line_segment(
-                [Pos2::new(c.x + r * 0.2, c.y - r * 0.7), Pos2::new(c.x + r, c.y)],
-                stroke,
-            );
-            painter.line_segment(
-                [Pos2::new(c.x + r * 0.2, c.y + r * 0.7), Pos2::new(c.x + r, c.y)],
+                [
+                    Pos2::new(c.x + r * 0.2, c.y + r * 0.7),
+                    Pos2::new(c.x + r, c.y),
+                ],
                 stroke,
             );
         }

@@ -197,7 +197,9 @@ impl Wardrobe {
     pub fn upload_endpoint(&self) -> &'static str {
         match self.provider {
             AccountProvider::ElyBy => "https://account.ely.by/api/account/v1/skin",
-            AccountProvider::Microsoft => "https://api.minecraftservices.com/minecraft/profile/skins",
+            AccountProvider::Microsoft => {
+                "https://api.minecraftservices.com/minecraft/profile/skins"
+            }
             AccountProvider::Offline => "",
         }
     }

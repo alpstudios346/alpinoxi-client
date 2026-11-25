@@ -66,7 +66,11 @@ impl TokenVault for SystemVault {
     fn keys(&self) -> Vec<String> {
         platform::keys()
             .into_iter()
-            .filter_map(|target| target.strip_prefix(&format!("{}/", self.service)).map(str::to_owned))
+            .filter_map(|target| {
+                target
+                    .strip_prefix(&format!("{}/", self.service))
+                    .map(str::to_owned)
+            })
             .collect()
     }
 }
@@ -113,10 +117,20 @@ mod platform {
     #[link(name = "advapi32")]
     extern "system" {
         fn CredWriteW(credential: *const CredentialW, flags: u32) -> i32;
-        fn CredReadW(target: *const u16, kind: u32, flags: u32, credential: *mut *mut CredentialW) -> i32;
+        fn CredReadW(
+            target: *const u16,
+            kind: u32,
+            flags: u32,
+            credential: *mut *mut CredentialW,
+        ) -> i32;
         fn CredDeleteW(target: *const u16, kind: u32, flags: u32) -> i32;
         fn CredFree(buffer: *mut c_void);
-        fn CredEnumerateW(filter: *const u16, flags: u32, count: *mut u32, credentials: *mut *mut *mut CredentialW) -> i32;
+        fn CredEnumerateW(
+            filter: *const u16,
+            flags: u32,
+            count: *mut u32,
+            credentials: *mut *mut *mut CredentialW,
+        ) -> i32;
     }
 
     fn wide(text: &str) -> Vec<u16> {
@@ -170,12 +184,16 @@ mod platform {
         }
         // SAFETY: `out` is non-null on success, per the API contract.
         let credential = unsafe { &*out };
-        let bytes = if credential.credential_blob.is_null() || credential.credential_blob_size == 0 {
+        let bytes = if credential.credential_blob.is_null() || credential.credential_blob_size == 0
+        {
             Vec::new()
         } else {
             // SAFETY: the blob is `credential_blob_size` bytes, as the API reports.
             unsafe {
-                std::slice::from_raw_parts(credential.credential_blob, credential.credential_blob_size as usize)
+                std::slice::from_raw_parts(
+                    credential.credential_blob,
+                    credential.credential_blob_size as usize,
+                )
             }
             .to_vec()
         };
@@ -286,7 +304,10 @@ mod tests {
         };
         let key = "test.roundtrip";
         vault.store(key, "secret-value").expect("store");
-        assert_eq!(vault.load(key).expect("load").as_deref(), Some("secret-value"));
+        assert_eq!(
+            vault.load(key).expect("load").as_deref(),
+            Some("secret-value")
+        );
         assert!(vault.keys().iter().any(|held| held == key));
         vault.forget(key).expect("forget");
         assert!(vault.load(key).expect("load after forget").is_none());

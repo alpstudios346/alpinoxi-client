@@ -49,8 +49,7 @@ impl Default for Settings {
 impl Settings {
     pub fn local_skin_for(&self, provider: AccountProvider) -> Option<Skin> {
         self.local_skin.clone().filter(|skin| {
-            skin.source == SkinSource::for_provider(provider)
-                || skin.source == SkinSource::Local
+            skin.source == SkinSource::for_provider(provider) || skin.source == SkinSource::Local
         })
     }
 }
@@ -94,7 +93,10 @@ fn detect_windows() -> Option<u16> {
         ])
         .output()
         .ok()?;
-    let bytes: u64 = String::from_utf8_lossy(&output.stdout).trim().parse().ok()?;
+    let bytes: u64 = String::from_utf8_lossy(&output.stdout)
+        .trim()
+        .parse()
+        .ok()?;
     Some((bytes / 1024 / 1024).min(u64::from(u16::MAX)) as u16)
 }
 

@@ -29,7 +29,11 @@ impl std::fmt::Display for TokenSet {
             f,
             "TokenSet {{ access_token: <{} chars>, refresh_token: {}, expires_in: {} }}",
             self.access_token.len(),
-            if self.refresh_token.is_some() { "present" } else { "none" },
+            if self.refresh_token.is_some() {
+                "present"
+            } else {
+                "none"
+            },
             self.expires_in
         )
     }
@@ -74,8 +78,7 @@ pub fn random_urlsafe(len: usize) -> String {
 
 /// PKCE S256 challenge for a verifier (RFC 7636).
 pub fn code_challenge(verifier: &str) -> String {
-    use sha1::Digest;
-    use sha2::Sha256;
+    use sha2::{Digest, Sha256};
     let digest = Sha256::digest(verifier.as_bytes());
     base64_url_no_pad(&digest)
 }
@@ -170,7 +173,9 @@ mod tests {
         let a = random_urlsafe(32);
         let b = random_urlsafe(32);
         assert_eq!(a.len(), 32);
-        assert!(a.chars().all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_'));
+        assert!(a
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_'));
         assert_ne!(a, b);
     }
 

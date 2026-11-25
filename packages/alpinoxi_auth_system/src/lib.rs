@@ -37,7 +37,10 @@ pub enum AuthenticationState {
     /// Nothing started yet.
     Idle,
     /// The player must finish something in the browser.
-    AwaitingBrowser { url: String, user_code: Option<String> },
+    AwaitingBrowser {
+        url: String,
+        user_code: Option<String>,
+    },
     /// Flow completed and a profile is available.
     Connected(AccountProfile),
     /// Flow failed; the message is safe to show (never contains a token).
@@ -125,7 +128,9 @@ impl HttpResponse {
 /// Starts a sign-in. Cracked needs no network at all.
 pub fn begin(provider: AccountProvider) -> AuthenticationState {
     match provider {
-        AccountProvider::Offline => AuthenticationState::Failed(AuthenticationError::OfflineProfile),
+        AccountProvider::Offline => {
+            AuthenticationState::Failed(AuthenticationError::OfflineProfile)
+        }
         AccountProvider::Microsoft | AccountProvider::ElyBy => AuthenticationState::Idle,
     }
 }

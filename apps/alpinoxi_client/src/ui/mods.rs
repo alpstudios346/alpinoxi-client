@@ -60,7 +60,11 @@ pub fn show(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
     .collect();
 
     if matches.is_empty() {
-        ui::empty_state(ui, "Nothing matches", "Try a shorter search or clear the filters.");
+        ui::empty_state(
+            ui,
+            "Nothing matches",
+            "Try a shorter search or clear the filters.",
+        );
         return;
     }
 
@@ -75,13 +79,22 @@ pub fn show(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
             ui.horizontal(|ui| {
                 ui.vertical(|ui| {
                     ui.horizontal(|ui| {
-                        ui.label(RichText::new(entry.name).size(16.0).strong().color(theme::TEXT));
+                        ui.label(
+                            RichText::new(entry.name)
+                                .size(16.0)
+                                .strong()
+                                .color(theme::TEXT),
+                        );
                         ui::pill(ui, entry.kind.label(), theme::ACCENT_SOFT);
                         if entry.performance {
                             ui::pill(ui, "Performance", theme::MINT);
                         }
                     });
-                    ui.label(RichText::new(entry.summary).size(12.5).color(theme::TEXT_DIM));
+                    ui.label(
+                        RichText::new(entry.summary)
+                            .size(12.5)
+                            .color(theme::TEXT_DIM),
+                    );
                     ui.label(
                         RichText::new(entry.licence)
                             .size(11.0)
@@ -89,7 +102,11 @@ pub fn show(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
                     );
                 });
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                    let label = if installed { "Remove" } else { "Add to instance" };
+                    let label = if installed {
+                        "Remove"
+                    } else {
+                        "Add to instance"
+                    };
                     if ui::ghost_button(ui, label, Vec2::new(140.0, 32.0)).clicked() {
                         toggle(app, entry.id);
                     }

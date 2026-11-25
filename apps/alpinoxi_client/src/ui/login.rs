@@ -92,19 +92,36 @@ fn provider_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp, provider: AccountProv
     let mut clicked = false;
 
     egui::Frame::new()
-        .fill(if selected { theme::BG_CARD_HOVER } else { theme::BG_CARD })
-        .stroke(Stroke::new(if selected { 1.6 } else { 1.0 }, if selected { accent } else { theme::BORDER }))
+        .fill(if selected {
+            theme::BG_CARD_HOVER
+        } else {
+            theme::BG_CARD
+        })
+        .stroke(Stroke::new(
+            if selected { 1.6 } else { 1.0 },
+            if selected { accent } else { theme::BORDER },
+        ))
         .corner_radius(CornerRadius::same(16.0))
         .inner_margin(egui::Margin::same(18))
         .show(ui, |ui| {
             ui.set_width(width - 36.0);
             ui.horizontal(|ui| {
-                ui.painter().circle_filled(ui.cursor().min + Vec2::new(6.0, 8.0), 5.0, accent);
+                ui.painter()
+                    .circle_filled(ui.cursor().min + Vec2::new(6.0, 8.0), 5.0, accent);
                 ui.add_space(16.0);
-                ui.label(RichText::new(provider.label()).size(19.0).strong().color(theme::TEXT));
+                ui.label(
+                    RichText::new(provider.label())
+                        .size(19.0)
+                        .strong()
+                        .color(theme::TEXT),
+                );
             });
             ui.add_space(4.0);
-            ui.label(RichText::new(provider.tagline()).size(13.0).color(theme::TEXT_DIM));
+            ui.label(
+                RichText::new(provider.tagline())
+                    .size(13.0)
+                    .color(theme::TEXT_DIM),
+            );
             ui.add_space(14.0);
             ui::separator(ui);
             ui.add_space(12.0);
@@ -115,7 +132,13 @@ fn provider_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp, provider: AccountProv
                     bullet(ui, "Your premium skin and cape");
                     bullet(ui, "No password ever typed here");
                     ui.add_space(16.0);
-                    if ui::primary_button(ui, "Sign in with Microsoft", Vec2::new(ui.available_width(), 40.0)).clicked() {
+                    if ui::primary_button(
+                        ui,
+                        "Sign in with Microsoft",
+                        Vec2::new(ui.available_width(), 40.0),
+                    )
+                    .clicked()
+                    {
                         clicked = true;
                     }
                 }
@@ -124,7 +147,13 @@ fn provider_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp, provider: AccountProv
                     bullet(ui, "Ely.by skins and capes");
                     bullet(ui, "Works on Ely.by servers");
                     ui.add_space(16.0);
-                    if ui::primary_button(ui, "Sign in with Ely.by", Vec2::new(ui.available_width(), 40.0)).clicked() {
+                    if ui::primary_button(
+                        ui,
+                        "Sign in with Ely.by",
+                        Vec2::new(ui.available_width(), 40.0),
+                    )
+                    .clicked()
+                    {
                         clicked = true;
                     }
                 }
@@ -154,7 +183,13 @@ fn provider_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp, provider: AccountProv
                     }
                     ui.add_space(2.0);
                     let button = egui::Button::new(
-                        RichText::new("Play cracked").color(if valid { Color32::from_rgb(6, 14, 26) } else { theme::TEXT_DIM }).strong(),
+                        RichText::new("Play cracked")
+                            .color(if valid {
+                                Color32::from_rgb(6, 14, 26)
+                            } else {
+                                theme::TEXT_DIM
+                            })
+                            .strong(),
                     )
                     .fill(if valid { accent } else { theme::BG_PANEL })
                     .corner_radius(CornerRadius::same(10.0));
@@ -166,7 +201,10 @@ fn provider_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp, provider: AccountProv
         });
 
     // The whole card is a target too, so clicking the title selects the provider.
-    if ui.interact(ui.min_rect(), ui.id().with(provider.id()), Sense::click()).clicked() {
+    if ui
+        .interact(ui.min_rect(), ui.id().with(provider.id()), Sense::click())
+        .clicked()
+    {
         app.login.provider = provider;
     }
     if clicked {
@@ -199,7 +237,11 @@ fn status_bar(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
             ui.set_width(ui.available_width().min(700.0));
             ui.horizontal(|ui| {
                 ui.label(RichText::new("●").color(colour).size(11.0));
-                ui.label(RichText::new(app.notice.clone()).size(13.0).color(theme::TEXT));
+                ui.label(
+                    RichText::new(app.notice.clone())
+                        .size(13.0)
+                        .color(theme::TEXT),
+                );
             });
         });
 }

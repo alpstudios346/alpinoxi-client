@@ -4,7 +4,7 @@
 //! name. Each row carries its provider badge so a cracked friend and an Ely.by
 //! friend are never confused, and the chat box is a normal text field.
 
-use eframe::egui::{self, RichText, Vec2, CornerRadius};
+use eframe::egui::{self, CornerRadius, RichText, Vec2};
 
 use alpinoxi_core::friends::Presence;
 
@@ -59,7 +59,11 @@ fn list_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
 
         let rows = app.book.sorted();
         if rows.is_empty() {
-            ui::empty_state(ui, "No friends yet", "Add a name above. Requests appear here too.");
+            ui::empty_state(
+                ui,
+                "No friends yet",
+                "Add a name above. Requests appear here too.",
+            );
         }
         for (friend, presence) in rows {
             let colour = match presence {
@@ -74,14 +78,28 @@ fn list_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
                 .show(ui, |ui| {
                     ui.set_width(ui.available_width());
                     ui.horizontal(|ui| {
-                        ui.painter()
-                            .circle_filled(ui.cursor().min + Vec2::new(5.0, 8.0), 4.0, colour);
+                        ui.painter().circle_filled(
+                            ui.cursor().min + Vec2::new(5.0, 8.0),
+                            4.0,
+                            colour,
+                        );
                         ui.add_space(14.0);
-                        ui.label(RichText::new(friend.name.clone()).strong().color(theme::TEXT));
-                        ui::pill(ui, friend.provider.label(), theme::provider_color(friend.provider));
+                        ui.label(
+                            RichText::new(friend.name.clone())
+                                .strong()
+                                .color(theme::TEXT),
+                        );
+                        ui::pill(
+                            ui,
+                            friend.provider.label(),
+                            theme::provider_color(friend.provider),
+                        );
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                             ui.label(RichText::new(presence.label()).size(11.5).color(colour));
-                            if let Presence::InGame { server: Some(server) } = &presence {
+                            if let Presence::InGame {
+                                server: Some(server),
+                            } = &presence
+                            {
                                 ui.label(
                                     RichText::new(server.clone())
                                         .size(11.0)

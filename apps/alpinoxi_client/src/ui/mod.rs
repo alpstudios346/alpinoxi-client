@@ -48,9 +48,13 @@ pub fn heading(ui: &mut egui::Ui, text: &str) {
 
 /// Primary action button, filled with the accent colour.
 pub fn primary_button(ui: &mut egui::Ui, text: &str, size: Vec2) -> Response {
-    let button = egui::Button::new(RichText::new(text).color(Color32::from_rgb(6, 14, 26)).strong())
-        .fill(theme::ACCENT)
-        .corner_radius(CornerRadius::same(10.0));
+    let button = egui::Button::new(
+        RichText::new(text)
+            .color(Color32::from_rgb(6, 14, 26))
+            .strong(),
+    )
+    .fill(theme::ACCENT)
+    .corner_radius(CornerRadius::same(10.0));
     ui.add_sized(size, button)
 }
 
@@ -66,9 +70,11 @@ pub fn ghost_button(ui: &mut egui::Ui, text: &str, size: Vec2) -> Response {
 /// A pill: rounded label with a tinted background.
 pub fn pill(ui: &mut egui::Ui, text: &str, colour: Color32) {
     let text = RichText::new(text).size(11.5).color(colour).strong();
-    let galley = ui
-        .painter()
-        .layout_no_wrap(text.text().to_owned(), egui::FontId::proportional(11.5), colour);
+    let galley = ui.painter().layout_no_wrap(
+        text.text().to_owned(),
+        egui::FontId::proportional(11.5),
+        colour,
+    );
     let padding = Vec2::new(8.0, 3.0);
     let (rect, _) = ui.allocate_exact_size(galley.size() + padding * 2.0, Sense::hover());
     ui.painter().rect_filled(
@@ -76,8 +82,7 @@ pub fn pill(ui: &mut egui::Ui, text: &str, colour: Color32) {
         CornerRadius::same(7.0),
         Color32::from_rgba_unmultiplied(colour.r(), colour.g(), colour.b(), 34),
     );
-    ui.painter()
-        .galley(rect.min + padding, galley, colour);
+    ui.painter().galley(rect.min + padding, galley, colour);
 }
 
 /// A labelled row: dim caption on the left, control on the right.
@@ -97,7 +102,8 @@ pub fn setting_row(ui: &mut egui::Ui, label: &str, hint: &str, add: impl FnOnce(
 pub fn separator(ui: &mut egui::Ui) {
     let width = ui.available_width();
     let (rect, _) = ui.allocate_exact_size(Vec2::new(width, 1.0), Sense::hover());
-    ui.painter().rect_filled(rect, CornerRadius::ZERO, theme::BORDER);
+    ui.painter()
+        .rect_filled(rect, CornerRadius::ZERO, theme::BORDER);
 }
 
 /// Empty-state block: icon-free, one line plus a hint.

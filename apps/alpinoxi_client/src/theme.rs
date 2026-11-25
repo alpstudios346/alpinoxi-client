@@ -3,7 +3,7 @@
 //! Kept in one place so every screen shares the same spacing and colour tokens
 //! instead of each panel inventing its own.
 
-use eframe::egui::{self, Color32, FontFamily, FontId, CornerRadius, Stroke, TextStyle};
+use eframe::egui::{self, Color32, CornerRadius, FontFamily, FontId, Stroke, TextStyle};
 
 pub const BG_DEEP: Color32 = Color32::from_rgb(7, 14, 30);
 pub const BG_PANEL: Color32 = Color32::from_rgb(12, 22, 43);
@@ -76,10 +76,19 @@ pub fn install(ctx: &egui::Context) {
     style.spacing.interact_size.y = 34.0;
     style.spacing.scroll.bar_width = 8.0;
     style.text_styles = [
-        (TextStyle::Heading, FontId::new(26.0, FontFamily::Proportional)),
+        (
+            TextStyle::Heading,
+            FontId::new(26.0, FontFamily::Proportional),
+        ),
         (TextStyle::Body, FontId::new(15.0, FontFamily::Proportional)),
-        (TextStyle::Button, FontId::new(15.0, FontFamily::Proportional)),
-        (TextStyle::Small, FontId::new(12.5, FontFamily::Proportional)),
+        (
+            TextStyle::Button,
+            FontId::new(15.0, FontFamily::Proportional),
+        ),
+        (
+            TextStyle::Small,
+            FontId::new(12.5, FontFamily::Proportional),
+        ),
         (
             TextStyle::Monospace,
             FontId::new(13.0, FontFamily::Monospace),

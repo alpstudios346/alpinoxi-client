@@ -95,7 +95,11 @@ pub struct AccountProfile {
 }
 
 impl AccountProfile {
-    pub fn new(provider: AccountProvider, display_name: impl Into<String>, uuid: impl Into<String>) -> Self {
+    pub fn new(
+        provider: AccountProvider,
+        display_name: impl Into<String>,
+        uuid: impl Into<String>,
+    ) -> Self {
         Self {
             provider,
             display_name: display_name.into(),
@@ -234,7 +238,10 @@ mod tests {
     #[test]
     fn cracked_names_are_validated() {
         assert!(AccountProfile::cracked("Alpinoxi").is_ok());
-        assert_eq!(AccountProfile::cracked("ab"), Err(CrackedAccountError::BadLength));
+        assert_eq!(
+            AccountProfile::cracked("ab"),
+            Err(CrackedAccountError::BadLength)
+        );
         assert_eq!(
             AccountProfile::cracked("bad name"),
             Err(CrackedAccountError::BadCharacters)

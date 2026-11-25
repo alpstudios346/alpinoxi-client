@@ -59,8 +59,18 @@ fn rail(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
     ui.horizontal(|ui| {
         icons::draw(ui, Icon::Box, theme::ACCENT, 22.0);
         ui.vertical(|ui| {
-            ui.label(RichText::new("ALPINOXI").size(18.0).strong().color(theme::TEXT));
-            ui.label(RichText::new("CLIENT").size(10.0).strong().color(theme::TEXT_DIM));
+            ui.label(
+                RichText::new("ALPINOXI")
+                    .size(18.0)
+                    .strong()
+                    .color(theme::TEXT),
+            );
+            ui.label(
+                RichText::new("CLIENT")
+                    .size(10.0)
+                    .strong()
+                    .color(theme::TEXT_DIM),
+            );
         });
     });
     ui.add_space(22.0);
@@ -82,7 +92,11 @@ fn rail(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
         } else if response.hovered() {
             painter.rect_filled(rect, CornerRadius::same(10.0), theme::BG_CARD);
         }
-        let colour = if selected { theme::ACCENT } else { theme::TEXT_DIM };
+        let colour = if selected {
+            theme::ACCENT
+        } else {
+            theme::TEXT_DIM
+        };
         let icon_rect = egui::Rect::from_center_size(
             rect.left_center() + Vec2::new(20.0, 0.0),
             Vec2::splat(20.0),
@@ -93,7 +107,11 @@ fn rail(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
             egui::Align2::LEFT_CENTER,
             screen.label(),
             egui::FontId::proportional(14.5),
-            if selected { theme::TEXT } else { theme::TEXT_DIM },
+            if selected {
+                theme::TEXT
+            } else {
+                theme::TEXT_DIM
+            },
         );
         if response.clicked() {
             app.screen = screen;
@@ -144,7 +162,11 @@ fn rail_icon(screen: Screen) -> Icon {
 fn top_bar(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
     ui.horizontal_centered(|ui| {
         ui.vertical(|ui| {
-            ui.label(RichText::new(app.slogan.clone()).size(13.5).color(theme::ACCENT));
+            ui.label(
+                RichText::new(app.slogan.clone())
+                    .size(13.5)
+                    .color(theme::ACCENT),
+            );
             ui.label(
                 RichText::new(format!(
                     "{} · {} MiB heap · {} mods enabled",
@@ -197,7 +219,10 @@ fn top_bar(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
             }
             ui.add_space(4.0);
             if ui
-                .add(egui::Button::new(RichText::new("↻").size(16.0).color(theme::TEXT_DIM)).frame(false))
+                .add(
+                    egui::Button::new(RichText::new("↻").size(16.0).color(theme::TEXT_DIM))
+                        .frame(false),
+                )
                 .on_hover_text("Another tagline")
                 .clicked()
             {

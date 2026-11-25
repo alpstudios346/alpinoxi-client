@@ -10,7 +10,7 @@
 use serde::Deserialize;
 
 use crate::token::{code_challenge, random_urlsafe, TokenSet};
-use crate::{AuthenticationError, ContentType, ELYBY_CLIENT_ID, HttpRequest, HttpResponse, Method};
+use crate::{AuthenticationError, ContentType, HttpRequest, HttpResponse, Method, ELYBY_CLIENT_ID};
 
 pub const AUTHORIZE_URL: &str = "https://account.ely.by/oauth2/v1";
 pub const TOKEN_URL: &str = "https://account.ely.by/api/oauth2/v1/token";

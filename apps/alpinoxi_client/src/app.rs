@@ -112,7 +112,10 @@ impl AlpinoxiApp {
             .map(|skin| skin.location.clone())
             .unwrap_or_default();
         let mut slogans = SloganPicker::new(SLOGANS, 0x4f1b_c1a5_9e37_2d11);
-        let slogan = slogans.next(SLOGANS).unwrap_or("Alpinoxi is best!").to_owned();
+        let slogan = slogans
+            .next(SLOGANS)
+            .unwrap_or("Alpinoxi is best!")
+            .to_owned();
         let wardrobe = Wardrobe::new(AccountProvider::Microsoft, "", settings.skin_model);
         Self {
             screen: Screen::Home,
@@ -183,11 +186,7 @@ impl AlpinoxiApp {
 
     /// Called once a flow succeeded: sets the account, wardrobe and friend book.
     pub fn connect(&mut self, profile: AccountProfile) {
-        self.wardrobe = Wardrobe::new(
-            profile.provider,
-            &profile.display_name,
-            self.skin_model,
-        );
+        self.wardrobe = Wardrobe::new(profile.provider, &profile.display_name, self.skin_model);
         self.wardrobe.resolve(self.settings.local_skin.clone());
         self.book.sign_in(Friend::new(
             profile.provider,
@@ -265,9 +264,7 @@ impl AlpinoxiApp {
         self.running = true;
         self.notice = format!(
             "Starting {} · {} with {} MiB of heap.",
-            self.settings.instance.name,
-            self.settings.instance.game_version,
-            plan.mebibytes
+            self.settings.instance.name, self.settings.instance.game_version, plan.mebibytes
         );
         self.show_toast("Launch prepared");
     }
@@ -341,7 +338,13 @@ impl AlpinoxiApp {
         let mut bridge = NullBridge;
         let mut overlay = alpinoxi_ingame::Overlay::default();
         if overlay
-            .send(message.from.clone(), &message.channel, &message.text, 0, &mut bridge)
+            .send(
+                message.from.clone(),
+                &message.channel,
+                &message.text,
+                0,
+                &mut bridge,
+            )
             .is_ok()
         {
             self.last_sent = Some(text);
@@ -386,11 +389,8 @@ impl AlpinoxiApp {
             [portrait.width as usize, portrait.height as usize],
             &portrait.rgba,
         );
-        self.skin_texture = Some(ctx.load_texture(
-            "alpinoxi-skin",
-            colour_image,
-            egui::TextureOptions::NEAREST,
-        ));
+        self.skin_texture =
+            Some(ctx.load_texture("alpinoxi-skin", colour_image, egui::TextureOptions::NEAREST));
     }
 
     pub fn accent(&self) -> egui::Color32 {

@@ -23,7 +23,11 @@ pub struct Friend {
 }
 
 impl Friend {
-    pub fn new(provider: AccountProvider, uuid: impl Into<String>, name: impl Into<String>) -> Self {
+    pub fn new(
+        provider: AccountProvider,
+        uuid: impl Into<String>,
+        name: impl Into<String>,
+    ) -> Self {
         Self {
             provider,
             uuid: uuid.into(),
@@ -51,7 +55,9 @@ pub enum Presence {
     /// Logged into the launcher but not in a world.
     InLauncher,
     /// In game, optionally on a server.
-    InGame { server: Option<String> },
+    InGame {
+        server: Option<String>,
+    },
 }
 
 impl Default for Presence {
@@ -131,7 +137,12 @@ pub struct ChatMessage {
 }
 
 impl ChatMessage {
-    pub fn new(from: Friend, channel: impl Into<String>, text: impl Into<String>, timestamp: u64) -> Self {
+    pub fn new(
+        from: Friend,
+        channel: impl Into<String>,
+        text: impl Into<String>,
+        timestamp: u64,
+    ) -> Self {
         Self {
             from,
             channel: channel.into(),

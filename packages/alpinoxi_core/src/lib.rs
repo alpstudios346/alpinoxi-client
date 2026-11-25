@@ -16,14 +16,14 @@ pub mod slogan;
 
 pub use account::{AccountProfile, AccountProvider, CrackedAccountError};
 pub use friends::{ChatMessage, Friend, FriendRequest, FriendState, Presence};
+pub use hud::{HudAnchor, HudElement, HudSettings, KeyChord, Keybind, KeybindAction, KeybindSet};
 pub use import::{
     detect, detect_all, plan, DetectedSetup, ImportItem, ImportPlan, ImportSelection, LauncherKind,
     SkipReason, SkippedItem,
 };
-pub use hud::{HudAnchor, HudElement, HudSettings, KeyChord, Keybind, KeybindAction, KeybindSet};
 pub use launcher::{
-    Instance, LaunchPlan, MemoryProfile, MemoryProfileError, PerformanceMod,
-    PERFORMANCE_MODS, SLOGANS,
+    Instance, LaunchPlan, MemoryProfile, MemoryProfileError, PerformanceMod, PERFORMANCE_MODS,
+    SLOGANS,
 };
 pub use skin::{Skin, SkinModel, SkinSource};
 pub use slogan::{Slogan, SloganPicker};

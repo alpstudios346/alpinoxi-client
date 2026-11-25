@@ -4,7 +4,7 @@
 //! HUD editor edits the same struct, so a layout arranged here is the layout the
 //! player sees in game.
 
-use eframe::egui::{self, RichText, CornerRadius};
+use eframe::egui::{self, CornerRadius, RichText};
 
 use alpinoxi_core::hud::{HudAnchor, HudElement};
 
@@ -30,7 +30,11 @@ pub fn show(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
     ui.horizontal(|ui| {
         let mut scale = app.settings.hud.scale_percent as u32;
         if ui
-            .add(egui::Slider::new(&mut scale, 50..=200).suffix("%").text("Scale"))
+            .add(
+                egui::Slider::new(&mut scale, 50..=200)
+                    .suffix("%")
+                    .text("Scale"),
+            )
             .changed()
         {
             app.settings.hud.scale_percent = scale as u8;
@@ -75,8 +79,16 @@ pub fn show(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
                     });
                 let placement = &mut app.settings.hud.placements[element.index()];
                 ui.horizontal(|ui| {
-                    ui.add(egui::DragValue::new(&mut placement.offset.0).speed(1.0).prefix("x "));
-                    ui.add(egui::DragValue::new(&mut placement.offset.1).speed(1.0).prefix("y "));
+                    ui.add(
+                        egui::DragValue::new(&mut placement.offset.0)
+                            .speed(1.0)
+                            .prefix("x "),
+                    );
+                    ui.add(
+                        egui::DragValue::new(&mut placement.offset.1)
+                            .speed(1.0)
+                            .prefix("y "),
+                    );
                 });
                 ui.end_row();
             }
@@ -94,7 +106,11 @@ pub fn show(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
         let size = egui::Vec2::new(ui.available_width(), 220.0);
         let (rect, _) = ui.allocate_exact_size(size, egui::Sense::hover());
         let painter = ui.painter();
-        painter.rect_filled(rect, CornerRadius::same(10.0), egui::Color32::from_rgb(9, 18, 34));
+        painter.rect_filled(
+            rect,
+            CornerRadius::same(10.0),
+            egui::Color32::from_rgb(9, 18, 34),
+        );
         for element in HudElement::ALL {
             if !app.settings.hud.is_visible(element) {
                 continue;
@@ -111,7 +127,11 @@ pub fn show(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
                 HudAnchor::BottomCentre => egui::Align2::CENTER_BOTTOM,
             };
             painter.text(
-                position + egui::vec2(placement.offset.0 as f32 * 0.25, placement.offset.1 as f32 * 0.25),
+                position
+                    + egui::vec2(
+                        placement.offset.0 as f32 * 0.25,
+                        placement.offset.1 as f32 * 0.25,
+                    ),
                 anchor_align,
                 element.label(),
                 egui::FontId::proportional(11.0),

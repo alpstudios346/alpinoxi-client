@@ -492,7 +492,8 @@ fn count_dirs(dir: &Path) -> usize {
             entries
                 .flatten()
                 .filter(|entry| {
-                    entry.path().is_dir() || entry.path().extension().is_some_and(|ext| ext == "zip")
+                    entry.path().is_dir()
+                        || entry.path().extension().is_some_and(|ext| ext == "zip")
                 })
                 .count()
         })
@@ -570,7 +571,8 @@ pub fn plan(
             // A mod built for another game version crashes the instance on start,
             // which looks like Alpinoxi's fault. Keep it out, and say so.
             if let Some(mod_version) = jar_game_version(&name) {
-                if !wanted_version.is_empty() && !versions_compatible(&wanted_version, &mod_version) {
+                if !wanted_version.is_empty() && !versions_compatible(&wanted_version, &mod_version)
+                {
                     skipped.push(SkippedItem {
                         relative,
                         reason: SkipReason::VersionMismatch {
@@ -774,8 +776,14 @@ mod tests {
             &dir.join("instances/Fabric 1.21.1/.minecraft/mods/lithium.jar"),
             "jar",
         );
-        write(&dir.join("instances/Fabric 1.21.1/mmc-pack.json"), "{\"components\":[{\"uid\":\"net.minecraft\",\"version\":\"1.21.1\"}]}");
-        write(&dir.join("instances/Vanilla/.minecraft/options.txt"), "fov:0.5\n");
+        write(
+            &dir.join("instances/Fabric 1.21.1/mmc-pack.json"),
+            "{\"components\":[{\"uid\":\"net.minecraft\",\"version\":\"1.21.1\"}]}",
+        );
+        write(
+            &dir.join("instances/Vanilla/.minecraft/options.txt"),
+            "fov:0.5\n",
+        );
 
         let all = detect_all(&dir);
         assert_eq!(all.len(), 2);
@@ -795,14 +803,24 @@ mod tests {
         write(&dir.join("mods/sodium.jar"), "jar");
 
         let setup = detect(&dir).unwrap();
-        let plan = plan(setup, ImportSelection::default(), "Imported", &BTreeSet::new());
+        let plan = plan(
+            setup,
+            ImportSelection::default(),
+            "Imported",
+            &BTreeSet::new(),
+        );
         assert!(plan
             .items
             .iter()
             .all(|item| !item.relative.contains("launcher_accounts")));
-        assert!(!ImportSelection { accounts: true, ..ImportSelection::default() }
+        assert!(
+            !ImportSelection {
+                accounts: true,
+                ..ImportSelection::default()
+            }
             .sanitised()
-            .accounts);
+            .accounts
+        );
     }
 
     #[test]
@@ -812,10 +830,18 @@ mod tests {
         write(&dir.join("mods/sodium-fabric-0.5.0+mc1.20.1.jar"), "jar");
         write(&dir.join("mods/lithium-fabric-0.14+mc1.21.1.jar"), "jar");
         write(&dir.join("mods/mystery.jar"), "jar");
-        write(&dir.join("launcher_profiles.json"), "{\"profiles\":{\"a\":{\"lastVersionId\":\"1.21.1\"}}}");
+        write(
+            &dir.join("launcher_profiles.json"),
+            "{\"profiles\":{\"a\":{\"lastVersionId\":\"1.21.1\"}}}",
+        );
 
         let setup = detect(&dir).unwrap();
-        let plan = plan(setup, ImportSelection::default(), "Imported", &BTreeSet::new());
+        let plan = plan(
+            setup,
+            ImportSelection::default(),
+            "Imported",
+            &BTreeSet::new(),
+        );
         let copied: Vec<&str> = plan.items.iter().map(|i| i.relative.as_str()).collect();
         assert!(copied.contains(&"mods/lithium-fabric-0.14+mc1.21.1.jar"));
         assert!(copied.contains(&"mods/mystery.jar"));
@@ -881,8 +907,16 @@ mod tests {
         write(&dir.join("saves/survival/region/r.0.0.mca"), "mca");
 
         let setup = detect(&dir).unwrap();
-        let plan = plan(setup, ImportSelection::default(), "Imported", &BTreeSet::new());
-        assert!(plan.items.iter().any(|item| item.destination == "saves/survival"));
+        let plan = plan(
+            setup,
+            ImportSelection::default(),
+            "Imported",
+            &BTreeSet::new(),
+        );
+        assert!(plan
+            .items
+            .iter()
+            .any(|item| item.destination == "saves/survival"));
         assert!(plan.warning.is_some());
         assert!(plan.total_bytes() >= 3);
     }

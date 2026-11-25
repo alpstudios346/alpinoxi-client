@@ -24,25 +24,40 @@ pub fn show(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
             .color(theme::TEXT_DIM),
         );
         ui.add_space(8.0);
-        ui::setting_row(ui, "Heap for Minecraft", "Capped at half of system RAM", |ui| {
-            for (profile, title) in [
-                (MemoryProfile::Balanced, "2 GB"),
-                (MemoryProfile::Performance, "4 GB"),
-            ] {
-                if ui
-                    .add(egui::Button::new(title).selected(app.settings.memory == profile))
-                    .clicked()
-                {
-                    app.set_memory(profile);
+        ui::setting_row(
+            ui,
+            "Heap for Minecraft",
+            "Capped at half of system RAM",
+            |ui| {
+                for (profile, title) in [
+                    (MemoryProfile::Balanced, "2 GB"),
+                    (MemoryProfile::Performance, "4 GB"),
+                ] {
+                    if ui
+                        .add(egui::Button::new(title).selected(app.settings.memory == profile))
+                        .clicked()
+                    {
+                        app.set_memory(profile);
+                    }
                 }
-            }
-        });
-        ui::setting_row(ui, "Keep launcher light", "No background scanning while you play", |ui| {
-            ui.checkbox(&mut app.settings.keep_launcher_light, "");
-        });
-        ui::setting_row(ui, "Close launcher on launch", "The game keeps running", |ui| {
-            ui.checkbox(&mut app.settings.close_launcher_on_launch, "");
-        });
+            },
+        );
+        ui::setting_row(
+            ui,
+            "Keep launcher light",
+            "No background scanning while you play",
+            |ui| {
+                ui.checkbox(&mut app.settings.keep_launcher_light, "");
+            },
+        );
+        ui::setting_row(
+            ui,
+            "Close launcher on launch",
+            "The game keeps running",
+            |ui| {
+                ui.checkbox(&mut app.settings.close_launcher_on_launch, "");
+            },
+        );
         ui.add_space(6.0);
         ui.label(
             RichText::new(format!(
@@ -111,9 +126,12 @@ pub fn show(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
                 app.save_settings();
             }
             ui.label(
-                RichText::new(format!("Settings file: {}", crate::config::settings_path().display()))
-                    .size(11.0)
-                    .color(theme::TEXT_DIM),
+                RichText::new(format!(
+                    "Settings file: {}",
+                    crate::config::settings_path().display()
+                ))
+                .size(11.0)
+                .color(theme::TEXT_DIM),
             );
         });
     });

@@ -131,9 +131,11 @@ fn options_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
         ui.add_space(10.0);
         ui::eyebrow(ui, "Local file");
         ui.label(
-            RichText::new("64x64 or 64x32 PNG. Alpinoxi checks the size before it accepts the file.")
-                .size(12.0)
-                .color(theme::TEXT_DIM),
+            RichText::new(
+                "64x64 or 64x32 PNG. Alpinoxi checks the size before it accepts the file.",
+            )
+            .size(12.0)
+            .color(theme::TEXT_DIM),
         );
         ui.add_space(6.0);
         ui.horizontal(|ui| {

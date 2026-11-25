@@ -14,10 +14,16 @@ pub fn show(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
         ui.vertical(|ui| {
             ui::eyebrow(ui, "Welcome back");
             ui.label(
-                RichText::new(format!("Ready, {}?", app.account.as_ref().map(|a| a.display_name.as_str()).unwrap_or("player")))
-                    .size(28.0)
-                    .strong()
-                    .color(theme::TEXT),
+                RichText::new(format!(
+                    "Ready, {}?",
+                    app.account
+                        .as_ref()
+                        .map(|a| a.display_name.as_str())
+                        .unwrap_or("player")
+                ))
+                .size(28.0)
+                .strong()
+                .color(theme::TEXT),
             );
         });
     });
@@ -103,24 +109,43 @@ fn instance_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
 fn memory_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
     ui::card(ui, |ui| {
         ui::eyebrow(ui, "Memory for Minecraft");
-        ui.label(RichText::new("Low RAM, high frames").size(18.0).strong().color(theme::TEXT));
         ui.label(
-            RichText::new("A bigger heap is not a faster game. Alpinoxi caps it at half of your RAM.")
-                .size(12.0)
-                .color(theme::TEXT_DIM),
+            RichText::new("Low RAM, high frames")
+                .size(18.0)
+                .strong()
+                .color(theme::TEXT),
+        );
+        ui.label(
+            RichText::new(
+                "A bigger heap is not a faster game. Alpinoxi caps it at half of your RAM.",
+            )
+            .size(12.0)
+            .color(theme::TEXT_DIM),
         );
         ui.add_space(10.0);
         for (profile, title, detail) in [
-            (MemoryProfile::Balanced, "Balanced", "2 GB · vanilla and Sodium"),
-            (MemoryProfile::Performance, "Performance", "4 GB · modded gameplay"),
+            (
+                MemoryProfile::Balanced,
+                "Balanced",
+                "2 GB · vanilla and Sodium",
+            ),
+            (
+                MemoryProfile::Performance,
+                "Performance",
+                "4 GB · modded gameplay",
+            ),
         ] {
             let selected = app.settings.memory == profile;
             let label = format!("{title}   {detail}");
             if ui
                 .add_sized(
                     [ui.available_width(), 34.0],
-                    egui::Button::new(RichText::new(label).color(if selected { theme::TEXT } else { theme::TEXT_DIM }))
-                        .selected(selected),
+                    egui::Button::new(RichText::new(label).color(if selected {
+                        theme::TEXT
+                    } else {
+                        theme::TEXT_DIM
+                    }))
+                    .selected(selected),
                 )
                 .clicked()
             {
@@ -156,10 +181,23 @@ fn account_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
         match app.account.clone() {
             Some(account) => {
                 ui.horizontal(|ui| {
-                    ui.label(RichText::new(account.display_name.clone()).size(18.0).strong().color(theme::TEXT));
-                    ui::pill(ui, account.provider.label(), theme::provider_color(account.provider));
+                    ui.label(
+                        RichText::new(account.display_name.clone())
+                            .size(18.0)
+                            .strong()
+                            .color(theme::TEXT),
+                    );
+                    ui::pill(
+                        ui,
+                        account.provider.label(),
+                        theme::provider_color(account.provider),
+                    );
                 });
-                ui.label(RichText::new(format!("UUID {}", account.uuid)).size(11.0).color(theme::TEXT_DIM));
+                ui.label(
+                    RichText::new(format!("UUID {}", account.uuid))
+                        .size(11.0)
+                        .color(theme::TEXT_DIM),
+                );
                 ui.add_space(8.0);
                 ui.label(
                     RichText::new(match app.wardrobe.skin.as_ref() {
@@ -187,7 +225,12 @@ fn account_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
         ui.add_space(10.0);
         ui::separator(ui);
         ui.add_space(8.0);
-        ui.label(RichText::new(app.slogan.clone()).size(12.5).italics().color(theme::ACCENT));
+        ui.label(
+            RichText::new(app.slogan.clone())
+                .size(12.5)
+                .italics()
+                .color(theme::ACCENT),
+        );
         ui.horizontal_wrapped(|ui| {
             for line in SLOGANS.iter().take(3) {
                 ui::pill(ui, line, Color32::from_rgb(120, 150, 190));
@@ -208,20 +251,29 @@ fn performance_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
             });
         });
         ui.label(
-            RichText::new("Client-side fixes only: they change how the game renders, never what it does.")
-                .size(12.0)
-                .color(theme::TEXT_DIM),
+            RichText::new(
+                "Client-side fixes only: they change how the game renders, never what it does.",
+            )
+            .size(12.0)
+            .color(theme::TEXT_DIM),
         );
         ui.add_space(8.0);
         ui.horizontal_wrapped(|ui| {
-            for entry in crate::catalog::entries().iter().filter(|entry| entry.performance) {
+            for entry in crate::catalog::entries()
+                .iter()
+                .filter(|entry| entry.performance)
+            {
                 let installed = app
                     .settings
                     .instance
                     .enabled_mods
                     .iter()
                     .any(|id| id == entry.id);
-                let colour = if installed { theme::MINT } else { theme::TEXT_DIM };
+                let colour = if installed {
+                    theme::MINT
+                } else {
+                    theme::TEXT_DIM
+                };
                 if ui
                     .add(
                         egui::Button::new(RichText::new(entry.name).size(12.5).color(colour))

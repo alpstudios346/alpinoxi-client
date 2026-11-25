@@ -183,7 +183,12 @@ mod tests {
     fn history_is_bounded() {
         let mut chat = ChatTabs::default();
         for index in 0..(HISTORY_LIMIT + 50) {
-            chat.push(ChatMessage::new(other(), "global", format!("line {index}"), index as u64));
+            chat.push(ChatMessage::new(
+                other(),
+                "global",
+                format!("line {index}"),
+                index as u64,
+            ));
         }
         assert_eq!(chat.active().messages().len(), HISTORY_LIMIT);
         assert_eq!(

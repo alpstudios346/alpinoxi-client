@@ -77,7 +77,11 @@ pub fn show(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
         });
         ui.add_space(10.0);
         ui.horizontal(|ui| {
-            ui.label(RichText::new("JVM arguments").size(12.0).color(theme::TEXT_DIM));
+            ui.label(
+                RichText::new("JVM arguments")
+                    .size(12.0)
+                    .color(theme::TEXT_DIM),
+            );
             let args = app.launch_plan().arguments().join(" ");
             ui.add(
                 egui::Label::new(

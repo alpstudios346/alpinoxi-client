@@ -10,7 +10,9 @@
 //! element, opening friends or chat is always a keybind, and the chat itself
 //! supports `@mentions` and tabs.
 
-use alpinoxi_core::friends::{ChatError, ChatMessage, Friend, FriendRequest, FriendState, Presence};
+use alpinoxi_core::friends::{
+    ChatError, ChatMessage, Friend, FriendRequest, FriendState, Presence,
+};
 use alpinoxi_core::hud::{HudElement, HudSettings, KeyChord, KeybindAction, KeybindSet};
 use alpinoxi_core::skin::Skin;
 
@@ -126,13 +128,15 @@ impl FriendBook {
     }
 
     pub fn accept(&mut self, counterpart: &Friend) -> Result<(), FriendError> {
+        // Resolved before the search: `?` cannot be used inside the closure
+        // `.find` takes, and borrowing `self.me` there fights the mutable
+        // borrow of `self.requests` below.
+        let me = self.me.clone().ok_or(FriendError::NotSignedIn)?;
         let request = self
             .requests
             .iter_mut()
             .find(|request| {
-                request.state == FriendState::Pending
-                    && request.counterpart(self.me.as_ref().ok_or(FriendError::NotSignedIn)?)
-                        == counterpart
+                request.state == FriendState::Pending && request.counterpart(&me) == counterpart
             })
             .ok_or(FriendError::NoSuchRequest)?;
         request.state = FriendState::Accepted;
@@ -157,12 +161,15 @@ impl FriendBook {
     }
 
     pub fn remove(&mut self, friend: &Friend) {
-        self.friends.retain(|existing| existing.key() != friend.key());
+        self.friends
+            .retain(|existing| existing.key() != friend.key());
         self.presence.retain(|(key, _)| key != &friend.key());
     }
 
     pub fn is_friend(&self, friend: &Friend) -> bool {
-        self.friends.iter().any(|existing| existing.key() == friend.key())
+        self.friends
+            .iter()
+            .any(|existing| existing.key() == friend.key())
     }
 
     pub fn friends(&self) -> &[Friend] {
@@ -178,7 +185,11 @@ impl FriendBook {
 
     pub fn set_presence(&mut self, friend: &Friend, presence: Presence) {
         let key = friend.key();
-        match self.presence.iter_mut().find(|(existing, _)| existing == &key) {
+        match self
+            .presence
+            .iter_mut()
+            .find(|(existing, _)| existing == &key)
+        {
             Some(entry) => entry.1 = presence,
             None => self.presence.push((key, presence)),
         }
@@ -205,7 +216,11 @@ impl FriendBook {
                 .is_online()
                 .cmp(&left_presence.is_online())
                 .then(right.favourite.cmp(&left.favourite))
-                .then_with(|| left.name.to_ascii_lowercase().cmp(&right.name.to_ascii_lowercase()))
+                .then_with(|| {
+                    left.name
+                        .to_ascii_lowercase()
+                        .cmp(&right.name.to_ascii_lowercase())
+                })
         });
         rows
     }
@@ -310,8 +325,7 @@ mod tests {
         }
         fn set_skin_preview(&mut self, _visible: bool) {}
         fn push_message(&mut self, channel: &str, text: &str) {
-            self.pushed
-                .push((channel.to_owned(), text.to_owned()));
+            self.pushed.push((channel.to_owned(), text.to_owned()));
         }
     }
 
@@ -338,7 +352,12 @@ mod tests {
         let binds = KeybindSet::default();
         let mut bridge = Recorder::default();
         assert_eq!(
-            handle_key(KeyChord::key(alpinoxi_core::hud::KeyCode::F9), &mut hud, &binds, &mut bridge),
+            handle_key(
+                KeyChord::key(alpinoxi_core::hud::KeyCode::F9),
+                &mut hud,
+                &binds,
+                &mut bridge
+            ),
             ActionOutcome::Nothing
         );
     }
@@ -349,10 +368,18 @@ mod tests {
         book.sign_in(me());
         let other = Friend::new(AccountProvider::Microsoft, "uuid-other", "Notch");
         book.send_request(other.clone(), 1).unwrap();
-        assert_eq!(book.send_request(other.clone(), 2), Err(FriendError::AlreadyPending));
+        assert_eq!(
+            book.send_request(other.clone(), 2),
+            Err(FriendError::AlreadyPending)
+        );
         book.accept(&other).unwrap();
         assert!(book.is_friend(&other));
-        book.set_presence(&other, Presence::InGame { server: Some("play.example".to_owned()) });
+        book.set_presence(
+            &other,
+            Presence::InGame {
+                server: Some("play.example".to_owned()),
+            },
+        );
         assert!(book.presence_of(&other).is_online());
         assert_eq!(book.sorted().len(), 1);
     }
@@ -373,7 +400,10 @@ mod tests {
         overlay
             .send(me(), "global", "  hello  ", 1, &mut bridge)
             .unwrap();
-        assert_eq!(bridge.pushed, vec![("global".to_owned(), "  hello  ".to_owned())]);
+        assert_eq!(
+            bridge.pushed,
+            vec![("global".to_owned(), "  hello  ".to_owned())]
+        );
         assert!(overlay.send(me(), "global", "   ", 2, &mut bridge).is_err());
     }
 }

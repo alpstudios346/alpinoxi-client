@@ -19,6 +19,11 @@ repositories {
 }
 
 dependencies {
+    // The bridge is a separate mod, so its classes are not on this project's
+    // classpath. Compile against the bridge's sources: same package, same
+    // signatures, and the bridge jar provides them at runtime (declared in
+    // fabric.mod.json).
+    compileOnly files('../alpinoxi-bridge/src/main/java')
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"

@@ -75,7 +75,8 @@ impl FrameHistogram {
         }
         let mut sorted: Vec<f32> = self.samples.iter().copied().collect();
         sorted.sort_by(|left, right| left.partial_cmp(right).unwrap_or(std::cmp::Ordering::Equal));
-        let rank = ((percentile.clamp(0.0, 100.0) / 100.0) * (sorted.len() - 1) as f32).round() as usize;
+        let rank =
+            ((percentile.clamp(0.0, 100.0) / 100.0) * (sorted.len() - 1) as f32).round() as usize;
         sorted[rank.min(sorted.len() - 1)]
     }
 
@@ -197,7 +198,8 @@ pub fn diagnose(stats: FrameStats, current_render_distance: u8) -> Advice {
             bottleneck: Bottleneck::Memory,
             headline: "The heap is almost full, so garbage collection is eating frames.".to_owned(),
             actions: vec![
-                "Raise the heap by one step in the launcher, but not past half of system RAM.".to_owned(),
+                "Raise the heap by one step in the launcher, but not past half of system RAM."
+                    .to_owned(),
                 "Install FerriteCore: it often saves hundreds of megabytes on its own.".to_owned(),
             ],
             render_distance: None,
@@ -210,7 +212,8 @@ pub fn diagnose(stats: FrameStats, current_render_distance: u8) -> Advice {
             bottleneck: Bottleneck::Gpu,
             headline: "The GPU is the limit: it is busy while the frame time climbs.".to_owned(),
             actions: vec![
-                "Lower the render distance by two chunks first, it costs the most pixels.".to_owned(),
+                "Lower the render distance by two chunks first, it costs the most pixels."
+                    .to_owned(),
                 "Turn off shaders or drop their shadow resolution.".to_owned(),
             ],
             render_distance: Some(step),
@@ -220,11 +223,13 @@ pub fn diagnose(stats: FrameStats, current_render_distance: u8) -> Advice {
     if stats.one_percent_low_fps < stats.average_fps * 0.55 {
         return Advice {
             bottleneck: Bottleneck::Cpu,
-            headline: "Average FPS is fine but the lows are not: this is stutter, not low speed.".to_owned(),
+            headline: "Average FPS is fine but the lows are not: this is stutter, not low speed."
+                .to_owned(),
             actions: vec![
                 "Make sure Sodium and Lithium are both installed and up to date.".to_owned(),
                 "Add Entity Culling and ImmediatelyFast: they cut per-frame CPU work.".to_owned(),
-                "Cap the frame rate to your monitor's refresh rate to flatten frame times.".to_owned(),
+                "Cap the frame rate to your monitor's refresh rate to flatten frame times."
+                    .to_owned(),
             ],
             render_distance: None,
         };
@@ -232,9 +237,11 @@ pub fn diagnose(stats: FrameStats, current_render_distance: u8) -> Advice {
 
     Advice {
         bottleneck: Bottleneck::Cpu,
-        headline: "Frames are steady. If you want more, the ceiling is the CPU, not the GPU.".to_owned(),
+        headline: "Frames are steady. If you want more, the ceiling is the CPU, not the GPU."
+            .to_owned(),
         actions: vec![
-            "Keep the render distance: dropping it would not help while the GPU is idle.".to_owned(),
+            "Keep the render distance: dropping it would not help while the GPU is idle."
+                .to_owned(),
             "Turn down simulation distance if redstone-heavy areas stutter.".to_owned(),
         ],
         render_distance: None,
@@ -348,31 +355,25 @@ mod tests {
     #[test]
     fn short_windows_are_reported_as_unknown() {
         let histogram = histogram_with(&[16.0; 10]);
-        let advice = diagnose(
-            FrameStats::from_histogram(&histogram, 40, 1_000, 4_096),
-            12,
-        );
+        let advice = diagnose(FrameStats::from_histogram(&histogram, 40, 1_000, 4_096), 12);
         assert_eq!(advice.bottleneck, Bottleneck::Unknown);
     }
 
     #[test]
     fn full_heap_is_diagnosed_first() {
         let histogram = histogram_with(&[16.0; 120]);
-        let advice = diagnose(
-            FrameStats::from_histogram(&histogram, 40, 3_950, 4_096),
-            12,
-        );
+        let advice = diagnose(FrameStats::from_histogram(&histogram, 40, 3_950, 4_096), 12);
         assert_eq!(advice.bottleneck, Bottleneck::Memory);
-        assert!(advice.actions.iter().any(|action| action.contains("FerriteCore")));
+        assert!(advice
+            .actions
+            .iter()
+            .any(|action| action.contains("FerriteCore")));
     }
 
     #[test]
     fn busy_gpu_lowers_render_distance_by_two() {
         let histogram = histogram_with(&[33.0; 120]);
-        let advice = diagnose(
-            FrameStats::from_histogram(&histogram, 99, 1_500, 4_096),
-            12,
-        );
+        let advice = diagnose(FrameStats::from_histogram(&histogram, 99, 1_500, 4_096), 12);
         assert_eq!(advice.bottleneck, Bottleneck::Gpu);
         assert_eq!(advice.render_distance, Some(10));
     }
@@ -389,10 +390,7 @@ mod tests {
         let mut samples = vec![10.0; 118];
         samples.extend_from_slice(&[80.0, 80.0]);
         let histogram = histogram_with(&samples);
-        let advice = diagnose(
-            FrameStats::from_histogram(&histogram, 60, 2_000, 4_096),
-            12,
-        );
+        let advice = diagnose(FrameStats::from_histogram(&histogram, 60, 2_000, 4_096), 12);
         assert_eq!(advice.bottleneck, Bottleneck::Cpu);
         assert!(advice.headline.contains("stutter"));
     }

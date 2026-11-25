@@ -184,12 +184,32 @@ fn selection_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
         ui::eyebrow(ui, "What to bring");
         let mut selection = app.import.selection;
         let mut changed = false;
-        changed |= toggle(ui, "Mods", "Jars for this instance's game version only", &mut selection.mods);
+        changed |= toggle(
+            ui,
+            "Mods",
+            "Jars for this instance's game version only",
+            &mut selection.mods,
+        );
         changed |= toggle(ui, "Resource packs", "", &mut selection.resource_packs);
         changed |= toggle(ui, "Shader packs", "", &mut selection.shader_packs);
-        changed |= toggle(ui, "Worlds", "Copied, not moved: the other launcher keeps its copy", &mut selection.worlds);
-        changed |= toggle(ui, "Options", "Graphics and gameplay settings", &mut selection.options);
-        changed |= toggle(ui, "Keybinds and HUD", "Off by default: another launcher's keys are not Alpinoxi's", &mut selection.settings);
+        changed |= toggle(
+            ui,
+            "Worlds",
+            "Copied, not moved: the other launcher keeps its copy",
+            &mut selection.worlds,
+        );
+        changed |= toggle(
+            ui,
+            "Options",
+            "Graphics and gameplay settings",
+            &mut selection.options,
+        );
+        changed |= toggle(
+            ui,
+            "Keybinds and HUD",
+            "Off by default: another launcher's keys are not Alpinoxi's",
+            &mut selection.settings,
+        );
 
         ui.add_space(6.0);
         ui::separator(ui);
@@ -234,8 +254,17 @@ fn toggle(ui: &mut egui::Ui, label: &str, hint: &str, value: &mut bool) -> bool 
 fn plan_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
     ui::card(ui, |ui| {
         ui::eyebrow(ui, "Review");
-        let Some(setup) = app.import.chosen.and_then(|index| app.import.detected.get(index)).cloned() else {
-            ui.label(RichText::new("Pick a setup above.").size(13.0).color(theme::TEXT_DIM));
+        let Some(setup) = app
+            .import
+            .chosen
+            .and_then(|index| app.import.detected.get(index))
+            .cloned()
+        else {
+            ui.label(
+                RichText::new("Pick a setup above.")
+                    .size(13.0)
+                    .color(theme::TEXT_DIM),
+            );
             return;
         };
 
@@ -262,7 +291,12 @@ fn plan_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
                     .color(theme::TEXT_DIM),
             );
         } else {
-            ui.label(RichText::new(plan.headline()).size(14.0).color(theme::TEXT).strong());
+            ui.label(
+                RichText::new(plan.headline())
+                    .size(14.0)
+                    .color(theme::TEXT)
+                    .strong(),
+            );
             egui::ScrollArea::vertical()
                 .max_height(160.0)
                 .show(ui, |ui| {
@@ -316,7 +350,11 @@ fn plan_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
 
         ui.add_space(8.0);
         ui.horizontal(|ui| {
-            let label = if app.import.finished { "Imported" } else { "Import" };
+            let label = if app.import.finished {
+                "Imported"
+            } else {
+                "Import"
+            };
             if ui::primary_button(ui, label, Vec2::new(140.0, 32.0)).clicked()
                 && !app.import.finished
             {
@@ -329,7 +367,11 @@ fn plan_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
                     Err(error) => app.import.status = format!("Import failed: {error}"),
                 }
             }
-            ui.label(RichText::new(&app.import.status).size(12.0).color(theme::TEXT_DIM));
+            ui.label(
+                RichText::new(&app.import.status)
+                    .size(12.0)
+                    .color(theme::TEXT_DIM),
+            );
         });
     });
 }
@@ -354,7 +396,9 @@ fn existing_names(setup: &DetectedSetup) -> std::collections::BTreeSet<String> {
 /// than no import.
 fn execute(app: &mut AlpinoxiApp) -> Result<String, String> {
     let plan = app.import.plan.clone().ok_or("nothing to import")?;
-    let root = crate::config::data_dir().join("instances").join(&plan.instance.name);
+    let root = crate::config::data_dir()
+        .join("instances")
+        .join(&plan.instance.name);
     std::fs::create_dir_all(&root).map_err(|error| error.to_string())?;
 
     let mut copied = 0;
@@ -365,12 +409,14 @@ fn execute(app: &mut AlpinoxiApp) -> Result<String, String> {
             if let Some(parent) = destination.parent() {
                 std::fs::create_dir_all(parent).map_err(|error| error.to_string())?;
             }
-            std::fs::copy(&source, &destination).map_err(|error| {
-                format!("{}: {error}", item.relative)
-            })?;
+            std::fs::copy(&source, &destination)
+                .map_err(|error| format!("{}: {error}", item.relative))?;
             copied += 1;
         } else {
-            copy_tree(&plan.source.game_dir.join(&item.relative), &root.join(&item.destination))?;
+            copy_tree(
+                &plan.source.game_dir.join(&item.relative),
+                &root.join(&item.destination),
+            )?;
             copied += 1;
         }
     }

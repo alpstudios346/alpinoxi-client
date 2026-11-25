@@ -31,7 +31,7 @@ pub fn refresh_key(provider: &str) -> String {
 
 /// In-memory vault. Everything is lost when the process exits, which is exactly
 /// what you want for tests and for a session that must not persist tokens.
-#[derive(Debug, Clone, Default)]
+#[derive(Clone, Default)]
 pub struct MemoryVault {
     entries: BTreeMap<String, String>,
 }
