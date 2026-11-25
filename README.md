@@ -15,7 +15,7 @@
 
 ## Alpinoxi Client
 
-Alpinoxi Client is an independent Minecraft launcher maintained by AlpinoxiGD. It is written in Rust and built from the open-source OneLauncher/OneClient codebase under the GPL-3.0-only licence. The launcher is designed to be responsive and modest in memory use; Minecraft itself continues to run in its own Java process with memory selected per instance.
+Alpinoxi Client is an independent Minecraft launcher maintained by AlpinoxiGD. It is written in Rust and released under the GPL-3.0-only licence. The launcher is designed to be responsive and modest in memory use; Minecraft itself continues to run in its own Java process with memory selected per instance.
 
 ### Accounts and skins
 
@@ -36,16 +36,15 @@ Prerequisites:
 - JDK **17+** with `javac`
 
 ```sh
-cargo +stable build --locked -p oneclient_app --bin oneforall_app
+cargo +stable build --locked --release --bin alpinoxi_client
 ```
 
 Run the focused checks relevant to a change:
 
 ```sh
-cargo +stable test --locked -p oneclient_auth
-cargo +stable test --locked -p oneclient_common -p oneclient_core
+cargo +stable test --locked --workspace
 cargo +stable fmt --all -- --check
-cargo +stable clippy --locked -p oneclient_auth -p oneclient_core -p oneclient_app --all-targets
+cargo +stable clippy --locked --bin alpinoxi_client
 python3 -B -m unittest discover -s distribution -p 'test_*.py'
 ```
 
@@ -53,7 +52,7 @@ Packaging and platform details remain under `distribution/`. Do not publish an i
 
 ## Open source and attribution
 
-Alpinoxi Client is GPL-3.0-only. This repository keeps the upstream notices and third-party credits required by the source and its dependencies—read [ATTRIBUTION.md](ATTRIBUTION.md) before redistributing a build.
+Alpinoxi Client is GPL-3.0-only. This repository keeps the source notices and third-party credits required by the project and its dependencies—read [ATTRIBUTION.md](ATTRIBUTION.md) before redistributing a build.
 
 Alpinoxi does not rebrand or republish third-party performance mods as its own work. Compatible upstream mods may be offered as clearly attributed dependencies when their licences permit it. Alpinoxi-authored performance modules will be released with source, licence, benchmarks and compatibility notes.
 
@@ -61,7 +60,7 @@ Alpinoxi Client is not affiliated with, endorsed by or verified by Polyfrost, Mi
 
 ## Türkçe
 
-Alpinoxi Client, AlpinoxiGD tarafından geliştirilen, Minecraft Java Edition için hafif ve açık kaynaklı bir Rust başlatıcısıdır. Kod tabanı GPL-3.0-only lisanslı açık kaynak OneLauncher/OneClient projesinden türetilmiştir; gerekli kaynak ve üçüncü taraf atıfları [ATTRIBUTION.md](ATTRIBUTION.md) içinde korunur.
+Alpinoxi Client, AlpinoxiGD tarafından geliştirilen, Minecraft Java Edition için hafif ve açık kaynaklı bir Rust başlatıcısıdır. GPL-3.0-only lisansıyla yayımlanır; gerekli kaynak ve üçüncü taraf atıfları [ATTRIBUTION.md](ATTRIBUTION.md) içinde korunur.
 
 Microsoft, Ely.by ve çevrimdışı oyuncu profilleri desteklenir. Microsoft hesabı yalnızca resmî Microsoft/Minecraft doğrulama akışıyla kullanılır; Ely.by istemci kimliği `alpinoxi-client` olarak ayarlanır. Çevrimdışı profil, sadece offline-mode kabul eden sunucular içindir ve premium/online-mode doğrulamasını aşmaz.
 
