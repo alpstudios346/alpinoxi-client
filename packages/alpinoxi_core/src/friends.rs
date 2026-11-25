@@ -49,21 +49,14 @@ impl Friend {
 }
 
 /// What a friend is doing right now. The in-game bridge pushes these.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Presence {
+    #[default]
     Offline,
     /// Logged into the launcher but not in a world.
     InLauncher,
     /// In game, optionally on a server.
-    InGame {
-        server: Option<String>,
-    },
-}
-
-impl Default for Presence {
-    fn default() -> Self {
-        Self::Offline
-    }
+    InGame { server: Option<String> },
 }
 
 impl Presence {

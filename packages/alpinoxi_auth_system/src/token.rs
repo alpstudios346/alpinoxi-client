@@ -114,6 +114,8 @@ pub fn redact_body(body: &str) -> String {
         "device_code",
         "identityToken",
         "password",
+        // Xbox Live takes the Microsoft token inside a value, as `d=<token>`.
+        "RpsTicket",
     ];
     let mut out = body.to_owned();
     for key in SENSITIVE {
@@ -135,7 +137,7 @@ fn redact_key(body: &str, key: &str, separator: &str) -> String {
             after
                 .strip_prefix("\":\"")
                 .or_else(|| after.strip_prefix("\": \""))
-                .map(|tail| ("", tail))
+                .map(|tail| ("\":\"", tail))
         };
         match value {
             Some((prefix, tail)) => {

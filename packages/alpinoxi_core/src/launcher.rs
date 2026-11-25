@@ -14,20 +14,15 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 /// RAM profiles offered in the launcher UI.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub enum MemoryProfile {
     /// 2 GB: vanilla and light Sodium setups on low-RAM machines.
+    #[default]
     Balanced,
     /// 4 GB: modded gameplay.
     Performance,
     /// Anything the player types, validated before launch.
     Custom(u16),
-}
-
-impl Default for MemoryProfile {
-    fn default() -> Self {
-        Self::Balanced
-    }
 }
 
 impl MemoryProfile {
