@@ -1,0 +1,1167 @@
+<!--
+  hudui.html: a complete interface in one file. This is a template, not a page:
+  build_ui.py fills its DATA slot. Every slot must be filled, or the build fails
+  rather than shipping a page with braces in it.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alpinoxi Client</title>
+<style>
+  :root {
+    --bg: #070e1e;
+    --panel: #0c162b;
+    --card: #111e37;
+    --card-hover: #172848;
+    --border: #1e3254;
+    --accent: #4fd1ff;
+    --accent-soft: #2680be;
+    --mint: #5eeab2;
+    --warn: #ffc45c;
+    --danger: #ff6b81;
+    --text: #e2ecfa;
+    --dim: #94a8c6;
+    --ms: #6cbe78;
+    --ely: #a87eff;
+    --crack: #ff9e5c;
+    --r: 12px;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.5 "Segoe UI", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-thumb { background: #1b2c4a; border-radius: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+
+  /* ---------- shell ---------- */
+  .app { display: grid; grid-template-columns: 232px 1fr; height: 100vh; }
+  .rail {
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    padding: 18px 14px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 2px 6px 0; }
+  .brand .mark {
+    width: 26px; height: 26px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+    box-shadow: 0 0 18px rgba(79,209,255,.35);
+  }
+  .brand h1 { font-size: 18px; letter-spacing: .12em; margin: 0; }
+  .brand small { display: block; font-size: 10px; letter-spacing: .28em; color: var(--dim); }
+  .rule { height: 1px; background: var(--border); margin: 14px 0; }
+  .nav { display: flex; flex-direction: column; gap: 4px; }
+  .nav button {
+    display: flex; align-items: center; gap: 10px;
+    background: transparent; border: 1px solid transparent;
+    border-radius: 10px; padding: 9px 11px; text-align: left;
+    color: var(--dim); font-size: 14.5px;
+    transition: background .12s, color .12s, border-color .12s;
+  }
+  .nav button:hover { background: var(--card); color: var(--text); }
+  .nav button[aria-current="page"] {
+    background: var(--card); border-color: var(--border); color: var(--text);
+  }
+  .nav button[aria-current="page"] .dot { background: var(--accent); }
+  .nav .dot { width: 7px; height: 7px; border-radius: 50%; background: #2a4268; flex: none; }
+  .nav .badge {
+    margin-left: auto; font-size: 11px; color: var(--warn);
+    background: rgba(255,196,92,.12); border-radius: 20px; padding: 1px 7px;
+  }
+  .rail-foot { margin-top: auto; font-size: 11px; color: var(--dim); padding: 0 6px; }
+  .rail-foot strong { display: block; color: var(--accent-soft); font-weight: 600; margin-bottom: 6px; }
+
+  .main { display: flex; flex-direction: column; min-width: 0; }
+  .topbar {
+    height: 66px; flex: none;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; padding: 0 22px;
+    background: var(--panel); border-bottom: 1px solid var(--border);
+  }
+  .topbar .slogan { font-size: 13.5px; color: var(--accent); }
+  .topbar .meta { font-size: 11.5px; color: var(--dim); margin-top: 2px; }
+  .topbar .right { display: flex; align-items: center; gap: 10px; }
+  .chip {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 6px 11px;
+  }
+  .chip .who { font-size: 13.5px; font-weight: 600; }
+  .chip .prov { font-size: 10.5px; }
+  .screen { padding: 22px 26px; overflow-y: auto; height: 100%; }
+  .view[hidden] { display: none; }
+
+  /* ---------- pieces ---------- */
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 16px; margin-bottom: 16px;
+  }
+  .eyebrow {
+    font-size: 11.5px; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--dim); margin-bottom: 6px;
+  }
+  h2.title { font-size: 24px; margin: 0 0 4px; }
+  h3.title { font-size: 18px; margin: 0 0 4px; }
+  .sub { font-size: 12.5px; color: var(--dim); }
+  .row { display: flex; align-items: center; gap: 10px; }
+  .row.between { justify-content: space-between; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 980px) { .grid2 { grid-template-columns: 1fr; } }
+  .btn {
+    background: transparent; border: 1px solid var(--border);
+    border-radius: 10px; padding: 8px 14px; color: var(--text);
+    transition: background .12s, border-color .12s, transform .06s;
+  }
+  .btn:hover { background: var(--card-hover); border-color: var(--accent-soft); }
+  .btn:active { transform: translateY(1px); }
+  .btn.primary {
+    background: var(--accent); border-color: var(--accent);
+    color: #06101a; font-weight: 700;
+  }
+  .btn.primary:hover { background: #6fdcff; }
+  .btn[disabled] { opacity: .45; cursor: not-allowed; }
+  .btn.sel { border-color: var(--accent); background: var(--card-hover); }
+  .pill {
+    display: inline-block; font-size: 11.5px; font-weight: 600;
+    border-radius: 20px; padding: 2px 9px; margin-right: 6px;
+  }
+  .pill.accent { color: var(--accent); background: rgba(79,209,255,.12); }
+  .pill.mint { color: var(--mint); background: rgba(94,234,178,.12); }
+  .pill.warn { color: var(--warn); background: rgba(255,196,92,.12); }
+  .pill.dim { color: var(--dim); background: rgba(148,168,198,.1); }
+  .pill.ms { color: var(--ms); background: rgba(108,190,120,.12); }
+  .pill.ely { color: var(--ely); background: rgba(168,126,255,.12); }
+  .pill.crack { color: var(--crack); background: rgba(255,158,92,.12); }
+  input[type="text"], input[type="number"], select {
+    background: #091121; border: 1px solid var(--border);
+    border-radius: 9px; padding: 8px 11px; color: var(--text);
+    font: inherit; outline: none; width: 100%;
+  }
+  input[type="text"]:focus, select:focus { border-color: var(--accent-soft); }
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+  .switch {
+    position: relative; width: 44px; height: 24px; flex: none;
+    background: #16243c; border: 1px solid var(--border);
+    border-radius: 20px; transition: background .15s;
+  }
+  .switch::after {
+    content: ""; position: absolute; top: 3px; left: 3px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--dim); transition: transform .15s, background .15s;
+  }
+  .switch[aria-pressed="true"] { background: rgba(79,209,255,.25); border-color: var(--accent-soft); }
+  .switch[aria-pressed="true"]::after { transform: translateX(20px); background: var(--accent); }
+  .toast {
+    position: fixed; right: 22px; bottom: 22px;
+    background: var(--card); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); border-radius: 10px;
+    padding: 11px 15px; font-size: 13px; max-width: 380px;
+    box-shadow: 0 12px 32px rgba(0,0,0,.45);
+    opacity: 0; transform: translateY(8px); pointer-events: none;
+    transition: opacity .18s, transform .18s;
+  }
+  .toast.show { opacity: 1; transform: none; }
+  .empty { text-align: center; padding: 26px 0; color: var(--dim); }
+  .empty strong { display: block; color: var(--text); font-size: 16px; margin-bottom: 4px; }
+
+  /* ---------- login ---------- */
+  .login {
+    min-height: 100vh; display: grid; place-items: center;
+    background:
+      radial-gradient(1000px 520px at 18% -10%, rgba(79,209,255,.10), transparent 60%),
+      radial-gradient(800px 460px at 92% 110%, rgba(168,126,255,.09), transparent 60%),
+      var(--bg);
+    padding: 32px;
+  }
+  .login .box { width: min(880px, 100%); }
+  .providers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (max-width: 760px) { .providers { grid-template-columns: 1fr; } }
+  .provider {
+    text-align: left; background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 16px; transition: border-color .12s, background .12s;
+  }
+  .provider:hover { background: var(--card-hover); }
+  .provider.sel { border-color: var(--accent); }
+  .provider .name { font-size: 16px; font-weight: 700; }
+  .provider .note { font-size: 12px; color: var(--dim); margin-top: 4px; }
+
+  /* ---------- hud preview ---------- */
+  .hud-stage {
+    position: relative; height: 420px; border-radius: 14px;
+    border: 1px solid var(--border); overflow: hidden;
+    background:
+      linear-gradient(180deg, #0b1a30 0%, #0d2038 55%, #0a1526 100%);
+  }
+  .hud-stage .horizon {
+    position: absolute; inset: 55% 0 0 0;
+    background: linear-gradient(180deg, rgba(94,234,178,.06), transparent);
+  }
+  .hud-el {
+    position: absolute; font-size: 12px; font-family: Consolas, monospace;
+    background: rgba(7,14,30,.55); border: 1px solid rgba(79,209,255,.28);
+    border-radius: 6px; padding: 3px 7px; white-space: nowrap;
+    transition: left .12s, top .12s;
+  }
+  .hud-el.off { opacity: .22; border-style: dashed; }
+  .anchor-group { display: flex; flex-wrap: wrap; gap: 6px; }
+  .anchor-group button {
+    background: transparent; border: 1px solid var(--border);
+    border-radius: 8px; padding: 5px 10px; font-size: 12px; color: var(--dim);
+  }
+  .anchor-group button.sel { border-color: var(--accent); color: var(--text); }
+  .el-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 0; border-bottom: 1px solid rgba(30,50,84,.55);
+  }
+  .el-row:last-child { border-bottom: 0; }
+  .el-row .lbl { flex: 1; font-size: 13.5px; }
+
+  /* ---------- skin ---------- */
+  .skin-stage {
+    position: relative; height: 360px; border-radius: 14px; overflow: hidden;
+    background:
+      conic-gradient(from 90deg, #0d182b 0 25%, #0b1424 0 50%, #0d182b 0 75%, #0b1424 0);
+    background-size: 24px 24px;
+    display: grid; place-items: center;
+  }
+  .skin-figure {
+    width: 150px; height: 300px; border-radius: 8px;
+    background: linear-gradient(160deg, #4fd1ff 0%, #2680be 40%, #12304f 100%);
+    box-shadow: 0 18px 40px rgba(0,0,0,.45);
+    position: relative; image-rendering: pixelated;
+  }
+  .skin-figure::before, .skin-figure::after {
+    content: ""; position: absolute; background: rgba(255,255,255,.10);
+    border-radius: 4px;
+  }
+  .skin-figure::before { left: 8%; top: 6%; width: 84%; height: 22%; }
+  .skin-figure::after { left: 8%; top: 34%; width: 84%; height: 30%; }
+  .skin-figure.slim { width: 132px; }
+
+  /* ---------- friends ---------- */
+  .friend {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 0; border-bottom: 1px solid rgba(30,50,84,.55);
+  }
+  .friend:last-child { border-bottom: 0; }
+  .friend .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .friend .name { font-weight: 600; font-size: 13.5px; }
+  .friend .where { margin-left: auto; font-size: 11.5px; color: var(--dim); }
+  .chatlog {
+    height: 190px; overflow-y: auto; background: #091121;
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px; font-size: 13px;
+  }
+  .chatlog p { margin: 0 0 6px; }
+  .chatlog .who { color: var(--accent); font-weight: 600; }
+
+  /* ---------- catalogue ---------- */
+  .mod {
+    display: flex; align-items: flex-start; gap: 12px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 14px; margin-bottom: 10px;
+  }
+  .mod .body { flex: 1; min-width: 0; }
+  .mod .nm { font-size: 15.5px; font-weight: 700; }
+  .mod .sum { font-size: 12.5px; color: var(--dim); margin: 3px 0 6px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+
+  /* ---------- keybinds ---------- */
+  .bind {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid rgba(30,50,84,.55);
+  }
+  .bind:last-child { border-bottom: 0; }
+  .bind .act { flex: 1; font-size: 13.5px; }
+  .key {
+    min-width: 132px; text-align: center; font-family: Consolas, monospace;
+    font-size: 12.5px; background: #091121; border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 10px;
+  }
+  .key.arming { border-color: var(--warn); color: var(--warn); }
+</style>
+</head>
+<body>
+<div class="login" id="login-view">
+  <div class="box">
+    <div class="row" style="gap:12px;margin-bottom:22px">
+      <div class="mark" style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-soft))"></div>
+      <div>
+        <h2 class="title" style="letter-spacing:.1em">ALPINOXI</h2>
+        <div class="sub" style="letter-spacing:.3em;font-size:10px">CLIENT</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow">Sign in</div>
+      <h3 class="title">Pick your account type</h3>
+      <div class="sub" style="margin-bottom:14px">
+        All three work the same way: skins, friends and the HUD included.
+      </div>
+
+      <div class="providers" id="providers"></div>
+
+      <div id="cracked-box" style="margin-top:14px;display:none">
+        <label class="eyebrow" for="cracked-name">In-game name</label>
+        <div class="row">
+          <input id="cracked-name" type="text" placeholder="Alpinoxi" autocomplete="off">
+          <button class="btn primary" id="cracked-go" style="min-width:120px">Continue</button>
+        </div>
+        <div class="sub" style="margin-top:8px">
+          Cracked accounts run offline. Skins show only to people on servers that accept them.
+        </div>
+      </div>
+
+      <div id="browser-box" style="margin-top:14px;display:none">
+        <div class="row between">
+          <div>
+            <div class="eyebrow">Browser sign-in</div>
+            <div class="sub" id="browser-note"></div>
+          </div>
+          <button class="btn" id="browser-go">Open sign-in</button>
+        </div>
+      </div>
+
+      <div class="sub" id="login-notice" style="margin-top:14px"></div>
+    </div>
+
+    <div class="sub" style="text-align:center;margin-top:14px" id="login-slogan"></div>
+  </div>
+</div>
+
+<div class="app" id="app-view" hidden>
+  <aside class="rail">
+    <div class="brand">
+      <div class="mark"></div>
+      <div><h1>ALPINOXI</h1><small>CLIENT</small></div>
+    </div>
+    <div class="rule"></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="rail-foot">
+      <strong>No Electron. No web view.</strong>
+      <span id="rail-version"></span>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <div class="slogan" id="top-slogan"></div>
+        <div class="meta" id="top-meta"></div>
+      </div>
+      <div class="right">
+        <div class="chip" id="account-chip">
+          <span class="dot" style="width:9px;height:9px;border-radius:50%"></span>
+          <div><div class="who"></div><div class="prov"></div></div>
+        </div>
+        <button class="btn" id="sign-out">Sign out</button>
+        <button class="btn primary" id="top-launch" style="min-width:112px">Launch</button>
+      </div>
+    </header>
+
+    <main class="screen">
+      <section class="view" id="view-home">
+        <div class="card">
+          <div class="row between">
+            <div>
+              <div class="eyebrow">Selected instance</div>
+              <h2 class="title" id="home-instance"></h2>
+              <div class="sub" id="home-instance-meta"></div>
+            </div>
+            <div class="row">
+              <button class="btn" data-goto="import">Import</button>
+              <button class="btn" data-goto="instances">Edit</button>
+              <button class="btn primary" id="home-launch" style="min-width:150px">Launch game</button>
+            </div>
+          </div>
+          <div class="rule"></div>
+          <div id="home-pills"></div>
+          <div class="sub" id="home-ram-note" style="margin-top:8px"></div>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <div class="eyebrow">Memory for Minecraft</div>
+            <h3 class="title">Low RAM, high frames</h3>
+            <div class="sub" style="margin-bottom:12px">
+              A bigger heap is not a faster game. Alpinoxi caps it at half of your RAM.
+            </div>
+            <div class="row" style="gap:8px;margin-bottom:10px">
+              <button class="btn" data-mem="2048" style="flex:1">Balanced · 2 GB</button>
+              <button class="btn" data-mem="4096" style="flex:1">Performance · 4 GB</button>
+            </div>
+            <input type="range" id="ram-slider" min="512" max="16384" step="512">
+            <div class="sub" id="ram-label" style="margin-top:6px"></div>
+          </div>
+
+          <div class="card">
+            <div class="eyebrow">Account</div>
+            <div class="row" style="gap:8px">
+              <h3 class="title" id="acct-name" style="margin:0"></h3>
+              <span class="pill dim" id="acct-prov"></span>
+            </div>
+            <div class="sub" id="acct-uuid" style="margin-top:4px"></div>
+            <div class="rule"></div>
+            <div class="sub" id="acct-skin"></div>
+            <div class="row" style="margin-top:12px">
+              <button class="btn" data-goto="skin">Open wardrobe</button>
+              <button class="btn" data-goto="friends">Friends</button>
+            </div>
+            <div class="rule"></div>
+            <div class="sub" id="acct-slogan" style="color:var(--accent)"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="row between">
+            <div class="eyebrow">Performance</div>
+            <button class="btn" data-goto="mods">Open catalogue</button>
+          </div>
+          <div class="sub" style="margin-bottom:10px">
+            Client-side fixes only: they change how the game renders, never what it does.
+          </div>
+          <div id="home-perf"></div>
+        </div>
+      </section>
+
+      <section class="view" id="view-instances" hidden>
+        <div class="eyebrow">Instances</div>
+        <h2 class="title">Your worlds, separated</h2>
+        <div class="sub" style="margin-bottom:16px">
+          Each instance keeps its own mods, resource packs, HUD layout and RAM plan.
+        </div>
+        <div class="card">
+          <div class="row" style="gap:12px;flex-wrap:wrap">
+            <div style="flex:2;min-width:200px">
+              <div class="eyebrow">Name</div>
+              <input type="text" id="inst-name">
+            </div>
+            <div style="flex:1;min-width:120px">
+              <div class="eyebrow">Game version</div>
+              <input type="text" id="inst-version">
+            </div>
+            <div style="flex:1;min-width:140px">
+              <div class="eyebrow">Loader</div>
+              <select id="inst-loader">
+                <option value="fabric">fabric</option>
+                <option value="quilt">quilt</option>
+                <option value="neoforge">neoforge</option>
+                <option value="vanilla">vanilla</option>
+              </select>
+            </div>
+          </div>
+          <div class="rule"></div>
+          <div class="row between">
+            <div>
+              <div class="eyebrow">Enabled mods</div>
+              <div class="sub" id="inst-mods"></div>
+            </div>
+            <button class="btn" data-goto="mods">Manage</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-skin" hidden>
+        <div class="eyebrow">Wardrobe</div>
+        <h2 class="title">Your skin, no commands</h2>
+        <div class="sub" style="margin-bottom:16px">
+          Pick a model, drop in a PNG, done. Everything is a button here.
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="eyebrow">Preview</div>
+            <div class="skin-stage">
+              <div class="skin-figure" id="skin-figure"></div>
+            </div>
+            <div style="margin-top:10px" id="skin-pills"></div>
+          </div>
+          <div class="card">
+            <div class="eyebrow">Model</div>
+            <div class="row" style="gap:8px">
+              <button class="btn" data-model="classic" style="flex:1">Classic<br><span class="sub">4px arms · Steve</span></button>
+              <button class="btn" data-model="slim" style="flex:1">Slim<br><span class="sub">3px arms · Alex</span></button>
+            </div>
+            <div class="rule"></div>
+            <div class="eyebrow">Local file</div>
+            <div class="sub" style="margin-bottom:6px">
+              64x64 or 64x32 PNG. Alpinoxi checks the size before it accepts the file.
+            </div>
+            <div class="row">
+              <input type="text" id="skin-path" placeholder="C:/Users/you/skin.png">
+              <button class="btn primary" id="skin-apply" style="min-width:96px">Apply</button>
+            </div>
+            <div class="rule"></div>
+            <div class="eyebrow">Who can see it</div>
+            <div class="sub" id="skin-visibility"></div>
+            <div class="rule"></div>
+            <div class="eyebrow">Upload target</div>
+            <div class="sub" id="skin-upload"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-friends" hidden>
+        <div class="eyebrow">Friends</div>
+        <h2 class="title">Everyone, whichever account they use</h2>
+        <div class="sub" style="margin-bottom:16px">
+          Microsoft, Ely.by and cracked players sit in the same list.
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="eyebrow">Add a friend</div>
+            <div class="row" style="margin-bottom:12px">
+              <input type="text" id="friend-name" placeholder="Name">
+              <button class="btn primary" id="friend-add" style="min-width:110px">Send request</button>
+            </div>
+            <div class="eyebrow">Online</div>
+            <div id="friend-list"></div>
+            <div id="friend-requests"></div>
+          </div>
+          <div class="card">
+            <div class="eyebrow">Chat</div>
+            <div class="row" style="margin-bottom:8px" id="chat-tabs"></div>
+            <div class="chatlog" id="chatlog"></div>
+            <div class="row" style="margin-top:8px">
+              <input type="text" id="chat-input" placeholder="Message">
+              <button class="btn primary" id="chat-send" style="min-width:86px">Send</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-mods" hidden>
+        <div class="eyebrow">Catalogue</div>
+        <h2 class="title">Mods and resource packs</h2>
+        <div class="sub" style="margin-bottom:14px">
+          Hand-picked, open source, and linked to their own project page so the authors keep the credit.
+        </div>
+        <div class="filters">
+          <input type="text" id="mod-search" placeholder="Search" style="max-width:280px">
+          <button class="btn" data-kind="mod">Mods</button>
+          <button class="btn" data-kind="resourcepack">Resource packs</button>
+          <button class="btn" id="mod-perf">Performance only</button>
+        </div>
+        <div id="mod-list"></div>
+      </section>
+
+      <section class="view" id="view-import" hidden>
+        <div class="eyebrow">Import</div>
+        <h2 class="title">Bring your worlds over</h2>
+        <div class="sub" style="margin-bottom:16px">
+          Alpinoxi copies, never moves: your other launcher stays exactly as it is.
+          Accounts are never imported, because their tokens are encrypted with the other launcher's key.
+        </div>
+        <div class="card">
+          <div class="eyebrow">Launcher folder</div>
+          <div class="row">
+            <input type="text" id="import-path" placeholder="C:/Users/you/AppData/Roaming/.minecraft">
+            <button class="btn" id="import-scan" style="min-width:110px">Scan</button>
+          </div>
+          <div class="sub" id="import-result" style="margin-top:12px"></div>
+        </div>
+      </section>
+
+      <section class="view" id="view-settings" hidden>
+        <div class="eyebrow">Settings</div>
+        <h2 class="title">Launcher</h2>
+        <div class="sub" style="margin-bottom:16px">What Alpinoxi remembers between runs.</div>
+        <div class="grid2">
+          <div class="card">
+            <div class="eyebrow">Launcher behaviour</div>
+            <div class="row between" style="padding:8px 0">
+              <div>
+                <div>Keep the launcher light</div>
+                <div class="sub">Release the window's memory once the game starts.</div>
+              </div>
+              <button class="switch" id="set-light" aria-pressed="false" aria-label="Keep the launcher light"></button>
+            </div>
+            <div class="row between" style="padding:8px 0">
+              <div>
+                <div>Close launcher on launch</div>
+                <div class="sub">Hand the window back to the game.</div>
+              </div>
+              <button class="switch" id="set-close" aria-pressed="false" aria-label="Close launcher on launch"></button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="eyebrow">HUD</div>
+            <div class="row between" style="padding:8px 0">
+              <div>
+                <div>HUD in game</div>
+                <div class="sub">The mod reads this before its first frame.</div>
+              </div>
+              <button class="switch" id="set-hud" aria-pressed="true" aria-label="HUD in game"></button>
+            </div>
+            <div class="row between" style="padding:8px 0">
+              <div>
+                <div>Background behind elements</div>
+                <div class="sub">Turn off for a cleaner screen.</div>
+              </div>
+              <button class="switch" id="set-hudbg" aria-pressed="true" aria-label="HUD background"></button>
+            </div>
+            <div class="eyebrow" style="margin-top:12px">HUD scale</div>
+            <input type="range" id="hud-scale" min="50" max="200" step="5">
+            <div class="sub" id="hud-scale-label" style="margin-top:6px"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="eyebrow">Keybinds</div>
+          <h3 class="title">Your keys, not a command list</h3>
+          <div class="sub" style="margin-bottom:10px">Click a key, press the new combination. Escape cancels.</div>
+          <div id="bind-list"></div>
+          <div class="row" style="margin-top:12px">
+            <button class="btn" id="bind-reset">Reset to defaults</button>
+            <span class="sub" id="bind-conflict"></span>
+          </div>
+          <div class="sub" style="margin-top:10px;color:var(--accent-soft)">
+            Defaults: Shift+H HUD editor · F1 toggle HUD · O friends · Y chat · U skin preview
+          </div>
+        </div>
+        <div class="card">
+          <div class="eyebrow">HUD editor</div>
+          <div class="sub" style="margin-bottom:12px">Click an element to hide or show it. Drag a chip in game with Shift+H.</div>
+          <div class="row" style="align-items:flex-start;gap:16px;flex-wrap:wrap">
+            <div class="hud-stage" id="hud-stage" style="flex:1;min-width:340px"></div>
+            <div style="flex:1;min-width:280px" id="hud-elements"></div>
+          </div>
+          <div class="eyebrow" style="margin-top:12px">Anchor for the selected element</div>
+          <div class="anchor-group" id="anchor-group"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+
+// ---------- data the launcher hands over ----------
+const DATA = {"version": "0.2.0", "slogan": "OneClient is best!", "system_memory_mib": 6082, "memory_mib": 2048, "keep_light": true, "close_on_launch": false, "provider": "microsoft", "cracked_name": "", "skin_model": "Classic", "skin_source": "None", "skin_note": "No skin selected yet.", "upload_target": "local only", "providers": [{"id": "microsoft", "name": "Microsoft", "note": "The real account. Skins, capes and friends everywhere.", "browser": "Alpinoxi opens your browser and waits for Microsoft to hand back a token. No password is typed into the launcher."}, {"id": "elyby", "name": "Ely.by", "note": "Skins through Ely.by, client id alpinoxi-client.", "browser": "Ely.by sign-in opens in your browser. The launcher only ever sees the token, never your password."}, {"id": "offline", "name": "Cracked", "note": "No account needed. Skins only where the server accepts them.", "browser": ""}], "account": null, "uuid_for": "\u003cfunction uuid_for at 0x000001E5F03336A0\u003e", "instance": {"name": "Vanilla", "version": "1.21.1", "loader": "fabric", "enabled_mods": [], "resource_packs": 0}, "performance": [{"id": "sodium", "name": "Sodium", "summary": "Rewrites the chunk renderer: the single biggest FPS win"}, {"id": "lithium", "name": "Lithium", "summary": "Faster ticks, AI and physics without changing behaviour"}, {"id": "ferritecore", "name": "FerriteCore", "summary": "Cuts model and block-state memory by roughly half"}, {"id": "krypton", "name": "Krypton", "summary": "Moves networking off the render thread"}, {"id": "modernfix", "name": "ModernFix", "summary": "Faster startup and fewer stutters on modded packs"}, {"id": "entityculling", "name": "Entity Culling", "summary": "Skips rendering entities you cannot see"}, {"id": "indium", "name": "Indium", "summary": "Sodium compatibility layer for mods that use the Fabric renderer"}, {"id": "immediatelyfast", "name": "ImmediatelyFast", "summary": "Batches immediate-mode GUI and text rendering"}, {"id": "memoryleakfix", "name": "Memory Leak Fix", "summary": "Patches known leaks that grow over a long session"}], "catalog": [{"id": "sodium", "name": "Sodium", "summary": "Rewrites the chunk renderer: the single biggest FPS win", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/sodium"}, {"id": "lithium", "name": "Lithium", "summary": "Faster ticks, AI and physics without changing behaviour", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/lithium"}, {"id": "ferritecore", "name": "FerriteCore", "summary": "Cuts model and block-state memory by roughly half", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/ferritecore"}, {"id": "krypton", "name": "Krypton", "summary": "Moves networking off the render thread", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/krypton"}, {"id": "modernfix", "name": "ModernFix", "summary": "Faster startup and fewer stutters on modded packs", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/modernfix"}, {"id": "entityculling", "name": "Entity Culling", "summary": "Skips rendering entities you cannot see", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/entityculling"}, {"id": "indium", "name": "Indium", "summary": "Sodium compatibility layer for mods that use the Fabric renderer", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/indium"}, {"id": "immediatelyfast", "name": "ImmediatelyFast", "summary": "Batches immediate-mode GUI and text rendering", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/immediatelyfast"}, {"id": "memoryleakfix", "name": "Memory Leak Fix", "summary": "Patches known leaks that grow over a long session", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/memoryleakfix"}, {"id": "fabric-api", "name": "Fabric API", "summary": "The hooks every Fabric mod builds on", "kind": "mod", "performance": false, "licence": "Open source, official release", "url": "https://modrinth.com/mod/fabric-api"}, {"id": "modmenu", "name": "Mod Menu", "summary": "A settings screen for the mods you install", "kind": "mod", "performance": false, "licence": "Open source, official release", "url": "https://modrinth.com/mod/modmenu"}, {"id": "iris", "name": "Iris Shaders", "summary": "Shader packs on top of Sodium", "kind": "mod", "performance": false, "licence": "Open source, official release", "url": "https://modrinth.com/mod/iris"}, {"id": "alpinoxi-pack", "name": "Alpinoxi HUD pack", "summary": "The pack the launcher's HUD previews", "kind": "resourcepack", "performance": false, "licence": "Alpinoxi, MIT", "url": "https://modrinth.com/resourcepack/"}, {"id": "fresh-animations", "name": "Fresh Animations", "summary": "Living mob animations, no extra frames", "kind": "resourcepack", "performance": false, "licence": "CC BY-NC-SA", "url": "https://modrinth.com/resourcepack/fresh-animations"}], "friends": [{"name": "Alpinoxi", "provider": "Ely.by", "presence": "In game", "server": "play.alpinoxi.net"}, {"name": "Steve", "provider": "Microsoft", "presence": "In launcher", "server": null}, {"name": "Alex", "provider": "Offline", "presence": "Offline", "server": null}], "pending": 1, "hud": {"enabled": true, "background": true, "scale_percent": 100, "elements": [{"id": "fps", "label": "FPS", "anchor": "Top left", "visible": true, "sample": "144 FPS"}, {"id": "coordinates", "label": "Coordinates", "anchor": "Top left", "visible": true, "sample": "X 128  Y 71  Z -64"}, {"id": "ping", "label": "Ping", "anchor": "Top right", "visible": true, "sample": "23 ms"}, {"id": "keystrokes", "label": "Keystrokes", "anchor": "Bottom left", "visible": true, "sample": "W A S D"}, {"id": "armor", "label": "Armor", "anchor": "Bottom left", "visible": true, "sample": "⛊⛊⛊⛊"}, {"id": "potion_effects", "label": "Potion effects", "anchor": "Top right", "visible": true, "sample": "Speed 1:12"}, {"id": "server_address", "label": "Server address", "anchor": "Top right", "visible": true, "sample": "play.alpinoxi.net"}, {"id": "clock", "label": "Clock", "anchor": "Top left", "visible": true, "sample": "21:40"}, {"id": "friends", "label": "Friends online", "anchor": "Top right", "visible": true, "sample": "3 online"}, {"id": "reach", "label": "Reach", "anchor": "Bottom centre", "visible": true, "sample": "3.0 blocks"}]}, "binds": [{"action": "Open HUD editor", "chord": "Shift+H", "vanilla": false}, {"action": "Toggle HUD", "chord": "F1", "vanilla": false}, {"action": "Open friends", "chord": "O", "vanilla": false}, {"action": "Open chat", "chord": "Y", "vanilla": false}, {"action": "Toggle skin preview", "chord": "U", "vanilla": false}, {"action": "Toggle FPS", "chord": "F1+FPS", "vanilla": false}], "default_binds": [{"action": "Open HUD editor", "chord": "Shift+H", "vanilla": false}, {"action": "Toggle HUD", "chord": "F1", "vanilla": false}, {"action": "Open friends", "chord": "O", "vanilla": false}, {"action": "Open chat", "chord": "Y", "vanilla": false}, {"action": "Toggle skin preview", "chord": "U", "vanilla": false}, {"action": "Toggle FPS", "chord": "F1+FPS", "vanilla": false}]};
+
+const SCREENS = ["home", "instances", "skin", "friends", "mods", "import", "settings"];
+const LABELS = {
+  home: "Home", instances: "Instances", skin: "Skin", friends: "Friends",
+  mods: "Mods & packs", import: "Import", settings: "Settings"
+};
+const ANCHORS = ["Top left", "Top right", "Bottom left", "Bottom right", "Bottom centre"];
+
+const state = {
+  screen: "home",
+  data: DATA,
+  signedIn: false,
+  arming: null,
+  selectedElement: "fps",
+  chat: [{ who: "System", text: "Welcome to Alpinoxi chat. Press Y in game to open it.", local: false }],
+  chatChannel: "global",
+  modQuery: "",
+  modKind: null,
+  modPerf: false,
+  toastTimer: null
+};
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({
+  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+}[c]));
+
+function toast(text) {
+  const el = $("toast");
+  el.textContent = text;
+  el.classList.add("show");
+  clearTimeout(state.toastTimer);
+  state.toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
+}
+
+function pillClass(provider) {
+  return provider === "Microsoft" ? "ms" : provider === "Ely.by" ? "ely" : "crack";
+}
+
+function planHeap() {
+  const requested = state.data.memory_mib;
+  const ceiling = Math.min(Math.floor(state.data.system_memory_mib / 2), 8192);
+  return Math.max(512, Math.min(requested, ceiling));
+}
+
+// ---------- login ----------
+function renderProviders() {
+  const host = $("providers");
+  host.innerHTML = "";
+  state.data.providers.forEach((p) => {
+    const b = document.createElement("button");
+    b.className = "provider" + (state.data.provider === p.id ? " sel" : "");
+    b.innerHTML = `<div class="name">${esc(p.name)}</div><div class="note">${esc(p.note)}</div>`;
+    b.onclick = () => {
+      state.data.provider = p.id;
+      $("cracked-box").style.display = p.id === "offline" ? "block" : "none";
+      $("browser-box").style.display = p.id === "offline" ? "none" : "block";
+      $("browser-note").textContent = p.browser;
+      $("login-notice").textContent = p.note;
+      renderProviders();
+    };
+    host.appendChild(b);
+  });
+}
+
+function signIn(profile) {
+  state.data.account = profile;
+  state.signedIn = true;
+  $("login-view").hidden = true;
+  $("app-view").hidden = false;
+  renderAll();
+  toast(`Signed in as ${profile.name}`);
+}
+
+$("cracked-go").onclick = () => {
+  const name = $("cracked-name").value.trim();
+  if (name.length < 3) {
+    $("login-notice").textContent = "A name needs at least three characters.";
+    return;
+  }
+  signIn({ name, provider: "Offline", uuid: state.data.uuid_for(name) });
+};
+
+$("browser-go").onclick = () => {
+  $("login-notice").textContent =
+    "Alpinoxi opens your browser. Nothing is typed into this window: the code goes straight to the provider.";
+};
+
+// ---------- shell ----------
+function renderNav() {
+  const nav = $("nav");
+  nav.innerHTML = "";
+  SCREENS.forEach((s) => {
+    const b = document.createElement("button");
+    b.innerHTML = `<span class="dot"></span><span>${LABELS[s]}</span>`;
+    if (s === state.screen) b.setAttribute("aria-current", "page");
+    b.onclick = () => go(s);
+    nav.appendChild(b);
+  });
+}
+
+function go(screen) {
+  state.screen = screen;
+  SCREENS.forEach((s) => { $("view-" + s).hidden = s !== screen; });
+  renderNav();
+  document.querySelector(".screen").scrollTop = 0;
+}
+
+document.querySelectorAll("[data-goto]").forEach((b) => {
+  b.onclick = () => go(b.dataset.goto);
+});
+
+$("sign-out").onclick = () => {
+  state.signedIn = false;
+  state.data.account = null;
+  $("app-view").hidden = true;
+  $("login-view").hidden = false;
+};
+
+$("top-launch").onclick = $("home-launch").onclick = () => {
+  toast(`Starting ${state.data.instance.name} · ${state.data.instance.version} with ${planHeap()} MiB`);
+};
+
+// ---------- home ----------
+function renderHome() {
+  const inst = state.data.instance;
+  $("home-instance").textContent = inst.name;
+  $("home-instance-meta").textContent =
+    `${inst.version} · ${inst.loader} · ${inst.enabled_mods.length} mods · ${inst.resource_packs} resource packs`;
+  $("home-pills").innerHTML = [
+    `<span class="pill accent">${planHeap()} MiB heap</span>`,
+    `<span class="pill mint">G1GC tuned</span>`,
+    `<span class="pill dim">${state.data.keep_light ? "Launcher stays light" : "Launcher kept open"}</span>`
+  ].join("");
+  $("home-ram-note").textContent = planHeap() < state.data.memory_mib
+    ? `${state.data.memory_mib} MiB was requested, but this machine has ${state.data.system_memory_mib} MiB of RAM, so Alpinoxi will use ${planHeap()} MiB.`
+    : "";
+
+  const acct = state.data.account || { name: "-", provider: "Offline", uuid: "-" };
+  $("acct-name").textContent = acct.name;
+  $("acct-prov").textContent = acct.provider;
+  $("acct-prov").className = "pill " + pillClass(acct.provider);
+  $("acct-uuid").textContent = "UUID " + acct.uuid;
+  $("acct-skin").textContent = state.data.skin_note;
+  $("acct-slogan").textContent = state.data.slogan;
+
+  $("top-slogan").textContent = state.data.slogan;
+  $("top-meta").textContent =
+    `${inst.version} · ${planHeap()} MiB heap · ${inst.enabled_mods.length} mods enabled`;
+  $("account-chip").querySelector(".who").textContent = acct.name;
+  $("account-chip").querySelector(".prov").textContent = acct.provider;
+  $("account-chip").querySelector(".prov").className = "prov";
+  $("account-chip").querySelector(".dot").style.background =
+    acct.provider === "Microsoft" ? "var(--ms)" : acct.provider === "Ely.by" ? "var(--ely)" : "var(--crack)";
+
+  document.querySelectorAll("[data-mem]").forEach((b) => {
+    b.classList.toggle("sel", Number(b.dataset.mem) === state.data.memory_mib);
+  });
+  $("ram-slider").value = state.data.memory_mib;
+  $("ram-label").textContent =
+    `${planHeap()} MiB heap · system RAM ${state.data.system_memory_mib} MiB`;
+
+  $("home-perf").innerHTML = state.data.performance.map((m) => {
+    const on = state.data.instance.enabled_mods.includes(m.id);
+    return `<button class="btn ${on ? "sel" : ""}" data-mod="${esc(m.id)}" title="${esc(m.summary)}">${esc(m.name)}</button>`;
+  }).join(" ");
+  $("home-perf").querySelectorAll("[data-mod]").forEach((b) => {
+    b.onclick = () => toggleMod(b.dataset.mod);
+  });
+}
+
+document.querySelectorAll("[data-mem]").forEach((b) => {
+  b.onclick = () => { state.data.memory_mib = Number(b.dataset.mem); renderHome(); };
+});
+$("ram-slider").oninput = (e) => {
+  state.data.memory_mib = Number(e.target.value);
+  renderHome();
+};
+
+function toggleMod(id) {
+  const list = state.data.instance.enabled_mods;
+  const at = list.indexOf(id);
+  if (at === -1) list.push(id); else list.splice(at, 1);
+  renderHome();
+  renderMods();
+  toast(at === -1 ? "Added to the instance" : "Removed from the instance");
+}
+
+// ---------- instances ----------
+function renderInstances() {
+  const inst = state.data.instance;
+  $("inst-name").value = inst.name;
+  $("inst-version").value = inst.version;
+  $("inst-loader").value = inst.loader;
+  $("inst-mods").textContent = inst.enabled_mods.length
+    ? inst.enabled_mods.join(", ")
+    : "No mods yet.";
+}
+$("inst-name").oninput = (e) => { state.data.instance.name = e.target.value; renderHome(); };
+$("inst-version").oninput = (e) => { state.data.instance.version = e.target.value; renderHome(); };
+$("inst-loader").onchange = (e) => { state.data.instance.loader = e.target.value; renderHome(); };
+
+// ---------- skin ----------
+function renderSkin() {
+  const fig = $("skin-figure");
+  fig.className = "skin-figure" + (state.data.skin_model === "Slim" ? " slim" : "");
+  $("skin-pills").innerHTML = [
+    `<span class="pill accent">${esc(state.data.skin_model)}</span>`,
+    `<span class="pill dim">${esc(state.data.skin_source)}</span>`
+  ].join("");
+  $("skin-visibility").textContent = state.data.skin_note;
+  $("skin-upload").textContent = state.data.upload_target;
+  document.querySelectorAll("[data-model]").forEach((b) => {
+    b.classList.toggle("sel", b.dataset.model === state.data.skin_model.toLowerCase());
+  });
+}
+document.querySelectorAll("[data-model]").forEach((b) => {
+  b.onclick = () => {
+    state.data.skin_model = b.dataset.model === "slim" ? "Slim" : "Classic";
+    renderSkin();
+  };
+});
+$("skin-apply").onclick = () => {
+  const path = $("skin-path").value.trim();
+  if (!path) { toast("Type the path to a PNG first"); return; }
+  state.data.skin_note = "Local file accepted. Only servers that accept custom skins will show it.";
+  state.data.skin_source = "Local";
+  renderSkin();
+  toast("Local skin applied");
+};
+
+// ---------- friends ----------
+function renderFriends() {
+  const host = $("friend-list");
+  host.innerHTML = state.data.friends.length ? "" : `<div class="empty"><strong>Nobody yet</strong>Add a name above.</div>`;
+  state.data.friends.forEach((f) => {
+    const colour = f.presence === "In game" ? "var(--mint)" : f.presence === "In launcher" ? "var(--warn)" : "#2a4268";
+    const row = document.createElement("div");
+    row.className = "friend";
+    row.innerHTML = `
+      <span class="dot" style="background:${colour}"></span>
+      <span class="name">${esc(f.name)}</span>
+      <span class="pill ${pillClass(f.provider)}">${esc(f.provider)}</span>
+      <span class="where">${esc(f.presence)}${f.server ? " · " + esc(f.server) : ""}</span>`;
+    host.appendChild(row);
+  });
+  $("friend-requests").innerHTML = state.data.pending
+    ? `<div class="rule"></div><div class="eyebrow">Requests</div><div class="sub" style="color:var(--warn)">${state.data.pending} pending</div>`
+    : "";
+  renderChat();
+}
+
+function renderChat() {
+  $("chat-tabs").innerHTML = ["global", "party"].map((c) =>
+    `<button class="btn ${state.chatChannel === c ? "sel" : ""}" data-chat="${c}">${c[0].toUpperCase() + c.slice(1)}</button>`
+  ).join("");
+  $("chat-tabs").querySelectorAll("[data-chat]").forEach((b) => {
+    b.onclick = () => { state.chatChannel = b.dataset.chat; renderChat(); };
+  });
+  const log = $("chatlog");
+  log.innerHTML = state.chat.map((m) =>
+    `<p><span class="who">${esc(m.who)}</span> ${esc(m.text)}</p>`
+  ).join("");
+  log.scrollTop = log.scrollHeight;
+}
+
+$("friend-add").onclick = () => {
+  const name = $("friend-name").value.trim();
+  if (!name) return;
+  if (state.data.friends.some((f) => f.name.toLowerCase() === name.toLowerCase())) {
+    toast("Already in your list");
+    return;
+  }
+  state.data.friends.push({ name, provider: "Offline", presence: "Offline", server: null });
+  state.data.pending += 1;
+  $("friend-name").value = "";
+  renderFriends();
+  toast(`Request sent to ${name}`);
+};
+
+$("chat-send").onclick = () => {
+  const text = $("chat-input").value.trim();
+  if (!text) return;
+  state.chat.push({ who: (state.data.account || {}).name || "You", text, local: true });
+  $("chat-input").value = "";
+  renderChat();
+};
+$("chat-input").onkeydown = (e) => { if (e.key === "Enter") $("chat-send").click(); };
+
+// ---------- catalogue ----------
+function renderMods() {
+  const q = state.modQuery.toLowerCase();
+  const host = $("mod-list");
+  const rows = state.data.catalog.filter((m) =>
+    (!state.modKind || m.kind === state.modKind) &&
+    (!state.modPerf || m.performance) &&
+    (!q || m.name.toLowerCase().includes(q) || m.summary.toLowerCase().includes(q))
+  );
+  if (!rows.length) {
+    host.innerHTML = `<div class="empty"><strong>Nothing matches</strong>Try a shorter search or clear the filters.</div>`;
+    return;
+  }
+  host.innerHTML = rows.map((m) => {
+    const on = state.data.instance.enabled_mods.includes(m.id);
+    return `<div class="mod">
+      <div class="body">
+        <div class="nm">${esc(m.name)}</div>
+        <div class="sum">${esc(m.summary)}</div>
+        <span class="pill dim">${esc(m.kind === "mod" ? "Mod" : "Resource pack")}</span>
+        ${m.performance ? `<span class="pill mint">Performance</span>` : ""}
+        <span class="pill accent">${esc(m.licence)}</span>
+      </div>
+      <div class="row">
+        <button class="btn" data-open="${esc(m.url)}">Page</button>
+        <button class="btn ${on ? "sel" : ""}" data-mod="${esc(m.id)}" style="min-width:132px">${on ? "Remove" : "Add to instance"}</button>
+      </div>
+    </div>`;
+  }).join("");
+  host.querySelectorAll("[data-mod]").forEach((b) => { b.onclick = () => toggleMod(b.dataset.mod); });
+  host.querySelectorAll("[data-open]").forEach((b) => {
+    b.onclick = () => toast("The launcher opens this page in your browser");
+  });
+  document.querySelectorAll("[data-kind]").forEach((b) => {
+    b.classList.toggle("sel", b.dataset.kind === state.modKind);
+  });
+  $("mod-perf").classList.toggle("sel", state.modPerf);
+}
+$("mod-search").oninput = (e) => { state.modQuery = e.target.value; renderMods(); };
+document.querySelectorAll("[data-kind]").forEach((b) => {
+  b.onclick = () => {
+    state.modKind = state.modKind === b.dataset.kind ? null : b.dataset.kind;
+    renderMods();
+  };
+});
+$("mod-perf").onclick = () => { state.modPerf = !state.modPerf; renderMods(); };
+
+// ---------- import ----------
+$("import-scan").onclick = () => {
+  const path = $("import-path").value.trim();
+  if (!path) { $("import-result").textContent = "Type the folder your other launcher uses."; return; }
+  $("import-result").textContent =
+    "Alpinoxi reads that folder, lists what it can copy (worlds, resource packs, configs) and skips accounts and libraries. Nothing is moved.";
+  toast("Scan needs the Rust side: the launcher does this natively");
+};
+
+// ---------- settings ----------
+function renderSettings() {
+  $("set-light").setAttribute("aria-pressed", String(state.data.keep_light));
+  $("set-close").setAttribute("aria-pressed", String(state.data.close_on_launch));
+  $("set-hud").setAttribute("aria-pressed", String(state.data.hud.enabled));
+  $("set-hudbg").setAttribute("aria-pressed", String(state.data.hud.background));
+  $("hud-scale").value = state.data.hud.scale_percent;
+  $("hud-scale-label").textContent = `${state.data.hud.scale_percent}%`;
+  renderBinds();
+  renderHudEditor();
+}
+
+function bindSwitch(id, key) {
+  $(id).onclick = () => {
+    state.data[key] = !state.data[key];
+    renderSettings();
+    renderHome();
+  };
+}
+bindSwitch("set-light", "keep_light");
+bindSwitch("set-close", "close_on_launch");
+
+$("set-hud").onclick = () => {
+  state.data.hud.enabled = !state.data.hud.enabled;
+  renderSettings();
+};
+$("set-hudbg").onclick = () => {
+  state.data.hud.background = !state.data.hud.background;
+  renderSettings();
+  renderHudEditor();
+};
+$("hud-scale").oninput = (e) => {
+  state.data.hud.scale_percent = Number(e.target.value);
+  $("hud-scale-label").textContent = `${e.target.value}%`;
+};
+
+function renderBinds() {
+  const host = $("bind-list");
+  host.innerHTML = state.data.binds.map((b, i) => `
+    <div class="bind">
+      <span class="act">${esc(b.action)}</span>
+      ${b.vanilla ? `<span class="pill warn">vanilla key</span>` : ""}
+      <button class="key ${state.arming === i ? "arming" : ""}" data-bind="${i}">
+        ${state.arming === i ? "press a key…" : esc(b.chord)}
+      </button>
+    </div>`).join("");
+  host.querySelectorAll("[data-bind]").forEach((btn) => {
+    btn.onclick = () => {
+      state.arming = Number(btn.dataset.bind);
+      renderBinds();
+      toast("Press the new combination, Escape to cancel");
+    };
+  });
+  $("bind-conflict").textContent = "";
+}
+$("bind-reset").onclick = () => {
+  state.data.binds = state.data.default_binds.slice();
+  renderBinds();
+  toast("Keybinds reset");
+};
+
+window.addEventListener("keydown", (e) => {
+  if (state.arming === null) return;
+  e.preventDefault();
+  if (e.key === "Escape") { state.arming = null; renderBinds(); return; }
+  if (["Shift", "Control", "Alt", "Meta"].includes(e.key)) return;
+  const parts = [];
+  if (e.shiftKey) parts.push("Shift");
+  if (e.ctrlKey) parts.push("Ctrl");
+  if (e.altKey) parts.push("Alt");
+  parts.push(e.key.length === 1 ? e.key.toUpperCase() : e.key);
+  const chord = parts.join("+");
+  const taken = state.data.binds.find((b, i) => i !== state.arming && b.chord === chord);
+  if (taken) {
+    $("bind-conflict").textContent = `${taken.action} already uses ${chord}, pick another key.`;
+    return;
+  }
+  state.data.binds[state.arming].chord = chord;
+  state.arming = null;
+  renderBinds();
+  toast(`Bound to ${chord}`);
+});
+
+function renderHudEditor() {
+  const stage = $("hud-stage");
+  stage.innerHTML = `<div class="horizon"></div>`;
+  const groups = {};
+  state.data.hud.elements.forEach((el) => {
+    (groups[el.anchor] = groups[el.anchor] || []).push(el);
+  });
+  Object.entries(groups).forEach(([anchor, els]) => {
+    const wrap = document.createElement("div");
+    const pos = {
+      "Top left": { left: "12px", top: "12px", align: "left" },
+      "Top right": { right: "12px", top: "12px", align: "right" },
+      "Bottom left": { left: "12px", bottom: "12px", align: "left" },
+      "Bottom right": { right: "12px", bottom: "12px", align: "right" },
+      "Bottom centre": { left: "50%", bottom: "12px", transform: "translateX(-50%)", align: "center" }
+    }[anchor] || { left: "12px", top: "12px" };
+    Object.assign(wrap.style, pos, { position: "absolute", display: "flex", flexDirection: "column", gap: "4px" });
+    els.forEach((el) => {
+      const chip = document.createElement("div");
+      chip.className = "hud-el" + (el.visible ? "" : " off");
+      chip.textContent = el.sample || el.label;
+      chip.style.position = "static";
+      wrap.appendChild(chip);
+    });
+    stage.appendChild(wrap);
+  });
+
+  const host = $("hud-elements");
+  host.innerHTML = "";
+  state.data.hud.elements.forEach((el) => {
+    const row = document.createElement("div");
+    row.className = "el-row";
+    row.innerHTML = `
+      <span class="lbl">${esc(el.label)}</span>
+      <span class="pill dim">${esc(el.anchor)}</span>
+      <button class="switch" aria-pressed="${el.visible}" aria-label="${esc(el.label)}"></button>`;
+    row.querySelector(".switch").onclick = () => {
+      el.visible = !el.visible;
+      state.selectedElement = el.id;
+      renderHudEditor();
+    };
+    row.onclick = (e) => {
+      if (e.target.classList.contains("switch")) return;
+      state.selectedElement = el.id;
+      renderHudEditor();
+    };
+    if (el.id === state.selectedElement) row.style.background = "rgba(79,209,255,.06)";
+    host.appendChild(row);
+  });
+
+  const group = $("anchor-group");
+  group.innerHTML = "";
+  ANCHORS.forEach((a) => {
+    const b = document.createElement("button");
+    b.textContent = a;
+    const el = state.data.hud.elements.find((e) => e.id === state.selectedElement);
+    if (el && el.anchor === a) b.className = "sel";
+    b.onclick = () => {
+      if (el) el.anchor = a;
+      renderHudEditor();
+    };
+    group.appendChild(b);
+  });
+}
+
+// ---------- boot ----------
+function renderAll() {
+  renderNav();
+  renderHome();
+  renderInstances();
+  renderSkin();
+  renderFriends();
+  renderMods();
+  renderSettings();
+  $("rail-version").textContent = `v${state.data.version} · Rust native`;
+  $("login-slogan").textContent = state.data.slogan;
+}
+
+$("login-slogan").textContent = state.data.slogan;
+$("cracked-name").value = state.data.cracked_name || "";
+renderProviders();
+$("cracked-box").style.display = state.data.provider === "offline" ? "block" : "none";
+$("browser-box").style.display = state.data.provider === "offline" ? "none" : "block";
+$("browser-note").textContent = state.data.providers.find((p) => p.id === state.data.provider).browser;
+if (state.data.account) signIn(state.data.account);
+</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+[package]
+name = "alpinoxi_shell"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Alpinoxi Client: the HTML interface in the OS's own webview, driven by Rust"
+
+[[bin]]
+name = "alpinoxi_shell"
+path = "src/main.rs"
+
+[dependencies]
+alpinoxi_core.workspace = true
+alpinoxi_ingame.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tao.workspace = true
+wry.workspace = true

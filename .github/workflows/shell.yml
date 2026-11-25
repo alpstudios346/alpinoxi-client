@@ -1,0 +1,65 @@
+name: Shell (HTML interface in a webview)
+
+# Builds `alpinoxi_shell.exe`: the launcher window that shows the HTML
+# interface in the OS's own webview. Separate from build.yml so a broken shell
+# never blocks the egui launcher's release.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/alpinoxi_shell/**'
+      - 'ui/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - '.github/workflows/shell.yml'
+  workflow_dispatch:
+
+jobs:
+  page:
+    name: Interface page
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build and check the page
+        run: python ui/build_ui.py --check
+      - uses: actions/upload-artifact@v4
+        with:
+          name: alpinoxi-ui-html
+          path: ui/dist/alpinoxi-ui.html
+          if-no-files-found: error
+
+  shell:
+    name: Shell (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      # The binary embeds the page, so it must exist before cargo runs.
+      - name: Build the page
+        run: python ui/build_ui.py --check
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: shell
+      - name: Test the command layer
+        run: cargo test -p alpinoxi_shell
+      - name: Build
+        run: cargo build -p alpinoxi_shell --release
+      - name: Collect
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp target/*/release/alpinoxi_shell.exe dist/AlpinoxiShell.exe 2>/dev/null ||
+            cp target/release/alpinoxi_shell.exe dist/AlpinoxiShell.exe
+          ls -la dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AlpinoxiShell-windows
+          path: dist/AlpinoxiShell.exe
+          if-no-files-found: error

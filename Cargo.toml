@@ -1,6 +1,7 @@
 [workspace]
 members = [
   "apps/alpinoxi_client",
+  "apps/alpinoxi_shell",
   "packages/alpinoxi_auth_system",
   "packages/alpinoxi_core",
   "packages/alpinoxi_ingame",
@@ -28,6 +29,10 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sha2 = "0.10"
 thiserror = "2"
+# The webview window the HTML interface runs in. One crate, the OS's own
+# renderer: no bundled browser, no Node.
+wry = "0.47"
+tao = "0.30"
 
 [profile.release]
 # The launcher's own footprint is part of the product: a lean binary starts
