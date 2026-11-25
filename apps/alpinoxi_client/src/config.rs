@@ -103,10 +103,14 @@ fn detect_windows() -> Option<u16> {
     None
 }
 
+/// Where Alpinoxi keeps its own files: settings, instances, skins.
+pub fn data_dir() -> PathBuf {
+    config_dir().join("alpinoxi")
+}
+
 /// Path of the settings file, created on demand.
 pub fn settings_path() -> PathBuf {
-    let base = config_dir();
-    base.join("alpinoxi").join("settings.json")
+    data_dir().join("settings.json")
 }
 
 fn config_dir() -> PathBuf {

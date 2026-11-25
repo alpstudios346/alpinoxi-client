@@ -70,6 +70,9 @@ fn instance_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
                 if ui::ghost_button(ui, "Edit", Vec2::new(74.0, 40.0)).clicked() {
                     app.screen = crate::app::Screen::Instances;
                 }
+                if ui::ghost_button(ui, "Import", Vec2::new(84.0, 40.0)).clicked() {
+                    app.screen = crate::app::Screen::Import;
+                }
             });
         });
         ui.add_space(12.0);

@@ -26,16 +26,18 @@ pub enum Screen {
     Skin,
     Friends,
     Mods,
+    Import,
     Settings,
 }
 
 impl Screen {
-    pub const ALL: [Self; 6] = [
+    pub const ALL: [Self; 7] = [
         Self::Home,
         Self::Instances,
         Self::Skin,
         Self::Friends,
         Self::Mods,
+        Self::Import,
         Self::Settings,
     ];
 
@@ -46,6 +48,7 @@ impl Screen {
             Self::Skin => "Skin",
             Self::Friends => "Friends",
             Self::Mods => "Mods & packs",
+            Self::Import => "Import",
             Self::Settings => "Settings",
         }
     }
@@ -96,6 +99,8 @@ pub struct AlpinoxiApp {
     pub last_sent: Option<String>,
     /// Path typed into the wardrobe's local-skin field.
     pub skin_path: String,
+    /// Import-from-another-launcher screen state.
+    pub import: ui::import::ImportState,
 }
 
 impl AlpinoxiApp {
@@ -137,6 +142,7 @@ impl AlpinoxiApp {
             toast: None,
             last_sent: None,
             skin_path,
+            import: ui::import::ImportState::new(),
             settings,
         }
     }

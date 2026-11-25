@@ -4,6 +4,7 @@
 pub mod friends;
 pub mod home;
 pub mod hud;
+pub mod import;
 pub mod instances;
 pub mod keybinds;
 pub mod login;

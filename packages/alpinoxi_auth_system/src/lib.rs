@@ -18,11 +18,13 @@ use thiserror::Error;
 
 pub mod elyby;
 pub mod microsoft;
+pub mod system_vault;
 pub mod token;
 pub mod vault;
 
 pub use elyby::ElyByFlow;
 pub use microsoft::MicrosoftFlow;
+pub use system_vault::SystemVault;
 pub use token::{code_challenge, random_urlsafe, TokenSet};
 pub use vault::{MemoryVault, TokenVault};
 

@@ -9,12 +9,17 @@ use thiserror::Error;
 pub mod account;
 pub mod friends;
 pub mod hud;
+pub mod import;
 pub mod launcher;
 pub mod skin;
 pub mod slogan;
 
 pub use account::{AccountProfile, AccountProvider, CrackedAccountError};
 pub use friends::{ChatMessage, Friend, FriendRequest, FriendState, Presence};
+pub use import::{
+    detect, detect_all, plan, DetectedSetup, ImportItem, ImportPlan, ImportSelection, LauncherKind,
+    SkipReason, SkippedItem,
+};
 pub use hud::{HudAnchor, HudElement, HudSettings, KeyChord, Keybind, KeybindAction, KeybindSet};
 pub use launcher::{
     Instance, JvmProfile, LaunchPlan, MemoryProfile, MemoryProfileError, PerformanceMod,

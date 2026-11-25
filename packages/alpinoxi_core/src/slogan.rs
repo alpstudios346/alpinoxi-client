@@ -28,6 +28,30 @@ impl Slogan {
     }
 }
 
+/// Lines in the spirit of "OneClient is best!", as Alpinoxi's own set.
+///
+/// The classic line stays first and is credited, not claimed: it is where the
+/// idea came from. Everything after it is Alpinoxi's.
+pub const TAGLINES: &[&str] = &[
+    "OneClient is best!",
+    "Alpinoxi is best!",
+    "Low RAM, high frames.",
+    "Native Rust. No Electron.",
+    "Your skin, your name, your friends.",
+    "Press the keybind, not a command.",
+    "Same game. Less waiting.",
+    "Three logins, one client.",
+    "Sodium inside, stutter outside.",
+    "Rust decides, Java draws.",
+];
+
+impl SloganPicker {
+    /// The full Alpinoxi set, with the borrowed classic kept separate.
+    pub fn alpinoxi(seed: u64) -> Self {
+        Self::new(TAGLINES, seed)
+    }
+}
+
 /// Deterministic shuffler: no `rand` dependency, no allocation per tick.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct SloganPicker {

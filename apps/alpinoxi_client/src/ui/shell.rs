@@ -49,6 +49,7 @@ pub fn show(ctx: &egui::Context, app: &mut AlpinoxiApp) {
                     Screen::Skin => ui::skin::show(ui, app),
                     Screen::Friends => ui::friends::show(ui, app),
                     Screen::Mods => ui::mods::show(ui, app),
+                    Screen::Import => ui::import::show(ui, app),
                     Screen::Settings => ui::settings::show(ui, app),
                 });
         });
@@ -135,6 +136,7 @@ fn rail_icon(screen: Screen) -> Icon {
         Screen::Skin => Icon::Skin,
         Screen::Friends => Icon::Friends,
         Screen::Mods => Icon::Mods,
+        Screen::Import => Icon::Arrow,
         Screen::Settings => Icon::Settings,
     }
 }
