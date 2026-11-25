@@ -39,36 +39,36 @@ pub fn install(ctx: &egui::Context) {
     visuals.selection.bg_fill = ACCENT_SOFT;
     visuals.selection.stroke = Stroke::new(1.0, ACCENT);
     visuals.window_stroke = Stroke::new(1.0, BORDER);
-    visuals.window_corner_radius = CornerRadius::same(RADIUS as u8);
+    visuals.window_corner_radius = CornerRadius::same(RADIUS_U8);
 
     let widgets = &mut visuals.widgets;
     widgets.noninteractive.bg_fill = BG_CARD;
     widgets.noninteractive.weak_bg_fill = BG_CARD;
     widgets.noninteractive.bg_stroke = Stroke::new(1.0, BORDER);
-    widgets.noninteractive.corner_radius = CornerRadius::same(RADIUS as u8);
+    widgets.noninteractive.corner_radius = CornerRadius::same(RADIUS_U8);
 
     widgets.inactive.bg_fill = BG_CARD;
     widgets.inactive.weak_bg_fill = BG_CARD;
     widgets.inactive.bg_stroke = Stroke::new(1.0, BORDER);
     widgets.inactive.fg_stroke = Stroke::new(1.0, TEXT);
-    widgets.inactive.corner_radius = CornerRadius::same(RADIUS as u8);
+    widgets.inactive.corner_radius = CornerRadius::same(RADIUS_U8);
 
     widgets.hovered.bg_fill = BG_CARD_HOVER;
     widgets.hovered.weak_bg_fill = BG_CARD_HOVER;
     widgets.hovered.bg_stroke = Stroke::new(1.0, ACCENT_SOFT);
     widgets.hovered.fg_stroke = Stroke::new(1.4, Color32::WHITE);
-    widgets.hovered.corner_radius = CornerRadius::same(RADIUS as u8);
+    widgets.hovered.corner_radius = CornerRadius::same(RADIUS_U8);
 
     widgets.active.bg_fill = ACCENT_SOFT;
     widgets.active.weak_bg_fill = ACCENT_SOFT;
     widgets.active.bg_stroke = Stroke::new(1.0, ACCENT);
     widgets.active.fg_stroke = Stroke::new(1.6, Color32::WHITE);
-    widgets.active.corner_radius = CornerRadius::same(RADIUS as u8);
+    widgets.active.corner_radius = CornerRadius::same(RADIUS_U8);
 
     widgets.open.bg_fill = BG_CARD_HOVER;
     widgets.open.weak_bg_fill = BG_CARD_HOVER;
     widgets.open.bg_stroke = Stroke::new(1.0, ACCENT_SOFT);
-    widgets.open.corner_radius = CornerRadius::same(RADIUS as u8);
+    widgets.open.corner_radius = CornerRadius::same(RADIUS_U8);
 
     ctx.set_visuals(visuals);
 

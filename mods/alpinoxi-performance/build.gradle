@@ -40,6 +40,7 @@ sourceSets {
 dependencies {
     // Minecraft and Fabric, which the bridge's own sources need to compile.
     bridgeCompileOnly "net.fabricmc:fabric-loader:${project.loader_version}"
+    bridgeCompileOnly "org.slf4j:slf4j-api:2.0.9"
     compileOnly sourceSets.bridge.output
 }
 

@@ -68,7 +68,14 @@ pub fn show(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
         return;
     }
 
-    for entry in matches {
+    // Owned ids: the entries borrow `app.catalog`, and the buttons below need
+    // `app` mutably.
+    let matches: Vec<String> = matches.iter().map(|entry| entry.id.to_owned()).collect();
+
+    for id in matches {
+        let Some(entry) = app.catalog.iter().find(|entry| entry.id == id) else {
+            continue;
+        };
         let installed = app
             .settings
             .instance
@@ -108,7 +115,7 @@ pub fn show(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
                         "Add to instance"
                     };
                     if ui::ghost_button(ui, label, Vec2::new(140.0, 32.0)).clicked() {
-                        toggle(app, entry.id);
+                        toggle(app, &id);
                     }
                     if ui::ghost_button(ui, "Open page", Vec2::new(110.0, 32.0)).clicked() {
                         ui.ctx().open_url(egui::OpenUrl::new_tab(entry.url));

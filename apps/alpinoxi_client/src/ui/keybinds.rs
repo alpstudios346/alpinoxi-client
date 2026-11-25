@@ -32,7 +32,10 @@ pub fn capture(ctx: &egui::Context) -> Option<KeyChord> {
             ) {
                 continue;
             }
-            if input.key_pressed(translate(code)) {
+            let Some(key) = translate(code) else {
+                continue;
+            };
+            if input.key_pressed(key) {
                 return Some(KeyChord {
                     key: code,
                     shift,
@@ -45,9 +48,14 @@ pub fn capture(ctx: &egui::Context) -> Option<KeyChord> {
     })
 }
 
-fn translate(code: KeyCode) -> egui::Key {
+/// The egui key for a bind's key code.
+///
+/// `None` for a bare modifier: egui 0.31's `Key` has no Shift, Control or Alt
+/// variant, because modifiers are flags on `InputState::modifiers`, not keys.
+/// `capture` reads them from there and never arms on one.
+fn translate(code: KeyCode) -> Option<egui::Key> {
     use egui::Key;
-    match code {
+    Some(match code {
         KeyCode::A => Key::A,
         KeyCode::B => Key::B,
         KeyCode::C => Key::C,
@@ -92,13 +100,13 @@ fn translate(code: KeyCode) -> egui::Key {
         KeyCode::Space => Key::Space,
         KeyCode::Backspace => Key::Backspace,
         KeyCode::Grave => Key::Backtick,
-        // Modifiers are read from `input.modifiers` in `capture`, never polled
-        // as keys: egui has no Shift/Control/Alt variants, and a bind is a key
-        // plus modifier flags, so a lone modifier is not a key.
-        KeyCode::LeftShift | KeyCode::RightShift => Key::Shift,
-        KeyCode::LeftCtrl | KeyCode::RightCtrl => Key::Control,
-        KeyCode::LeftAlt | KeyCode::RightAlt => Key::Alt,
-    }
+        KeyCode::LeftShift
+        | KeyCode::RightShift
+        | KeyCode::LeftCtrl
+        | KeyCode::RightCtrl
+        | KeyCode::LeftAlt
+        | KeyCode::RightAlt => return None,
+    })
 }
 
 pub fn show(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
