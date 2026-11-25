@@ -3,11 +3,12 @@ members = [
   "apps/alpinoxi_client",
   "packages/alpinoxi_auth_system",
   "packages/alpinoxi_core",
+  "packages/alpinoxi_ingame",
 ]
 resolver = "2"
 
 [workspace.package]
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 rust-version = "1.82"
 authors = ["AlpinoxiGD"]
@@ -16,6 +17,24 @@ repository = "https://github.com/alpstudios346/alpinoxi-client"
 homepage = "https://github.com/alpstudios346/alpinoxi-client"
 
 [workspace.dependencies]
-eframe = { version = "0.30", default-features = false, features = ["default_fonts", "glow", "x11", "wayland"] }
+alpinoxi_core = { path = "packages/alpinoxi_core" }
+alpinoxi_auth_system = { path = "packages/alpinoxi_auth_system" }
+alpinoxi_ingame = { path = "packages/alpinoxi_ingame" }
+eframe = { version = "0.31", default-features = false, features = ["default_fonts", "glow", "x11", "wayland"] }
+image = { version = "0.25", default-features = false, features = ["png"] }
 serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
 thiserror = "2"
+
+[profile.release]
+# The launcher's own footprint is part of the product: a lean binary starts
+# faster and uses less RAM beside the game.
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[profile.dev]
+opt-level = 1

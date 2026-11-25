@@ -5,9 +5,13 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 authors.workspace = true
-description = "Alpinoxi Client native Minecraft launcher"
+description = "Alpinoxi Client: native Rust launcher with login, skins, friends, HUD and mods"
 
 [dependencies]
-alpinoxi_auth_system = { path = "../../packages/alpinoxi_auth_system" }
-alpinoxi_core = { path = "../../packages/alpinoxi_core" }
+alpinoxi_auth_system.workspace = true
+alpinoxi_core.workspace = true
+alpinoxi_ingame.workspace = true
 eframe.workspace = true
+image.workspace = true
+serde.workspace = true
+serde_json.workspace = true

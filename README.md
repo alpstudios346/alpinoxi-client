@@ -66,3 +66,21 @@ Alpinoxi Client, AlpinoxiGD tarafından sıfırdan Rust ile yazılan şık ve ha
 ## İlham ve atıf
 
 Bu client/başlatıcı fikrinin Polyfrost/OneClient projesinden ilham aldığını, bazı özellik fikirlerinin de Polyfrost'un YouTube içeriklerinden geldiğini unutmayınız. Alpinoxi'nin mevcut kaynak kodu bağımsız olarak yazılmıştır; bu ifade bir ortaklık veya onay anlamına gelmez.
+
+## Alpinoxi Client 0.2 — what is now in the code
+
+- **Three login types as peers**: Microsoft (device code flow, official Xbox → XSTS → `login_with_xbox` chain), Ely.by (OAuth 2.0 + PKCE, client id `alpinoxi-client`) and Cracked (validated name, vanilla offline UUID).
+- **Skin system for all three**: provider skins for Microsoft/Ely.by, a local PNG wardrobe for cracked players, 64x64 / 64x32 validation, classic and slim, and an honest note about who can see it.
+- **Friends and chat for all three**: identity is `provider:uuid`, presence (offline, launcher, in game), requests with accept/decline, tabs, mentions and history.
+- **HUD and keybinds, no commands**: Shift+H opens the HUD editor, F1 toggles the HUD, O opens friends, Y opens chat. Launcher and game read the same settings.
+- **Performance**: RAM plan capped at half of system RAM, Aikar-derived G1GC flags scaled by heap, and a curated client-side performance set (Sodium, Lithium, FerriteCore, Krypton, ModernFix, Entity Culling, Indium, ImmediatelyFast, Memory Leak Fix).
+- **Mods and resource packs**: a catalogue that links to official releases instead of redistributing files.
+
+Build and check:
+
+```sh
+cargo run -p alpinoxi_client
+cargo test --workspace
+```
+
+The launcher itself stays small on purpose: native `egui`, no web view, `lto = "thin"`, `strip`, and no runtime of its own.
