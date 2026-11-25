@@ -1,0 +1,13 @@
+[package]
+name = "alpinoxi_client"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Alpinoxi Client native Minecraft launcher"
+
+[dependencies]
+alpinoxi_auth_system = { path = "../../packages/alpinoxi_auth_system" }
+alpinoxi_core = { path = "../../packages/alpinoxi_core" }
+eframe.workspace = true

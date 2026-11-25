@@ -1,67 +1,60 @@
 <p align="center">
-  <img src=".github/media/RepoBanner.png" alt="Alpinoxi Client — Rust-based launcher for Minecraft" width="100%">
+  <img src="assets/BannerForRustAlpinoxiClient.png" alt="Alpinoxi Client" width="100%">
 </p>
 
-<p align="center">
-  <strong>A lightweight, open-source Rust launcher for Minecraft Java Edition.</strong>
-</p>
+<h1 align="center">Alpinoxi Client</h1>
 
-<p align="center">
-  <a href="https://github.com/alpstudios346/alpinoxi-client/releases">Releases</a> ·
-  <a href="CONTRIBUTING.md">Contributing</a> ·
-  <a href="ATTRIBUTION.md">Attribution</a> ·
-  <a href="docs/ALPINOXI_ROADMAP.md">Roadmap</a>
-</p>
+<p align="center">A stylish, lightweight Minecraft Java Edition launcher written in Rust.</p>
 
-## Alpinoxi Client
+Alpinoxi Client is a fresh, open-source Rust workspace maintained by **AlpinoxiGD**. It uses a native `egui` desktop interface rather than Electron, so the launcher stays separate from—and lightweight beside—the Minecraft Java process.
 
-Alpinoxi Client is an independent Minecraft launcher maintained by AlpinoxiGD. It is written in Rust and released under the GPL-3.0-only licence. The launcher is designed to be responsive and modest in memory use; Minecraft itself continues to run in its own Java process with memory selected per instance.
+## What exists now
 
-### Accounts and skins
+- Native Alpinoxi launcher shell with a dark blue, glass-inspired dashboard
+- Account model for Microsoft, Ely.by and Offline profiles
+- RAM profiles with explicit limits: Balanced, Performance and Custom
+- An account screen which makes each provider’s status clear
+- Security-first auth contract: no password collection and no token logging
 
-The current codebase supports Microsoft accounts, Ely.by and offline player profiles. Microsoft sign-in must use the official Microsoft/Minecraft authentication flow. Ely.by is configured with the `alpinoxi-client` client ID. Offline profiles are only for servers that deliberately permit offline-mode accounts; they do not bypass Microsoft authentication on online-mode servers.
+## What comes next
 
-Account tokens and passwords must never be committed, printed in logs or stored in documentation. See the project rules in `AGENTS.md` when contributing to authentication or skin code.
+The current UI is a foundation, not a finished Minecraft launcher. The next milestones are official Microsoft OAuth, Ely.by OAuth using client ID `alpinoxi-client`, secure OS credential storage, instance installation/launching, skin wardrobe UI, HUD settings, social features, and a licence-aware mod/resource-pack catalogue.
 
-### In development
+Offline profiles are only for servers which explicitly allow offline-mode identities. They never bypass online-mode Microsoft/Minecraft authentication.
 
-The first public beta has not been released. The planned Alpinoxi experience includes a polished skin wardrobe, HUD and keybind settings, social/chat features, curated mod and resource-pack downloads, and separately published Alpinoxi performance work. These are roadmap items, not claims about the current build; see [the roadmap](docs/ALPINOXI_ROADMAP.md) for scope and safeguards.
+## Run locally
 
-## Build from source
-
-Prerequisites:
-
-- Rust **1.97+**
-- Python 3
-- JDK **17+** with `javac`
+Install the current stable Rust toolchain, then run:
 
 ```sh
-cargo +stable build --locked --release --bin alpinoxi_client
+cargo run -p alpinoxi_client
 ```
 
-Run the focused checks relevant to a change:
+Quality checks:
 
 ```sh
-cargo +stable test --locked --workspace
-cargo +stable fmt --all -- --check
-cargo +stable clippy --locked --bin alpinoxi_client
-python3 -B -m unittest discover -s distribution -p 'test_*.py'
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace
 ```
 
-Packaging and platform details remain under `distribution/`. Do not publish an installer before its exact commit has been built, scanned and manually tested.
+## Project layout
 
-## Open source and attribution
+| Path | Purpose |
+| --- | --- |
+| `apps/alpinoxi_client` | Native desktop app and visual design system |
+| `packages/alpinoxi_core` | Account, launch and memory domain models |
+| `packages/alpinoxi_auth_system` | Provider-independent authentication state machine |
+| `docs/` | Architecture and security decisions |
 
-Alpinoxi Client is GPL-3.0-only. This repository keeps the source notices and third-party credits required by the project and its dependencies—read [ATTRIBUTION.md](ATTRIBUTION.md) before redistributing a build.
+## Open source
 
-Alpinoxi does not rebrand or republish third-party performance mods as its own work. Compatible upstream mods may be offered as clearly attributed dependencies when their licences permit it. Alpinoxi-authored performance modules will be released with source, licence, benchmarks and compatibility notes.
+The new Alpinoxi source is available under the [MIT License](LICENSE). Third-party mods remain the work of their respective authors: Alpinoxi will link to compatible official releases and keep their licences visible instead of copying or rebranding them.
 
-Alpinoxi Client is not affiliated with, endorsed by or verified by Polyfrost, Microsoft, Mojang or Ely.by.
+Alpinoxi Client is not affiliated with Mojang, Microsoft or Ely.by.
 
 ## Türkçe
 
-Alpinoxi Client, AlpinoxiGD tarafından geliştirilen, Minecraft Java Edition için hafif ve açık kaynaklı bir Rust başlatıcısıdır. GPL-3.0-only lisansıyla yayımlanır; gerekli kaynak ve üçüncü taraf atıfları [ATTRIBUTION.md](ATTRIBUTION.md) içinde korunur.
+Alpinoxi Client, AlpinoxiGD tarafından sıfırdan Rust ile yazılan şık ve hafif bir Minecraft Java Edition başlatıcısıdır. Electron kullanmaz; native arayüz sayesinde başlatıcı, Minecraft’ın Java işleminden ayrı ve düşük kaynak tüketimli kalır.
 
-Microsoft, Ely.by ve çevrimdışı oyuncu profilleri desteklenir. Microsoft hesabı yalnızca resmî Microsoft/Minecraft doğrulama akışıyla kullanılır; Ely.by istemci kimliği `alpinoxi-client` olarak ayarlanır. Çevrimdışı profil, sadece offline-mode kabul eden sunucular içindir ve premium/online-mode doğrulamasını aşmaz.
-
-İlk beta henüz yayımlanmadı. Şık skin arayüzü, HUD ve tuş ayarları, arkadaş/sohbet özellikleri, mod-kaynak paketi kataloğu ve açık kaynak Alpinoxi performans modları planlanmaktadır. Bunlar henüz mevcut sürüm özelliği değildir; kapsam için [yol haritasına](docs/ALPINOXI_ROADMAP.md) bakın.
+Şu an özgün launcher arayüzü, Microsoft/Ely.by/Offline hesap modeli ve RAM profilleri hazırdır. Gerçek Microsoft ve Ely.by girişleri, token kasası, Minecraft kurulum/başlatma, skin arayüzü, HUD, arkadaşlık/sohbet ve mod-kaynak paketi kataloğu sıradaki aşamalardır. Offline hesap yalnızca bunu açıkça kabul eden sunucularda kullanılabilir.
