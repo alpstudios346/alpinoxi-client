@@ -1,0 +1,87 @@
+name: Build
+
+# Produces the two things a player actually needs: the launcher and the mod jars.
+# The launcher is built on Windows because it is a Windows desktop app; the mods
+# are built with Gradle so Loom can remap them against Minecraft.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/**'
+      - 'packages/**'
+      - 'mods/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - '.github/workflows/build.yml'
+  workflow_dispatch:
+
+jobs:
+  launcher:
+    name: Launcher (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: launcher
+      - name: Build
+        run: cargo build -p alpinoxi_client --release
+      - name: Collect
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp target/release/alpinoxi_client.exe dist/AlpinoxiClient.exe
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AlpinoxiClient-windows
+          path: dist/AlpinoxiClient.exe
+          if-no-files-found: error
+
+  native-bridge:
+    name: Native bridge (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: bridge
+      - name: Build the JNI library
+        run: cargo build -p alpinoxi_jni --features jni-exports --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: alpinoxi_bridge-windows
+          path: target/release/alpinoxi_bridge.dll
+          if-no-files-found: error
+
+  mods:
+    name: Mods (remapped jars)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build each mod
+        working-directory: mods
+        run: |
+          for mod in alpinoxi-bridge alpinoxi-hud alpinoxi-performance; do
+            echo "::group::$mod"
+            (cd "$mod" && gradle build --no-daemon --stacktrace)
+            echo "::endgroup::"
+          done
+      - name: Collect
+        shell: bash
+        run: |
+          mkdir -p dist
+          find mods -path '*/build/libs/*.jar' ! -name '*-sources.jar' -exec cp {} dist/ \;
+          ls -la dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: alpinoxi-mods
+          path: dist/*.jar
+          if-no-files-found: error
