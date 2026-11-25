@@ -4,6 +4,8 @@
 //! plain functions in `ui/`, so the state stays testable and no screen needs a
 //! reference to another.
 
+use eframe::egui;
+
 use alpinoxi_auth_system::{AuthenticationState, MemoryVault};
 use alpinoxi_core::account::{AccountProfile, AccountProvider};
 use alpinoxi_core::friends::{ChatMessage, Friend, Presence};

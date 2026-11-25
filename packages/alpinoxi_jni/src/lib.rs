@@ -23,7 +23,11 @@ use alpinoxi_ingame::{FriendBook, Overlay};
 use serde::{Deserialize, Serialize};
 
 /// Everything the game asked Rust to keep between frames.
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+///
+/// Deliberately not `Serialize`: the chat, friend and overlay types are runtime
+/// state, and handing Java a serialised copy of them would invite a second,
+/// drifting source of truth. `snapshot()` is the one JSON shape the mods read.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct BridgeState {
     pub hud: HudSettings,
     pub keybinds: KeybindSet,
@@ -45,7 +49,7 @@ impl BridgeState {
 }
 
 /// HUD layout as the renderer needs it: one row per visible element.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct HudRow {
     pub id: String,
     pub label: String,
