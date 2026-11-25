@@ -96,7 +96,7 @@ pub fn show(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
             .instance
             .enabled_mods
             .iter()
-            .any(|id| id == entry.id);
+            .any(|existing| existing == &id);
         ui::card(ui, |ui| {
             ui.horizontal(|ui| {
                 ui.vertical(|ui| {

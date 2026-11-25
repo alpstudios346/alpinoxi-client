@@ -17,7 +17,6 @@ use alpinoxi_core::hud::{
     HudAnchor, HudElement, HudSettings, KeyChord, KeyCode, KeybindAction, KeybindSet,
 };
 use alpinoxi_core::launcher::{jvm_flags, MemoryProfile, PERFORMANCE_MODS};
-use alpinoxi_core::skin::SkinModel;
 use alpinoxi_ingame::chat::ChatTabs;
 use alpinoxi_ingame::{FriendBook, Overlay};
 use serde::{Deserialize, Serialize};

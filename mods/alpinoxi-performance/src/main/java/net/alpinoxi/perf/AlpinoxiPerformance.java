@@ -23,13 +23,14 @@ public final class AlpinoxiPerformance implements ClientModInitializer {
     public void onInitializeClient() {
         Native.ensureLoaded();
 
-        HudRenderCallback.EVENT.register((context, tickDelta) -> {
+        // This Fabric API hands the callback a RenderTickCounter, not a float.
+        HudRenderCallback.EVENT.register((context, tickCounter) -> {
             long now = System.nanoTime();
             if (lastFrameNanos != 0L) {
                 FrameMeter.record((now - lastFrameNanos) / 1_000_000.0f);
             }
             lastFrameNanos = now;
-            PerfHud.render(context, tickDelta);
+            PerfHud.render(context, tickCounter.getTickDelta(false));
         });
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {

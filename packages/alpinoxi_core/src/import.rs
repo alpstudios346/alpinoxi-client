@@ -533,6 +533,16 @@ pub fn plan(
         for entry in entries.flatten() {
             let name = entry.file_name().to_string_lossy().to_string();
             let relative = format!("{folder}/{name}");
+            if NEVER_COPY
+                .iter()
+                .any(|blocked| name.eq_ignore_ascii_case(blocked))
+            {
+                skipped.push(SkippedItem {
+                    relative,
+                    reason: SkipReason::NotSelected,
+                });
+                continue;
+            }
             if !is_safe_relative(&relative) {
                 skipped.push(SkippedItem {
                     relative,

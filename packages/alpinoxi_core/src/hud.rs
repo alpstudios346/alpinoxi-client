@@ -563,7 +563,8 @@ mod tests {
     #[test]
     fn normalise_clamps_scale() {
         let mut hud = HudSettings::default();
-        hud.scale_percent = 900;
+        // u8 tops out at 255, so the highest a scale can be set to is 255.
+        hud.scale_percent = 255;
         hud.normalise();
         assert_eq!(hud.scale_percent, 200);
     }

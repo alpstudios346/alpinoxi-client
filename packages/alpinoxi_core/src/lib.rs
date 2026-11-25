@@ -3,9 +3,6 @@
 //! Everything here is pure Rust: no HTTP, no filesystem, no UI. The desktop app,
 //! the auth package and (later) the in-game bridge all build on these types.
 
-use serde::{Deserialize, Serialize};
-use thiserror::Error;
-
 pub mod account;
 pub mod friends;
 pub mod hud;

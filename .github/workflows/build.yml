@@ -32,7 +32,10 @@ jobs:
         shell: bash
         run: |
           mkdir -p dist
-          cp target/release/alpinoxi_client.exe dist/AlpinoxiClient.exe
+          # .cargo/config.toml pins the GNU Windows target, so the binary lands
+          # under target/x86_64-pc-windows-gnu/release.
+          cp target/*/release/alpinoxi_client.exe dist/AlpinoxiClient.exe 2>/dev/null ||
+            cp target/release/alpinoxi_client.exe dist/AlpinoxiClient.exe
       - uses: actions/upload-artifact@v4
         with:
           name: AlpinoxiClient-windows
@@ -50,20 +53,11 @@ jobs:
           key: bridge
       - name: Build the JNI library
         run: cargo build -p alpinoxi_jni --features jni-exports --release
-      # The cdylib is named after the library target (alpinoxi_bridge) but
-      # cargo writes it beside the binary target's name, so find it rather than
-      # guess.
-      - name: Find the library
-        shell: bash
-        run: |
-          echo "--- target/release:"
-          ls -la target/release | head -40
-          echo "--- any dll under target:"
-          find target -name '*.dll' -print
+      # Same pinning: the cdylib is written under the target triple's folder.
       - uses: actions/upload-artifact@v4
         with:
           name: alpinoxi_bridge-windows
-          path: target/release/*.dll
+          path: target/**/release/alpinoxi_bridge.dll
           if-no-files-found: error
 
   mods:
