@@ -53,8 +53,16 @@ The new Alpinoxi source is available under the [MIT License](LICENSE). Third-par
 
 Alpinoxi Client is not affiliated with Mojang, Microsoft or Ely.by.
 
+## Inspiration and acknowledgement
+
+The idea behind this client/launcher was inspired by the Polyfrost/OneClient project, and some feature ideas were inspired by Polyfrost's YouTube content. Alpinoxi's current source is written independently; this acknowledgement does not imply an affiliation or endorsement.
+
 ## Türkçe
 
 Alpinoxi Client, AlpinoxiGD tarafından sıfırdan Rust ile yazılan şık ve hafif bir Minecraft Java Edition başlatıcısıdır. Electron kullanmaz; native arayüz sayesinde başlatıcı, Minecraft’ın Java işleminden ayrı ve düşük kaynak tüketimli kalır.
 
 Şu an özgün launcher arayüzü, Microsoft/Ely.by/Offline hesap modeli ve RAM profilleri hazırdır. Gerçek Microsoft ve Ely.by girişleri, token kasası, Minecraft kurulum/başlatma, skin arayüzü, HUD, arkadaşlık/sohbet ve mod-kaynak paketi kataloğu sıradaki aşamalardır. Offline hesap yalnızca bunu açıkça kabul eden sunucularda kullanılabilir.
+
+## İlham ve atıf
+
+Bu client/başlatıcı fikrinin Polyfrost/OneClient projesinden ilham aldığını, bazı özellik fikirlerinin de Polyfrost'un YouTube içeriklerinden geldiğini unutmayınız. Alpinoxi'nin mevcut kaynak kodu bağımsız olarak yazılmıştır; bu ifade bir ortaklık veya onay anlamına gelmez.
