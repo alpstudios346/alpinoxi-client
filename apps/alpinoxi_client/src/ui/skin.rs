@@ -41,7 +41,7 @@ fn preview_card(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
             CornerRadius::same(14.0 as u8),
             Color32::from_rgb(9, 18, 34),
         );
-        let checker = 12.0;
+        let checker: f32 = 12.0;
         let mut y = rect.top();
         let mut row = 0;
         while y < rect.bottom() {

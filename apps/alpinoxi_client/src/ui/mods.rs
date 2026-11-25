@@ -73,9 +73,24 @@ pub fn show(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
     let matches: Vec<String> = matches.iter().map(|entry| entry.id.to_owned()).collect();
 
     for id in matches {
-        let Some(entry) = app.catalog.iter().find(|entry| entry.id == id) else {
+        let Some(entry) = app
+            .catalog
+            .iter()
+            .find(|entry| entry.id == id)
+            .map(|entry| {
+                (
+                    entry.name,
+                    entry.summary,
+                    entry.kind.label(),
+                    entry.licence,
+                    entry.url,
+                    entry.performance,
+                )
+            })
+        else {
             continue;
         };
+        let (name, summary, kind, licence, url, performance) = entry;
         let installed = app
             .settings
             .instance
@@ -86,27 +101,14 @@ pub fn show(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
             ui.horizontal(|ui| {
                 ui.vertical(|ui| {
                     ui.horizontal(|ui| {
-                        ui.label(
-                            RichText::new(entry.name)
-                                .size(16.0)
-                                .strong()
-                                .color(theme::TEXT),
-                        );
-                        ui::pill(ui, entry.kind.label(), theme::ACCENT_SOFT);
-                        if entry.performance {
+                        ui.label(RichText::new(name).size(16.0).strong().color(theme::TEXT));
+                        ui::pill(ui, kind, theme::ACCENT_SOFT);
+                        if performance {
                             ui::pill(ui, "Performance", theme::MINT);
                         }
                     });
-                    ui.label(
-                        RichText::new(entry.summary)
-                            .size(12.5)
-                            .color(theme::TEXT_DIM),
-                    );
-                    ui.label(
-                        RichText::new(entry.licence)
-                            .size(11.0)
-                            .color(theme::ACCENT_SOFT),
-                    );
+                    ui.label(RichText::new(summary).size(12.5).color(theme::TEXT_DIM));
+                    ui.label(RichText::new(licence).size(11.0).color(theme::ACCENT_SOFT));
                 });
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                     let label = if installed {
@@ -118,7 +120,7 @@ pub fn show(ui: &mut egui::Ui, app: &mut AlpinoxiApp) {
                         toggle(app, &id);
                     }
                     if ui::ghost_button(ui, "Open page", Vec2::new(110.0, 32.0)).clicked() {
-                        ui.ctx().open_url(egui::OpenUrl::new_tab(entry.url));
+                        ui.ctx().open_url(egui::OpenUrl::new_tab(url));
                     }
                 });
             });

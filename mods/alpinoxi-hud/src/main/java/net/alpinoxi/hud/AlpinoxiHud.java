@@ -49,7 +49,8 @@ public final class AlpinoxiHud implements ClientModInitializer {
             }
         });
 
-        HudRenderCallback.EVENT.register((context, tickDelta) -> HudRenderer.render(context, tickDelta));
+        HudRenderCallback.EVENT.register((context, tickCounter) ->
+                HudRenderer.render(context, tickCounter.getTickDelta(false)));
         BridgeLog.info("Alpinoxi HUD ready (bridge {})", Native.isLoaded() ? "native" : "fallback");
     }
 
