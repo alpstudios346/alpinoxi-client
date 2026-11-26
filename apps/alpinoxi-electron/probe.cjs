@@ -5,6 +5,12 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('node:path');
 
 const results = [];
+const trace = (line) => console.log('· ' + line);
+const watchdog = setTimeout(() => {
+  console.log('HUNG at: ' + (results.at(-1) || 'start'));
+  console.log(results.join('\n'));
+  process.exit(1);
+}, 40000);
 
 // Stand-ins for main.js's handlers, so the page's boot call is answered.
 ipcMain.handle('alpinoxi:command', (_e, body) => {
@@ -33,6 +39,7 @@ ipcMain.handle('alpinoxi:command', (_e, body) => {
   }
 });
 ipcMain.handle('alpinoxi:boot', () => ({
+  account: { name: 'SavedPlayer', provider: 'Microsoft', uuid: '11111111-2222-3333-4444-555555555555' },
   version: '0.3.0',
   slogan: 'OneClient is best!',
   system_memory_mib: 8192,
@@ -66,9 +73,12 @@ app.whenReady().then(async () => {
   });
   win.webContents.on('render-process-gone', (_e, d) => results.push('renderer gone: ' + d.reason));
 
+  trace('loading the page');
   await win.loadFile(path.join(__dirname, 'ui', 'index.html'));
+  trace('page loaded');
 
   const probe = async (label, code) => {
+    trace(label);
     try {
       const value = await Promise.race([
         win.webContents.executeJavaScript(code, true),
@@ -80,16 +90,24 @@ app.whenReady().then(async () => {
     }
   };
 
-  for (let i = 0; i < 40; i++) {
-    const ready = await win.webContents.executeJavaScript(`document.querySelectorAll("#nav button").length > 0`, true);
-    if (ready) break;
-    await new Promise((r) => setTimeout(r, 100));
-  }
+  // Wait for the page to finish booting, with a ceiling so a hang is reported.
+  await Promise.race([
+    win.webContents.executeJavaScript(`new Promise((done) => {
+      const tick = () => {
+        if (document.getElementById("app-view") && !document.getElementById("app-view").hidden) return done('signed in');
+        if (document.querySelectorAll("#nav button").length) return done('rail ready');
+        setTimeout(tick, 100);
+      };
+      tick();
+    })`, true).then((state) => results.push('booted: ' + state)),
+    new Promise((r) => setTimeout(r, 8000))
+  ]);
 
   await probe('errors', `window.__errors || []`);
   await probe('screens', `["home","instances","skin","friends","mods","import","settings"].map(s => !!document.getElementById("view-" + s))`);
   await probe('boot trace', `(() => { try { renderAll(); return { navAfter: document.querySelectorAll("#nav button").length, err: null }; } catch (e) { return { err: e.message, stack: (e.stack||'').split('\\n').slice(0,3) }; } })()`);
   await probe('nav buttons', `document.querySelectorAll("#nav button").length`);
+  await probe('remembered account', `document.getElementById("acct-name").textContent`);
   await probe('boot state', `({ signedIn: !!document.getElementById("app-view") && !document.getElementById("app-view").hidden, screen: typeof state !== "undefined" ? state.screen : "no state" })`);
   await probe('providers', `document.querySelectorAll("#providers .provider").length`);
   await probe('goto settings', `(() => { document.querySelectorAll("#nav button")[6].onclick(); return document.getElementById("view-settings").hidden; })()`);
@@ -103,16 +121,18 @@ app.whenReady().then(async () => {
   await probe('logo present', `!!document.querySelector('.brand .mark') && getComputedStyle(document.querySelector('.brand .mark')).backgroundImage.startsWith('url("data:image')`);
 
   // The cracked login path, end to end.
-  await probe('elyby click', `(async () => {
+  await probe('sign out first', `(() => {
+    document.getElementById("sign-out").onclick();
+    return document.getElementById("login-view").hidden;
+  })()`);
+  await probe('elyby click', `(() => {
     document.querySelectorAll("#providers .provider")[1].onclick();
     document.getElementById("browser-go").onclick();
-    await new Promise((r) => setTimeout(r, 300));
     return { notice: document.getElementById("login-notice").textContent, provider: state.data.provider };
   })()`);
-  await probe('ms click', `(async () => {
+  await probe('ms click', `(() => {
     document.querySelectorAll("#providers .provider")[0].onclick();
     document.getElementById("browser-go").onclick();
-    await new Promise((r) => setTimeout(r, 300));
     return document.getElementById("login-notice").textContent.includes("browser is open");
   })()`);
   // What the launcher sends when the browser comes back with an account.
@@ -144,6 +164,7 @@ app.whenReady().then(async () => {
   })()`);
   await probe('uuid', `document.getElementById("acct-uuid").textContent`);
 
+  clearTimeout(watchdog);
   console.log(JSON.stringify(results, null, 1));
 
   // A probe line is a failure if it threw, timed out, or came back empty.

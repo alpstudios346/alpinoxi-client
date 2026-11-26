@@ -56,7 +56,8 @@ function defaultSettings() {
     close_launcher_on_launch: false,
     last_provider: 'microsoft',
     cracked_name: '',
-    skin_model: 'Classic'
+    skin_model: 'Classic',
+    account: null
   };
 }
 
@@ -120,9 +121,25 @@ function base64url(buffer) {
   return buffer.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
+// One sign-in at a time: a second click joins the one already waiting.
+let signingIn = null;
+
 /// Starts a provider sign-in: listen on loopback, open the page, wait for the
 /// code, exchange it, and hand the account to the window.
 async function startSignIn(provider) {
+  if (signingIn) {
+    notice('A sign-in is already waiting in your browser.');
+    return;
+  }
+  signingIn = signIn(provider);
+  try {
+    await signingIn;
+  } finally {
+    signingIn = null;
+  }
+}
+
+async function signIn(provider) {
   const spec = AUTH[provider];
   if (!spec) throw new Error(`unknown provider: ${provider}`);
 
@@ -229,7 +246,11 @@ function waitForCode(server, state, label, authorizeUrl) {
       settle(null, code);
     });
 
-    shell.openExternal(authorizeUrl);
+    Promise.resolve(shell.openExternal(authorizeUrl)).catch((error) => {
+      clearTimeout(timer);
+      server.close();
+      reject(new Error(`the browser could not be opened: ${error.message}`));
+    });
   });
 }
 
@@ -553,6 +574,7 @@ function createWindow() {
 ipcMain.handle('alpinoxi:command', (_event, body) => handle(body));
 ipcMain.handle('alpinoxi:boot', () => ({
   ...handlers.info(state),
+  account: state.account || null,
   settings: state
 }));
 

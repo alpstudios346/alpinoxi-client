@@ -49,6 +49,9 @@ async function boot() {
       if (info.settings.cracked_name) state.data.cracked_name = info.settings.cracked_name;
     }
     renderAll();
+    if (info.account && info.account.name) {
+      signIn(info.account);
+    }
     if (window.alpinoxiIpc.onNotice) {
       window.alpinoxiIpc.onNotice((text) => {
         toast(text);
