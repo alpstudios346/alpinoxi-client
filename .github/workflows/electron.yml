@@ -30,26 +30,8 @@ jobs:
         working-directory: .
         run: python ui/build_ui.py --check
 
-      - name: Copy the page into the Electron app
-        shell: bash
-        run: |
-          cp ../../ui/dist/alpinoxi-ui.html ui/index.html
-          python - <<'PY'
-          import io, pathlib
-          page = pathlib.Path('ui/index.html')
-          text = page.read_text(encoding='utf-8')
-          shim = '''<script>
-          window.alpinoxi = {
-            send(command) {
-              if (window.alpinoxiIpc) return window.alpinoxiIpc.send(command);
-              return Promise.resolve(null);
-            }
-          };
-          </script>
-          '''
-          text = text.replace('<script>\n"use strict";', shim + '<script>\n"use strict";', 1)
-          page.write_text(text, encoding='utf-8')
-          PY
+      - name: Build the Electron page
+        run: node prepare-page.cjs
 
       - uses: actions/setup-node@v4
         with:
@@ -60,6 +42,11 @@ jobs:
 
       - name: Self-test the command layer
         run: npx electron main.js --self-test
+
+      - name: Check the page
+        run: |
+          node check_page.cjs
+          node check_uuid.cjs
 
       - name: Package
         run: npm run build:win
