@@ -25,7 +25,9 @@
     "files": [
       "main.js",
       "preload.js",
-      "ui/**"
+      "ui/**",
+      "build/icon.png",
+      "build/tray.png"
     ],
     "win": {
       "target": [

@@ -88,6 +88,23 @@ function saveSettings(settings) {
   );
 }
 
+// Where each provider's sign-in page lives. `alpinoxi-client` is the Ely.by
+// client id the Rust side uses too.
+const AUTH_URLS = {
+  microsoft: 'https://login.live.com/oauth20_authorize.srf?client_id=00000000402b5328&response_type=code&scope=service%3A%3Auser.auth.xboxlive.com%3A%3AMBI_SSL&redirect_uri=https%3A%2F%2Flogin.live.com%2Foauth20_desktop.srf',
+  elyby: 'https://account.ely.by/oauth2/v1?client_id=alpinoxi-client&response_type=code&scope=account_info%20minecraft_server_session'
+};
+
+// Minecraft's offline UUID: MD5 of "OfflinePlayer:<name>", version 3.
+function offlineUuid(name) {
+  const crypto = require('node:crypto');
+  const digest = crypto.createHash('md5').update(`OfflinePlayer:${name}`, 'utf8').digest();
+  digest[6] = (digest[6] & 0x0f) | 0x30;
+  digest[8] = (digest[8] & 0x3f) | 0x80;
+  const hex = digest.toString('hex');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
 function planHeap(settings) {
   const cap = Math.min(Math.floor(settings.system_memory_mib / 2), HEAP_CEILING_MIB);
   return Math.max(512, Math.min(Number(settings.memory_mib) || 2048, cap));
@@ -143,7 +160,26 @@ const handlers = {
     system_memory_mib: s.system_memory_mib,
     heap_mib: planHeap(s),
     data_dir: dataDir()
-  })
+  }),
+  // Signing in is the launcher's job, not the page's: the page sends a
+  // provider and a name, and the launcher answers with an account.
+  sign_in: (s, cmd) => {
+    if (cmd.provider === 'offline') {
+      const name = String(cmd.name || '').trim();
+      if (!/^[A-Za-z0-9_]{3,16}$/.test(name)) {
+        return { error: 'a name is 3 to 16 letters, numbers or underscores' };
+      }
+      s.cracked_name = name;
+      saveSettings(s);
+      return { account: { name, provider: 'Offline', uuid: offlineUuid(name) } };
+    }
+    // Microsoft and Ely.by open the provider's own page. The token comes back
+    // to a loopback listener, never through this window.
+    const url = AUTH_URLS[cmd.provider];
+    if (!url) return { error: `unknown provider: ${cmd.provider}` };
+    shell.openExternal(url);
+    return { pending: true, opened: url };
+  }
 };
 
 let state = null;
