@@ -33,7 +33,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_min_inner_size(LogicalSize::new(960.0, 620.0))
         .build(&event_loop)?;
 
-    let mut state = state::LauncherState::load();
+    // The IPC handler is a `Fn`, so the state it mutates lives behind a mutex:
+    // one command at a time, never two settings written over each other.
+    let state = std::sync::Arc::new(std::sync::Mutex::new(state::LauncherState::load()));
 
     // The whole page is inlined, so the window opens with no file next to the
     // exe to find, and no relative path that can break.
@@ -42,10 +44,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_devtools(cfg!(debug_assertions))
         // wry hands the page's `window.ipc.postMessage(...)` over as a request
         // whose body is the JSON command.
-        .with_ipc_handler(move |request: wry::http::Request<String>| {
-            // Every command goes through one door: the page can ask questions
-            // and change settings, and never anything else.
-            let _ = state.handle(request.body());
+        .with_ipc_handler({
+            let state = state.clone();
+            move |request: wry::http::Request<String>| {
+                // Every command goes through one door: the page can ask
+                // questions and change settings, and never anything else.
+                if let Ok(mut state) = state.lock() {
+                    let _ = state.handle(request.body());
+                }
+            }
         })
         .build(&window)?;
 
@@ -56,7 +63,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 event: WindowEvent::CloseRequested,
                 ..
             } => {
-                state.save();
+                if let Ok(mut state) = state.lock() {
+                    state.save();
+                }
                 *control_flow = ControlFlow::Exit;
             }
             // The webview fills the window, so a resize needs no work: wry

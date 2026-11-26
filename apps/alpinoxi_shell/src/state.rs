@@ -7,7 +7,7 @@
 
 use std::path::PathBuf;
 
-use alpinoxi_core::hud::{HudElement, HudSettings, KeyChord, KeybindAction, KeybindSet};
+use alpinoxi_core::hud::{HudElement, HudSettings, KeyChord, KeyCode, KeybindAction, KeybindSet};
 use alpinoxi_core::launcher::{Instance, LaunchPlan, MemoryProfile};
 use alpinoxi_core::skin::{Skin, SkinModel};
 use serde::{Deserialize, Serialize};
