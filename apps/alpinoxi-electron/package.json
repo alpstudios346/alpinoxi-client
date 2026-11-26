@@ -30,13 +30,13 @@
     "win": {
       "target": [
         {
-          "target": "nsis",
+          "target": "portable",
           "arch": [
             "x64"
           ]
         },
         {
-          "target": "portable",
+          "target": "nsis",
           "arch": [
             "x64"
           ]
@@ -49,6 +49,10 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "shortcutName": "Alpinoxi Client"
+    },
+    "portable": {
+      "artifactName": "AlpinoxiClient-Portable-${version}.exe",
+      "requestExecutionLevel": "user"
     }
   }
 }
