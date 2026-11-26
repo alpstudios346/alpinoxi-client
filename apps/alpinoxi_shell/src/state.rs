@@ -276,8 +276,12 @@ mod tests {
     #[test]
     fn the_heap_is_capped_at_half_the_machine() {
         let mut state = state();
+        // 16 GB asked for on an 8 GB machine: half of it is the ceiling.
         let reply = state.handle(r#"{"cmd":"set_memory","mib":16000}"#);
         assert_eq!(reply, "{\"heap\":4096}");
+        // And a request below the cap is honoured as written.
+        let reply = state.handle(r#"{"cmd":"set_memory","mib":3072}"#);
+        assert_eq!(reply, "{\"heap\":3072}");
     }
 
     #[test]

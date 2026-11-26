@@ -75,18 +75,15 @@ impl LaunchPlan {
     }
 
     pub fn from_profile(profile: MemoryProfile, total_system_mebibytes: u16) -> Self {
-        match profile {
-            MemoryProfile::Custom(value) => Self::with_heap(u32::from(value)),
-            _ => {
-                let auto = Self::auto(total_system_mebibytes);
-                if u32::from(profile.mebibytes()) <= auto.mebibytes {
-                    Self::with_heap(u32::from(profile.mebibytes()))
-                } else {
-                    // Never promise more than half of the machine's RAM.
-                    auto
-                }
-            }
-        }
+        // The cap applies to every profile, custom included: a player who
+        // types 16 GB into a 8 GB laptop gets the safe heap, not a crash on
+        // the first world load. `auto` already clamps to half the machine
+        // and to 8 GiB, so it is both the floor for a profile's own request
+        // and the ceiling for everything else.
+        let auto = Self::auto(total_system_mebibytes);
+        let wanted = u32::from(profile.mebibytes());
+        // A profile may ask for less than the cap, never for more.
+        Self::with_heap(wanted.min(auto.mebibytes))
     }
 
     pub fn with_heap(mebibytes: u32) -> Self {
