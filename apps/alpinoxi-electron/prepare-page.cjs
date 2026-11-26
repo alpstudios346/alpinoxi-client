@@ -50,8 +50,22 @@ async function boot() {
     }
     renderAll();
     if (window.alpinoxiIpc.onNotice) {
-      window.alpinoxiIpc.onNotice((text) => toast(text));
+      window.alpinoxiIpc.onNotice((text) => {
+        toast(text);
+        if ($('login-notice') && !$('login-view').hidden) $('login-notice').textContent = text;
+      });
     }
+    // A sign-in finished in the browser: the launcher sends the account here.
+    const onLauncherEvent = (message) => {
+      if (message && message.type === 'signed_in' && message.account) {
+        signIn(message.account);
+      }
+    };
+    if (window.alpinoxiIpc.onEvent) {
+      window.alpinoxiIpc.onEvent(onLauncherEvent);
+      if (window.alpinoxiIpc.__testEvent) window.alpinoxiIpc.__testEvent(onLauncherEvent);
+    }
+    window.__eventWired = !!window.alpinoxiIpc.onEvent;
   } catch (error) {
     toast('Could not reach the launcher: ' + error.message);
   }

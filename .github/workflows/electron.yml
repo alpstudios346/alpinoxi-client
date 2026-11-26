@@ -48,6 +48,7 @@ jobs:
           node check_page.cjs
           node check_uuid.cjs
           node smoke.cjs
+          node oauth-test.cjs
 
       # Opens the real window in Chromium and clicks through every screen.
       - name: Probe the window

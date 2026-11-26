@@ -10,6 +10,13 @@ const results = [];
 ipcMain.handle('alpinoxi:command', (_e, body) => {
   try {
     const cmd = typeof body === 'string' ? JSON.parse(body) : body;
+    if (cmd.cmd === 'sign_in' && cmd.provider !== 'offline') {
+      const urls = {
+        elyby: 'https://account.ely.by/oauth2/v1?client_id=alpinoxi-client&response_type=code&scope=account_info+offline_access+minecraft_server_session&state=STATE&code_challenge=CHALLENGE&code_challenge_method=S256&description=Alpinoxi+Client&redirect_uri=http%3A%2F%2F127.0.0.1%3A1234%2Fcallback',
+        microsoft: 'https://login.live.com/oauth20_authorize.srf?client_id=00000000402b5328&response_type=code&scope=XboxLive.signin+offline_access&state=STATE&code_challenge=CHALLENGE&code_challenge_method=S256&redirect_uri=http%3A%2F%2F127.0.0.1%3A1234%2Fcallback'
+      };
+      return { pending: true, opened: urls[cmd.provider] };
+    }
     if (cmd.cmd === 'sign_in' && cmd.provider === 'offline') {
       const crypto = require('node:crypto');
       const name = String(cmd.name || '').trim();
@@ -96,6 +103,38 @@ app.whenReady().then(async () => {
   await probe('logo present', `!!document.querySelector('.brand .mark') && getComputedStyle(document.querySelector('.brand .mark')).backgroundImage.startsWith('url("data:image')`);
 
   // The cracked login path, end to end.
+  await probe('elyby click', `(async () => {
+    document.querySelectorAll("#providers .provider")[1].onclick();
+    document.getElementById("browser-go").onclick();
+    await new Promise((r) => setTimeout(r, 300));
+    return { notice: document.getElementById("login-notice").textContent, provider: state.data.provider };
+  })()`);
+  await probe('ms click', `(async () => {
+    document.querySelectorAll("#providers .provider")[0].onclick();
+    document.getElementById("browser-go").onclick();
+    await new Promise((r) => setTimeout(r, 300));
+    return document.getElementById("login-notice").textContent.includes("browser is open");
+  })()`);
+  // What the launcher sends when the browser comes back with an account.
+  const fired = await win.webContents.executeJavaScript(`(() => {
+    if (!window.__eventWired) return 'page never called onEvent';
+    if (!window.__fireEvent) {
+      // The hook is created by the page's own handler, through the bridge.
+      window.alpinoxiIpc.__testEvent((message) => {
+        window.__pageEventHandler ? window.__pageEventHandler(message) : null;
+      });
+      if (!window.__fireEvent) return 'no fire hook';
+    }
+    try {
+      window.__fireEvent({ type: 'signed_in', account: { name: 'ElyPlayer', provider: 'Ely.by', uuid: '0f1e2d3c-4b5a-4678-9abc-def012345678' } });
+      return 'fired';
+    } catch (error) {
+      return 'threw: ' + error.message;
+    }
+  })()`, true).catch((error) => 'exec failed: ' + error.message);
+  results.push('fire: ' + fired);
+  await new Promise((r) => setTimeout(r, 300));
+  await probe('signed_in event', `document.getElementById("acct-name").textContent`);
   await probe('cracked login', `(async () => {
     const box = document.getElementById("cracked-name");
     box.value = "Alpinoxi";
