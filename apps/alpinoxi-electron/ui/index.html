@@ -1207,6 +1207,9 @@ async function boot() {
       if (info.version) state.data.version = info.version;
     }
     renderAll();
+    if (window.alpinoxiIpc.onNotice) {
+      window.alpinoxiIpc.onNotice((text) => toast(text));
+    }
   } catch (error) {
     toast('Could not reach the launcher: ' + error.message);
   }

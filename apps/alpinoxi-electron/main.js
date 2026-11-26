@@ -184,6 +184,35 @@ function createWindow() {
   });
 
   win.once('ready-to-show', () => win.show());
+
+  const log = (line) => {
+    try {
+      fs.appendFileSync(path.join(dataDir(), 'launcher.log'), `${new Date().toISOString()} ${line}\n`);
+    } catch {
+      /* a launcher that cannot log still has to run */
+    }
+  };
+
+  win.webContents.on('render-process-gone', (_event, details) => {
+    log(`renderer gone: ${details.reason} (exit ${details.exitCode})`);
+    // One reload is a hiccup; a second failure is a real bug, so say so.
+    if (!win.__reloaded) {
+      win.__reloaded = true;
+      win.reload();
+    } else {
+      win.loadFile(path.join(__dirname, 'ui', 'index.html'));
+      win.webContents.once('did-finish-load', () =>
+        win.webContents.send('alpinoxi:notice', 'The window restarted after a crash.')
+      );
+    }
+  });
+
+  win.webContents.on('did-fail-load', (_event, code, description) => {
+    log(`load failed: ${code} ${description}`);
+  });
+
+  process.on('uncaughtException', (error) => log(`uncaught: ${error.stack || error.message}`));
+
   win.loadFile(path.join(__dirname, 'ui', 'index.html'));
 
   // A link never navigates the launcher window; it opens in the browser.
