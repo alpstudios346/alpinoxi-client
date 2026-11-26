@@ -69,7 +69,9 @@ pub struct LaunchPlan {
 impl LaunchPlan {
     /// Picks a heap from system RAM and the chosen profile, then derives flags.
     pub fn auto(total_system_mebibytes: u16) -> Self {
-        let half = u32::from(total_system_mebibytes) * 1024 / 2;
+        // `total_system_mebibytes` is mebibytes, not gigabytes: half of
+        // 8 192 MiB is 4 096 MiB, and the floor keeps a tiny machine usable.
+        let half = u32::from(total_system_mebibytes) / 2;
         let heap = half.clamp(1_024, 8_192);
         Self::with_heap(heap)
     }

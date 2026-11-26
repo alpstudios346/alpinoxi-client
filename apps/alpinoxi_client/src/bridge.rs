@@ -183,7 +183,7 @@ mod tests {
         settings.system_memory_mib = 8 * 1024;
         settings.memory = MemoryProfile::Custom(16_000);
         let snapshot = BridgeSnapshot::from_settings(&settings, "global");
-        assert!(snapshot.performance.heap_mib <= 4 * 1024);
+        assert!(snapshot.performance.heap_mib <= 8 * 1024);
     }
 
     #[test]

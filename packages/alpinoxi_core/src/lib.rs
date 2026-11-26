@@ -38,9 +38,14 @@ mod tests {
 
     #[test]
     fn auto_profile_never_asks_for_more_than_half_of_ram() {
-        for total in [4_u16, 8, 16, 32, 64] {
+        // `total` is in mebibytes, so half of 4 GiB is 2048 MiB.
+        for total in [4_096_u16, 8_192, 16_384, 32_768] {
             let plan = LaunchPlan::auto(total);
-            assert!(plan.mebibytes <= u32::from(total) * 1024 / 2);
+            assert!(
+                plan.mebibytes <= u32::from(total) / 2,
+                "{total} MiB machine got {} MiB",
+                plan.mebibytes
+            );
             assert!(plan.mebibytes >= 1_024);
         }
     }

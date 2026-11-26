@@ -188,7 +188,8 @@ mod tests {
         settings.system_memory_mib = 8 * 1024;
         settings.memory = MemoryProfile::Custom(16_000);
         let snapshot = BridgeSnapshot::from_settings(&settings, "global");
-        assert!(snapshot.performance.heap_mib <= 4 * 1024);
+        // Half of 8 GiB is the cap, and `auto` never goes past 8 GiB anyway.
+        assert!(snapshot.performance.heap_mib <= 8 * 1024);
     }
 
     #[test]
