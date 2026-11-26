@@ -29,6 +29,19 @@ function dataDir() {
 }
 
 const settingsPath = () => path.join(dataDir(), 'settings.json');
+
+// One writer for launcher.log. It is defined here, at the top, because the
+// sign-in flow and the window both need it, and a launcher that cannot log
+// still has to run.
+function log(line) {
+  try {
+    const dir = dataDir();
+    fs.mkdirSync(dir, { recursive: true });
+    fs.appendFileSync(path.join(dir, 'launcher.log'), `${new Date().toISOString()} ${line}\n`);
+  } catch {
+    /* a launcher that cannot log still has to run */
+  }
+}
 const bridgePath = () => path.join(dataDir(), 'bridge.json');
 
 function systemMemoryMib() {
@@ -494,6 +507,7 @@ function handle(body) {
 // ---------------------------------------------------------------------------
 
 function createWindow() {
+  log(`window: opening (v${VERSION})`);
   const win = new BrowserWindow({
     width: 1180,
     height: 760,
@@ -513,15 +527,10 @@ function createWindow() {
     }
   });
 
-  win.once('ready-to-show', () => win.show());
-
-  const log = (line) => {
-    try {
-      fs.appendFileSync(path.join(dataDir(), 'launcher.log'), `${new Date().toISOString()} ${line}\n`);
-    } catch {
-      /* a launcher that cannot log still has to run */
-    }
-  };
+  win.once('ready-to-show', () => {
+    log('window: ready');
+    win.show();
+  });
 
   win.webContents.on('render-process-gone', (_event, details) => {
     log(`renderer gone: ${details.reason} (exit ${details.exitCode})`);
@@ -530,17 +539,21 @@ function createWindow() {
       win.__reloaded = true;
       win.reload();
     } else {
-      mainWindow = win;
+      log('renderer gone twice: the window is being rebuilt');
+      win.loadFile(path.join(__dirname, 'ui', 'index.html'));
+      win.webContents.once('did-finish-load', () => {
+        if (!win.isDestroyed()) {
+          win.webContents.send('alpinoxi:notice', 'The window restarted after a crash.');
+        }
+      });
+    }
+  });
+
   win.on('closed', () => {
     if (mainWindow === win) mainWindow = null;
   });
 
   win.loadFile(path.join(__dirname, 'ui', 'index.html'));
-      win.webContents.once('did-finish-load', () =>
-        win.webContents.send('alpinoxi:notice', 'The window restarted after a crash.')
-      );
-    }
-  });
 
   win.webContents.on('did-fail-load', (_event, code, description, url) => {
     log(`load failed: ${code} ${description} ${url}`);
@@ -564,6 +577,7 @@ function createWindow() {
     if (mainWindow === win) mainWindow = null;
   });
 
+  win.webContents.once('did-finish-load', () => log('window: page loaded'));
   win.loadFile(path.join(__dirname, 'ui', 'index.html'));
 
   // A link never navigates the launcher window; it opens in the browser.
