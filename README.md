@@ -6,7 +6,7 @@
 
 <p align="center">A stylish, lightweight Minecraft Java Edition launcher written in Rust.</p>
 
-Alpinoxi Client is a fresh, open-source Rust workspace maintained by **AlpinoxiGD**. It uses a native `egui` desktop interface rather than Electron, so the launcher stays separate from—and lightweight beside—the Minecraft Java process.
+Alpinoxi Client is a fresh, open-source project maintained by **AlpinoxiGD**. It ships in two forms: an **Electron desktop build** (`Alpinoxi Client.exe`, an NSIS installer and a portable single exe) and a small native build. Both show the same interface, so a screen is written once.
 
 ## What exists now
 
@@ -23,6 +23,11 @@ Every item on this list is in the repository and covered by tests:
 - **Mods and resource packs**: a licence-aware catalogue that links to official releases instead of redistributing files.
 - **Alpinoxi's own Fabric mods**: a HUD mod and a performance mod, both driven by the Rust core through a JNI bridge.
 - **Performance**: the curated client-side set (Sodium, Lithium, FerriteCore, Krypton, ModernFix, Entity Culling, Indium, ImmediatelyFast, Memory Leak Fix) plus Alpinoxi Performance's own frame-time histogram, 1% lows, bottleneck diagnosis and render-distance governor.
+- **One interface, two windows**: the same single-file HTML page is shown by the Electron build and by the native webview shell (`apps/alpinoxi_shell`), so the two cannot drift apart. Every screen exists once.
+- **Lunar-style layout**: a rail of screens, a top bar with the account chip and one Launch button, and a dark palette with a single accent.
+- **Command-free settings**: the keybind editor takes a key press and catches conflicts with the vanilla keys; the HUD editor toggles each element and picks its anchor, with a live preview of the in-game screen.
+- **One settings file**: `%APPDATA%/alpinoxi/settings.json`, plus `bridge.json` in the same folder that the in-game mods read, so the launcher's HUD preview and the HUD in game cannot disagree.
+- **A crash that is not a dead window**: the Electron main process logs to `launcher.log` and reloads the window once before showing a notice.
 
 ## What comes next
 
