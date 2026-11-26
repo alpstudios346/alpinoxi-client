@@ -18,3 +18,8 @@ mods/jars/*.jar
 mods/jars/*/classes/
 mods/jars/*.sources
 mods/jars/*.args
+
+# Electron: the launcher window's own node_modules and build output
+apps/alpinoxi-electron/node_modules/
+apps/alpinoxi-electron/dist/
+dist/electron/
