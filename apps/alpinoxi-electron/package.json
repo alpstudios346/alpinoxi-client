@@ -53,6 +53,11 @@
     "portable": {
       "artifactName": "AlpinoxiClient-Portable-${version}.exe",
       "requestExecutionLevel": "user"
-    }
+    },
+    "publish": null
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alpstudios346/alpinoxi-client.git"
   }
 }
