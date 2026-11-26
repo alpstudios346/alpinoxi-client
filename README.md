@@ -39,27 +39,56 @@ Offline profiles are only for servers which explicitly allow offline-mode identi
 
 ## Run locally
 
-Install the current stable Rust toolchain, then run:
+### The Electron build (the main one)
+
+Needs Node 20 or newer. Nothing else: Chromium comes with the package.
 
 ```sh
-cargo run -p alpinoxi_client
+cd apps/alpinoxi-electron
+npm install
+npm start            # the launcher window
+npm run build:win    # AlpinoxiClient-Portable-0.3.0.exe + NSIS installer, in dist/electron
 ```
 
-Quality checks:
+The portable exe is a single file: no installer, no admin rights, no runtime
+to install. The NSIS installer is there for people who want a Start-menu entry.
+
+### The native build
+
+Needs the current stable Rust toolchain.
+
+```sh
+python ui/build_ui.py            # the interface page, embedded into the exe
+cargo run -p alpinoxi_shell      # the webview window (WebView2 on Windows)
+cargo run -p alpinoxi_client     # the egui launcher
+```
+
+The page must be built before either native build: the binary embeds it, and
+`ui/build_ui.py --check` refuses to ship a page with an unfilled slot.
+
+### Quality checks
 
 ```sh
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
+python ui/build_ui.py --check
+cd apps/alpinoxi-electron && npx electron main.js --self-test
 ```
 
 ## Project layout
 
 | Path | Purpose |
 | --- | --- |
+| `apps/alpinoxi-electron` | Electron launcher: main process, preload bridge, packaging |
+| `apps/alpinoxi_shell` | Native webview window showing the same page |
 | `apps/alpinoxi_client` | Native desktop app and visual design system |
+| `ui/` | The interface: one HTML file and the script that fills it |
 | `packages/alpinoxi_core` | Account, launch and memory domain models |
 | `packages/alpinoxi_auth_system` | Provider-independent authentication state machine |
+| `packages/alpinoxi_ingame` | Frame timing, bottleneck diagnosis, render governor |
+| `packages/alpinoxi_jni` | The bridge the Fabric mods call |
+| `mods/` | Alpinoxi HUD, Performance and the bridge mod |
 | `docs/` | Architecture and security decisions |
 
 ## Open source
