@@ -141,6 +141,7 @@ def build_data() -> dict:
         "keep_light": settings.get("keep_launcher_light", True),
         "close_on_launch": settings.get("close_launcher_on_launch", False),
         "provider": (settings.get("last_provider") or "microsoft").lower(),
+        "last_provider": (settings.get("last_provider") or "microsoft").lower(),
         "cracked_name": settings.get("cracked_name", ""),
         "skin_model": settings.get("skin_model", "Classic"),
         "skin_source": "None",

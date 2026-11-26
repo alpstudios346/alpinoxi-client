@@ -28,6 +28,17 @@ window.alpinoxi = {
 
 const BOOT = `// Electron hands the page its settings and answers commands; the webview
 // build has neither, so both paths are guarded here.
+
+// Adopts an account: the window is signed in, and the screens are the app's.
+function applyAccount(account) {
+  state.data.account = account;
+  state.signedIn = true;
+  state.data.last_provider = account.provider === 'Microsoft' ? 'microsoft'
+    : account.provider === 'Ely.by' ? 'elyby' : 'offline';
+  $('login-view').hidden = true;
+  $('app-view').hidden = false;
+}
+
 async function boot() {
   if (!window.alpinoxiIpc) return;
   try {
@@ -48,10 +59,13 @@ async function boot() {
       if (info.version) state.data.version = info.version;
       if (info.settings.cracked_name) state.data.cracked_name = info.settings.cracked_name;
     }
-    renderAll();
-    if (info.account && info.account.name) {
-      signIn(info.account);
+    // The account that was signed in when the window last closed, so the
+    // window opens where the player left it instead of on the login screen.
+    const saved = (info.account && info.account.name) ? info.account : (info.settings && info.settings.account);
+    if (saved && saved.name) {
+      applyAccount(saved);
     }
+    renderAll();
     if (window.alpinoxiIpc.onNotice) {
       window.alpinoxiIpc.onNotice((text) => {
         toast(text);

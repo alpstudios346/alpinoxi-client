@@ -405,6 +405,14 @@ const handlers = {
     saveSettings(s);
     return { cracked_name: s.cracked_name };
   },
+  remember_provider: (s, cmd) => {
+    const known = ['microsoft', 'elyby', 'offline'];
+    if (known.includes(cmd.provider)) {
+      s.last_provider = cmd.provider;
+      saveSettings(s);
+    }
+    return { ok: true };
+  },
   open_external: (s, cmd) => {
     // Only https, so a page cannot ask the launcher to run a local file.
     if (typeof cmd.url === 'string' && cmd.url.startsWith('https://')) shell.openExternal(cmd.url);
@@ -548,6 +556,8 @@ function createWindow() {
   });
 
   process.on('uncaughtException', (error) => log(`uncaught: ${error.stack || error.message}`));
+  // A broken page must leave a trace, not spam the console.
+  process.on('unhandledRejection', (reason) => log(`unhandled: ${reason && reason.message ? reason.message : reason}`));
 
   mainWindow = win;
   win.on('closed', () => {

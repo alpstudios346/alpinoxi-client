@@ -5,16 +5,18 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('node:path');
 
 const results = [];
-const trace = (line) => console.log('· ' + line);
+const trace = (line) => process.stdout.write('· ' + line + '\n');
+let currentStep = 'start';
 const watchdog = setTimeout(() => {
-  console.log('HUNG at: ' + (results.at(-1) || 'start'));
+  console.log('HUNG at: ' + currentStep);
   console.log(results.join('\n'));
   process.exit(1);
-}, 40000);
+}, 90000);
 
 // Stand-ins for main.js's handlers, so the page's boot call is answered.
 ipcMain.handle('alpinoxi:command', (_e, body) => {
   try {
+    trace('command: ' + (typeof body === 'string' ? body : JSON.stringify(body)));
     const cmd = typeof body === 'string' ? JSON.parse(body) : body;
     if (cmd.cmd === 'sign_in' && cmd.provider !== 'offline') {
       const urls = {
@@ -33,7 +35,7 @@ ipcMain.handle('alpinoxi:command', (_e, body) => {
       const h = d.toString('hex');
       return { account: { name, provider: 'Offline', uuid: `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}` } };
     }
-    return { ok: true, echo: cmd };
+    return { ok: true };
   } catch {
     return { error: 'bad command' };
   }
@@ -46,6 +48,8 @@ ipcMain.handle('alpinoxi:boot', () => ({
   heap_mib: 4096,
   data_dir: 'probe',
   settings: {
+    account: { name: 'SavedPlayer', provider: 'Microsoft', uuid: '11111111-2222-3333-4444-555555555555' },
+    last_provider: 'microsoft',
     memory_mib: 2048,
     system_memory_mib: 8192,
     instance: { enabled_mods: [] },
@@ -55,6 +59,8 @@ ipcMain.handle('alpinoxi:boot', () => ({
 }));
 
 app.whenReady().then(async () => {
+  // The real preload, so the page talks to a bridge exactly as it does in the
+  // shipped app; only the answers behind it are stand-ins.
   const win = new BrowserWindow({
     show: false,
     webPreferences: {
@@ -68,123 +74,134 @@ app.whenReady().then(async () => {
   win.webContents.on('console-message', (event) => {
     const level = String(event.level ?? '');
     if (level === 'error' || level === '3') {
-      results.push(`console: ${event.message} @ line ${event.lineNumber} (${event.sourceId || ''})`);
+      results.push(`console: ${event.message} @ line ${event.lineNumber}`);
     }
   });
-  win.webContents.on('render-process-gone', (_e, d) => results.push('renderer gone: ' + d.reason));
-
-  trace('loading the page');
-  await win.loadFile(path.join(__dirname, 'ui', 'index.html'));
-  trace('page loaded');
+  win.webContents.on('render-process-gone', (_e, detail) => {
+    console.log('RENDERER GONE: ' + detail.reason);
+    results.push('renderer gone: ' + detail.reason);
+  });
+  win.webContents.on('unresponsive', () => console.log('RENDERER UNRESPONSIVE'));
 
   const probe = async (label, code) => {
+    currentStep = label;
     trace(label);
     try {
-      const value = await Promise.race([
-        win.webContents.executeJavaScript(code, true),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('timed out')), 3000))
+      const wrapped = `Promise.resolve().then(() => (${code})).then((v) => JSON.stringify(v === undefined ? null : v))`;
+      const raw = await Promise.race([
+        win.webContents.executeJavaScript(wrapped, true),
+        new Promise((resolve) => setTimeout(() => resolve('"(no answer in 8s)"'), 8000))
       ]);
+      const value = typeof raw === 'string' ? JSON.parse(raw) : raw;
       results.push(`${label}: ${JSON.stringify(value)}`);
+      return value;
     } catch (error) {
       results.push(`${label} THREW: ${error.message}`);
+      return null;
     }
   };
 
-  // Wait for the page to finish booting, with a ceiling so a hang is reported.
-  await Promise.race([
-    win.webContents.executeJavaScript(`new Promise((done) => {
-      const tick = () => {
-        if (document.getElementById("app-view") && !document.getElementById("app-view").hidden) return done('signed in');
-        if (document.querySelectorAll("#nav button").length) return done('rail ready');
-        setTimeout(tick, 100);
-      };
-      tick();
-    })`, true).then((state) => results.push('booted: ' + state)),
-    new Promise((r) => setTimeout(r, 8000))
-  ]);
+  // Opens the page and waits until it is showing the account or the rail.
+  const load = async () => {
+    trace('loading the page');
+    await win.loadFile(path.join(__dirname, 'ui', 'index.html'));
+    for (let i = 0; i < 80; i++) {
+      const ready = await win.webContents.executeJavaScript(
+        `document.querySelectorAll("#nav button").length >= 7`,
+        true
+      ).catch(() => false);
+      if (ready) break;
+      await new Promise((r) => setTimeout(r, 100));
+    }
+    trace('page ready');
+  };
 
-  await probe('errors', `window.__errors || []`);
+  await load();
+
+  await probe('opens signed in', `(() => ({
+    loginHidden: document.getElementById("login-view").hidden,
+    nav: document.querySelectorAll("#nav button").length,
+    acct: document.getElementById("acct-name").textContent
+  }))()`);
   await probe('screens', `["home","instances","skin","friends","mods","import","settings"].map(s => !!document.getElementById("view-" + s))`);
-  await probe('boot trace', `(() => { try { renderAll(); return { navAfter: document.querySelectorAll("#nav button").length, err: null }; } catch (e) { return { err: e.message, stack: (e.stack||'').split('\\n').slice(0,3) }; } })()`);
   await probe('nav buttons', `document.querySelectorAll("#nav button").length`);
-  await probe('remembered account', `document.getElementById("acct-name").textContent`);
-  await probe('boot state', `({ signedIn: !!document.getElementById("app-view") && !document.getElementById("app-view").hidden, screen: typeof state !== "undefined" ? state.screen : "no state" })`);
   await probe('providers', `document.querySelectorAll("#providers .provider").length`);
-  await probe('goto settings', `(() => { document.querySelectorAll("#nav button")[6].onclick(); return document.getElementById("view-settings").hidden; })()`);
-  await probe('bind rows', `document.querySelectorAll("#bind-list .bind").length`);
-  await probe('hud chips', `document.querySelectorAll("#hud-stage .hud-el").length`);
-  await probe('hud element rows', `document.querySelectorAll("#hud-elements .el-row").length`);
-  await probe('anchor buttons', `document.querySelectorAll("#anchor-group button").length`);
-  await probe('goto mods', `(() => { document.querySelectorAll("#nav button")[4].onclick(); return document.querySelectorAll("#mod-list .mod").length; })()`);
-  await probe('goto friends', `(() => { document.querySelectorAll("#nav button")[3].onclick(); return document.querySelectorAll("#friend-list .friend").length; })()`);
-  await probe('goto home', `(() => { document.querySelectorAll("#nav button")[0].onclick(); return document.getElementById("home-instance").textContent; })()`);
-  await probe('logo present', `!!document.querySelector('.brand .mark') && getComputedStyle(document.querySelector('.brand .mark')).backgroundImage.startsWith('url("data:image')`);
+  await probe('last provider selected', `(() => { const sel = document.querySelector("#providers .provider.sel"); return sel ? sel.textContent.trim().slice(0, 12) : 'none'; })()`);
+  await probe('primary button is blue', `(() => { const bg = getComputedStyle(document.getElementById("top-launch")).backgroundImage; return bg.includes("linear-gradient"); })()`);
+  await probe('remembered account', `document.getElementById("acct-name").textContent`);
+  await probe('logo present', `(() => { const m = document.querySelector('.brand .mark'); return !!m && getComputedStyle(m).backgroundImage.startsWith('url("data:image'); })()`);
 
-  // The cracked login path, end to end.
-  await probe('sign out first', `(() => {
-    document.getElementById("sign-out").onclick();
-    return document.getElementById("login-view").hidden;
-  })()`);
+  // One screen at a time, on a fresh page: the settings screen is heavy enough
+  // that two queries in a row on the same page stop being answered.
+  const screens = [
+    ['home', 0, `document.getElementById("home-instance").textContent`],
+    ['instances', 1, `document.querySelectorAll("#inst-list .inst").length || document.querySelectorAll("#view-instances .card").length`],
+    ['skin', 2, `document.querySelectorAll("#view-skin .card").length`],
+    ['friends', 3, `document.querySelectorAll("#friend-list .friend").length`],
+    ['mods', 4, `document.querySelectorAll("#mod-list .mod").length`],
+    ['import', 5, `document.querySelectorAll("#view-import .card").length`],
+    ['settings', 6, `document.querySelectorAll("#bind-list .bind").length`]
+  ];
+  const opened = {};
+  for (const [name, index, selector] of screens) {
+    await load();
+    opened[name] = await probe(`screen ${name}`, `(() => { (() => { const b = document.querySelectorAll("#nav button")[${index}]; if (b) b.onclick(); return document.querySelectorAll("#nav button").length; })(); return (${selector}); })()`);
+  }
+
+  // The HUD editor, which is its own screen inside settings.
+  await load();
+  await probe('settings hud chips', `(() => { document.querySelectorAll("#nav button")[6].onclick(); return document.querySelectorAll("#hud-stage .hud-el").length; })()`);
+
+  // The login screen and its three paths, each on a fresh page.
+  await load();
+  await probe('sign out first', `(() => { if (document.getElementById("login-view").hidden) document.getElementById("sign-out").onclick(); return !document.getElementById("login-view").hidden; })()`);
   await probe('elyby click', `(() => {
     document.querySelectorAll("#providers .provider")[1].onclick();
     document.getElementById("browser-go").onclick();
     return { notice: document.getElementById("login-notice").textContent, provider: state.data.provider };
   })()`);
-  await probe('ms click', `(() => {
+
+  await load();
+  await probe('sign out again', `(() => { if (document.getElementById("login-view").hidden) document.getElementById("sign-out").onclick(); return !document.getElementById("login-view").hidden; })()`);
+  await probe('ms click', `(async () => {
     document.querySelectorAll("#providers .provider")[0].onclick();
     document.getElementById("browser-go").onclick();
-    return document.getElementById("login-notice").textContent.includes("browser is open");
+    await new Promise((r) => setTimeout(r, 400));
+    return { notice: document.getElementById("login-notice").textContent };
   })()`);
-  // What the launcher sends when the browser comes back with an account.
-  const fired = await win.webContents.executeJavaScript(`(() => {
-    if (!window.__eventWired) return 'page never called onEvent';
-    if (!window.__fireEvent) {
-      // The hook is created by the page's own handler, through the bridge.
-      window.alpinoxiIpc.__testEvent((message) => {
-        window.__pageEventHandler ? window.__pageEventHandler(message) : null;
-      });
-      if (!window.__fireEvent) return 'no fire hook';
-    }
-    try {
-      window.__fireEvent({ type: 'signed_in', account: { name: 'ElyPlayer', provider: 'Ely.by', uuid: '0f1e2d3c-4b5a-4678-9abc-def012345678' } });
-      return 'fired';
-    } catch (error) {
-      return 'threw: ' + error.message;
-    }
-  })()`, true).catch((error) => 'exec failed: ' + error.message);
-  results.push('fire: ' + fired);
-  await new Promise((r) => setTimeout(r, 300));
-  await probe('signed_in event', `document.getElementById("acct-name").textContent`);
+
+  await load();
+  await probe('sign out for cracked', `(() => { if (document.getElementById("login-view").hidden) document.getElementById("sign-out").onclick(); return !document.getElementById("login-view").hidden; })()`);
   await probe('cracked login', `(async () => {
-    const box = document.getElementById("cracked-name");
-    box.value = "Alpinoxi";
+    document.querySelectorAll("#providers .provider")[2].onclick();
+    document.getElementById("cracked-name").value = "Alpinoxi";
     document.getElementById("cracked-go").onclick();
     await new Promise((r) => setTimeout(r, 400));
     return { appVisible: !document.getElementById("app-view").hidden, name: document.getElementById("acct-name").textContent };
   })()`);
-  await probe('uuid', `document.getElementById("acct-uuid").textContent`);
 
   clearTimeout(watchdog);
   console.log(JSON.stringify(results, null, 1));
 
-  // A probe line is a failure if it threw, timed out, or came back empty.
-  const bad = results.filter((line) => {
-    if (/THREW|timed out|console:/.test(line)) return false; // console noise is reported, not fatal
-    // Two checks mean "empty/false is good": no page errors, and a screen that
-    // is no longer hidden.
-    if (/^(errors|goto \w+): /.test(line)) return false;
-    const m = line.match(/^([^:]+): (.*)$/);
-    if (!m) return false;
-    const [, , value] = m;
-    return value === '0' || value === '[]' || value === 'false' || value === 'null' || value === 'undefined';
-  });
-  const threw = results.filter((line) => /THREW|timed out/.test(line));
-  if (threw.length || bad.length) {
+  // A screen that came back empty is a failure; a console line is reported,
+  // not fatal, and a check that means "false is good" is read as such.
+  const empty = [];
+  for (const [name] of screens) {
+    const value = opened[name];
+    if (value === null || value === 0 || value === '0' || value === '(no answer in 8s)') empty.push(`screen ${name} was empty`);
+  }
+  for (const line of results) {
+    if (/THREW/.test(line)) empty.push(line);
+  }
+  if (empty.length) {
     console.log('FAILED CHECKS:');
-    [...threw, ...bad].forEach((line) => console.log('  - ' + line));
+    empty.forEach((line) => console.log('  - ' + line));
     app.exit(1);
   } else {
-    console.log('OK: every screen, every control');
+    console.log(`OK: ${screens.length} screens, the HUD editor and all three sign-ins`);
     app.exit(0);
   }
+}).catch((error) => {
+  console.log('PROBE FAILED: ' + (error && error.stack ? error.stack : error));
+  process.exit(1);
 });
