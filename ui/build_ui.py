@@ -148,7 +148,6 @@ def build_data() -> dict:
         "upload_target": "local only",
         "providers": PROVIDERS,
         "account": None,
-        "uuid_for": uuid_for,
         "instance": {
             "name": instance.get("name", "Vanilla"),
             "version": instance.get("game_version", "1.21.1"),

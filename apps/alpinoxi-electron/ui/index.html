@@ -348,7 +348,7 @@
     <div class="rule"></div>
     <nav class="nav" id="nav"></nav>
     <div class="rail-foot">
-      <strong>No Electron. No web view.</strong>
+      <strong>Electron. One interface.</strong>
       <span id="rail-version"></span>
     </div>
   </aside>
@@ -658,7 +658,7 @@ window.alpinoxi = {
 "use strict";
 
 // ---------- data the launcher hands over ----------
-const DATA = {"version": "0.2.0", "slogan": "OneClient is best!", "system_memory_mib": 6082, "memory_mib": 2048, "keep_light": true, "close_on_launch": false, "provider": "microsoft", "cracked_name": "", "skin_model": "Classic", "skin_source": "None", "skin_note": "No skin selected yet.", "upload_target": "local only", "providers": [{"id": "microsoft", "name": "Microsoft", "note": "The real account. Skins, capes and friends everywhere.", "browser": "Alpinoxi opens your browser and waits for Microsoft to hand back a token. No password is typed into the launcher."}, {"id": "elyby", "name": "Ely.by", "note": "Skins through Ely.by, client id alpinoxi-client.", "browser": "Ely.by sign-in opens in your browser. The launcher only ever sees the token, never your password."}, {"id": "offline", "name": "Cracked", "note": "No account needed. Skins only where the server accepts them.", "browser": ""}], "account": null, "uuid_for": "\u003cfunction uuid_for at 0x000001E5F03336A0\u003e", "instance": {"name": "Vanilla", "version": "1.21.1", "loader": "fabric", "enabled_mods": [], "resource_packs": 0}, "performance": [{"id": "sodium", "name": "Sodium", "summary": "Rewrites the chunk renderer: the single biggest FPS win"}, {"id": "lithium", "name": "Lithium", "summary": "Faster ticks, AI and physics without changing behaviour"}, {"id": "ferritecore", "name": "FerriteCore", "summary": "Cuts model and block-state memory by roughly half"}, {"id": "krypton", "name": "Krypton", "summary": "Moves networking off the render thread"}, {"id": "modernfix", "name": "ModernFix", "summary": "Faster startup and fewer stutters on modded packs"}, {"id": "entityculling", "name": "Entity Culling", "summary": "Skips rendering entities you cannot see"}, {"id": "indium", "name": "Indium", "summary": "Sodium compatibility layer for mods that use the Fabric renderer"}, {"id": "immediatelyfast", "name": "ImmediatelyFast", "summary": "Batches immediate-mode GUI and text rendering"}, {"id": "memoryleakfix", "name": "Memory Leak Fix", "summary": "Patches known leaks that grow over a long session"}], "catalog": [{"id": "sodium", "name": "Sodium", "summary": "Rewrites the chunk renderer: the single biggest FPS win", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/sodium"}, {"id": "lithium", "name": "Lithium", "summary": "Faster ticks, AI and physics without changing behaviour", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/lithium"}, {"id": "ferritecore", "name": "FerriteCore", "summary": "Cuts model and block-state memory by roughly half", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/ferritecore"}, {"id": "krypton", "name": "Krypton", "summary": "Moves networking off the render thread", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/krypton"}, {"id": "modernfix", "name": "ModernFix", "summary": "Faster startup and fewer stutters on modded packs", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/modernfix"}, {"id": "entityculling", "name": "Entity Culling", "summary": "Skips rendering entities you cannot see", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/entityculling"}, {"id": "indium", "name": "Indium", "summary": "Sodium compatibility layer for mods that use the Fabric renderer", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/indium"}, {"id": "immediatelyfast", "name": "ImmediatelyFast", "summary": "Batches immediate-mode GUI and text rendering", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/immediatelyfast"}, {"id": "memoryleakfix", "name": "Memory Leak Fix", "summary": "Patches known leaks that grow over a long session", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/memoryleakfix"}, {"id": "fabric-api", "name": "Fabric API", "summary": "The hooks every Fabric mod builds on", "kind": "mod", "performance": false, "licence": "Open source, official release", "url": "https://modrinth.com/mod/fabric-api"}, {"id": "modmenu", "name": "Mod Menu", "summary": "A settings screen for the mods you install", "kind": "mod", "performance": false, "licence": "Open source, official release", "url": "https://modrinth.com/mod/modmenu"}, {"id": "iris", "name": "Iris Shaders", "summary": "Shader packs on top of Sodium", "kind": "mod", "performance": false, "licence": "Open source, official release", "url": "https://modrinth.com/mod/iris"}, {"id": "alpinoxi-pack", "name": "Alpinoxi HUD pack", "summary": "The pack the launcher's HUD previews", "kind": "resourcepack", "performance": false, "licence": "Alpinoxi, MIT", "url": "https://modrinth.com/resourcepack/"}, {"id": "fresh-animations", "name": "Fresh Animations", "summary": "Living mob animations, no extra frames", "kind": "resourcepack", "performance": false, "licence": "CC BY-NC-SA", "url": "https://modrinth.com/resourcepack/fresh-animations"}], "friends": [{"name": "Alpinoxi", "provider": "Ely.by", "presence": "In game", "server": "play.alpinoxi.net"}, {"name": "Steve", "provider": "Microsoft", "presence": "In launcher", "server": null}, {"name": "Alex", "provider": "Offline", "presence": "Offline", "server": null}], "pending": 1, "hud": {"enabled": true, "background": true, "scale_percent": 100, "elements": [{"id": "fps", "label": "FPS", "anchor": "Top left", "visible": true, "sample": "144 FPS"}, {"id": "coordinates", "label": "Coordinates", "anchor": "Top left", "visible": true, "sample": "X 128  Y 71  Z -64"}, {"id": "ping", "label": "Ping", "anchor": "Top right", "visible": true, "sample": "23 ms"}, {"id": "keystrokes", "label": "Keystrokes", "anchor": "Bottom left", "visible": true, "sample": "W A S D"}, {"id": "armor", "label": "Armor", "anchor": "Bottom left", "visible": true, "sample": "⛊⛊⛊⛊"}, {"id": "potion_effects", "label": "Potion effects", "anchor": "Top right", "visible": true, "sample": "Speed 1:12"}, {"id": "server_address", "label": "Server address", "anchor": "Top right", "visible": true, "sample": "play.alpinoxi.net"}, {"id": "clock", "label": "Clock", "anchor": "Top left", "visible": true, "sample": "21:40"}, {"id": "friends", "label": "Friends online", "anchor": "Top right", "visible": true, "sample": "3 online"}, {"id": "reach", "label": "Reach", "anchor": "Bottom centre", "visible": true, "sample": "3.0 blocks"}]}, "binds": [{"action": "Open HUD editor", "chord": "Shift+H", "vanilla": false}, {"action": "Toggle HUD", "chord": "F1", "vanilla": false}, {"action": "Open friends", "chord": "O", "vanilla": false}, {"action": "Open chat", "chord": "Y", "vanilla": false}, {"action": "Toggle skin preview", "chord": "U", "vanilla": false}, {"action": "Toggle FPS", "chord": "F1+FPS", "vanilla": false}], "default_binds": [{"action": "Open HUD editor", "chord": "Shift+H", "vanilla": false}, {"action": "Toggle HUD", "chord": "F1", "vanilla": false}, {"action": "Open friends", "chord": "O", "vanilla": false}, {"action": "Open chat", "chord": "Y", "vanilla": false}, {"action": "Toggle skin preview", "chord": "U", "vanilla": false}, {"action": "Toggle FPS", "chord": "F1+FPS", "vanilla": false}]};
+const DATA = {"version": "0.2.0", "slogan": "OneClient is best!", "system_memory_mib": 6082, "memory_mib": 2048, "keep_light": true, "close_on_launch": false, "provider": "microsoft", "cracked_name": "benalpp", "skin_model": "Classic", "skin_source": "None", "skin_note": "No skin selected yet.", "upload_target": "local only", "providers": [{"id": "microsoft", "name": "Microsoft", "note": "The real account. Skins, capes and friends everywhere.", "browser": "Alpinoxi opens your browser and waits for Microsoft to hand back a token. No password is typed into the launcher."}, {"id": "elyby", "name": "Ely.by", "note": "Skins through Ely.by, client id alpinoxi-client.", "browser": "Ely.by sign-in opens in your browser. The launcher only ever sees the token, never your password."}, {"id": "offline", "name": "Cracked", "note": "No account needed. Skins only where the server accepts them.", "browser": ""}], "account": null, "instance": {"name": "Vanilla", "version": "1.21.1", "loader": "fabric", "enabled_mods": [], "resource_packs": 0}, "performance": [{"id": "sodium", "name": "Sodium", "summary": "Rewrites the chunk renderer: the single biggest FPS win"}, {"id": "lithium", "name": "Lithium", "summary": "Faster ticks, AI and physics without changing behaviour"}, {"id": "ferritecore", "name": "FerriteCore", "summary": "Cuts model and block-state memory by roughly half"}, {"id": "krypton", "name": "Krypton", "summary": "Moves networking off the render thread"}, {"id": "modernfix", "name": "ModernFix", "summary": "Faster startup and fewer stutters on modded packs"}, {"id": "entityculling", "name": "Entity Culling", "summary": "Skips rendering entities you cannot see"}, {"id": "indium", "name": "Indium", "summary": "Sodium compatibility layer for mods that use the Fabric renderer"}, {"id": "immediatelyfast", "name": "ImmediatelyFast", "summary": "Batches immediate-mode GUI and text rendering"}, {"id": "memoryleakfix", "name": "Memory Leak Fix", "summary": "Patches known leaks that grow over a long session"}], "catalog": [{"id": "sodium", "name": "Sodium", "summary": "Rewrites the chunk renderer: the single biggest FPS win", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/sodium"}, {"id": "lithium", "name": "Lithium", "summary": "Faster ticks, AI and physics without changing behaviour", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/lithium"}, {"id": "ferritecore", "name": "FerriteCore", "summary": "Cuts model and block-state memory by roughly half", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/ferritecore"}, {"id": "krypton", "name": "Krypton", "summary": "Moves networking off the render thread", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/krypton"}, {"id": "modernfix", "name": "ModernFix", "summary": "Faster startup and fewer stutters on modded packs", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/modernfix"}, {"id": "entityculling", "name": "Entity Culling", "summary": "Skips rendering entities you cannot see", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/entityculling"}, {"id": "indium", "name": "Indium", "summary": "Sodium compatibility layer for mods that use the Fabric renderer", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/indium"}, {"id": "immediatelyfast", "name": "ImmediatelyFast", "summary": "Batches immediate-mode GUI and text rendering", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/immediatelyfast"}, {"id": "memoryleakfix", "name": "Memory Leak Fix", "summary": "Patches known leaks that grow over a long session", "kind": "mod", "performance": true, "licence": "Open source, official release", "url": "https://modrinth.com/mod/memoryleakfix"}, {"id": "fabric-api", "name": "Fabric API", "summary": "The hooks every Fabric mod builds on", "kind": "mod", "performance": false, "licence": "Open source, official release", "url": "https://modrinth.com/mod/fabric-api"}, {"id": "modmenu", "name": "Mod Menu", "summary": "A settings screen for the mods you install", "kind": "mod", "performance": false, "licence": "Open source, official release", "url": "https://modrinth.com/mod/modmenu"}, {"id": "iris", "name": "Iris Shaders", "summary": "Shader packs on top of Sodium", "kind": "mod", "performance": false, "licence": "Open source, official release", "url": "https://modrinth.com/mod/iris"}, {"id": "alpinoxi-pack", "name": "Alpinoxi HUD pack", "summary": "The pack the launcher's HUD previews", "kind": "resourcepack", "performance": false, "licence": "Alpinoxi, MIT", "url": "https://modrinth.com/resourcepack/"}, {"id": "fresh-animations", "name": "Fresh Animations", "summary": "Living mob animations, no extra frames", "kind": "resourcepack", "performance": false, "licence": "CC BY-NC-SA", "url": "https://modrinth.com/resourcepack/fresh-animations"}], "friends": [{"name": "Alpinoxi", "provider": "Ely.by", "presence": "In game", "server": "play.alpinoxi.net"}, {"name": "Steve", "provider": "Microsoft", "presence": "In launcher", "server": null}, {"name": "Alex", "provider": "Offline", "presence": "Offline", "server": null}], "pending": 1, "hud": {"enabled": true, "background": true, "scale_percent": 100, "elements": [{"id": "fps", "label": "FPS", "anchor": "Top left", "visible": true, "sample": "144 FPS"}, {"id": "coordinates", "label": "Coordinates", "anchor": "Top left", "visible": true, "sample": "X 128  Y 71  Z -64"}, {"id": "ping", "label": "Ping", "anchor": "Top right", "visible": true, "sample": "23 ms"}, {"id": "keystrokes", "label": "Keystrokes", "anchor": "Bottom left", "visible": true, "sample": "W A S D"}, {"id": "armor", "label": "Armor", "anchor": "Bottom left", "visible": true, "sample": "⛊⛊⛊⛊"}, {"id": "potion_effects", "label": "Potion effects", "anchor": "Top right", "visible": true, "sample": "Speed 1:12"}, {"id": "server_address", "label": "Server address", "anchor": "Top right", "visible": true, "sample": "play.alpinoxi.net"}, {"id": "clock", "label": "Clock", "anchor": "Top left", "visible": true, "sample": "21:40"}, {"id": "friends", "label": "Friends online", "anchor": "Top right", "visible": true, "sample": "3 online"}, {"id": "reach", "label": "Reach", "anchor": "Bottom centre", "visible": true, "sample": "3.0 blocks"}]}, "binds": [{"action": "Open HUD editor", "chord": "Shift+H", "vanilla": false}, {"action": "Toggle HUD", "chord": "F1", "vanilla": false}, {"action": "Open friends", "chord": "O", "vanilla": false}, {"action": "Open chat", "chord": "Y", "vanilla": false}, {"action": "Toggle skin preview", "chord": "U", "vanilla": false}, {"action": "Toggle FPS", "chord": "F1+FPS", "vanilla": false}], "default_binds": [{"action": "Open HUD editor", "chord": "Shift+H", "vanilla": false}, {"action": "Toggle HUD", "chord": "F1", "vanilla": false}, {"action": "Open friends", "chord": "O", "vanilla": false}, {"action": "Open chat", "chord": "Y", "vanilla": false}, {"action": "Toggle skin preview", "chord": "U", "vanilla": false}, {"action": "Toggle FPS", "chord": "F1+FPS", "vanilla": false}]};
 
 const SCREENS = ["home", "instances", "skin", "friends", "mods", "import", "settings"];
 const LABELS = {
@@ -678,7 +678,6 @@ const state = {
   modQuery: "",
   modKind: null,
   modPerf: false,
-  heap: null,
   toastTimer: null
 };
 
@@ -687,6 +686,8 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
 }[c]));
 
+// One door to the launcher. The native shell has no bridge, so the call is
+// simply answered with nothing there.
 function send(command) {
   if (!window.alpinoxiIpc) return Promise.resolve(null);
   return window.alpinoxiIpc.send(command).catch(() => null);
@@ -704,9 +705,54 @@ function pillClass(provider) {
   return provider === "Microsoft" ? "ms" : provider === "Ely.by" ? "ely" : "crack";
 }
 
+// The vanilla offline UUID: MD5 of "OfflinePlayer:<name>", version 3, variant
+// RFC 4122. Computed here because the launcher's data is JSON and cannot carry
+// a function across.
+function offlineUuid(name) {
+  const bytes = new TextEncoder().encode("OfflinePlayer:" + name);
+  const digest = md5(bytes);
+  digest[6] = (digest[6] & 0x0f) | 0x30;
+  digest[8] = (digest[8] & 0x3f) | 0x80;
+  const hex = Array.from(digest, (b) => b.toString(16).padStart(2, "0")).join("");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
+}
+
+// MD5, only because Minecraft's offline UUID uses it. Not for anything secret.
+function md5(input) {
+  const s = [7, 12, 17, 22, 5, 9, 14, 20, 4, 11, 16, 23, 6, 10, 15, 21];
+  const K = new Array(64).fill(0).map((_, i) => Math.floor(Math.abs(Math.sin(i + 1)) * 2 ** 32) >>> 0);
+  const words = [];
+  const bitLength = input.length * 8;
+  for (let i = 0; i < input.length; i++) words[i >> 2] = (words[i >> 2] || 0) | (input[i] << ((i % 4) * 8));
+  words[bitLength >> 5] = (words[bitLength >> 5] || 0) | (0x80 << (bitLength % 32));
+  words[(((bitLength + 64) >>> 9) << 4) + 14] = bitLength >>> 0;
+  let a0 = 0x67452301, b0 = 0xefcdab89, c0 = 0x98badcfe, d0 = 0x10325476;
+  for (let chunk = 0; chunk < words.length; chunk += 16) {
+    let A = a0, B = b0, C = c0, D = d0;
+    for (let i = 0; i < 64; i++) {
+      let F, g;
+      if (i < 16) { F = (B & C) | (~B & D); g = i; }
+      else if (i < 32) { F = (D & B) | (~D & C); g = (5 * i + 1) % 16; }
+      else if (i < 48) { F = B ^ C ^ D; g = (3 * i + 5) % 16; }
+      else { F = C ^ (B | ~D); g = (7 * i) % 16; }
+      const tmp = D;
+      D = C;
+      C = B;
+      const x = (A + F + K[i] + (words[chunk + g] || 0)) | 0;
+      const shift = s[(i >> 4) * 4 + (i % 4)];
+      B = (B + ((x << shift) | (x >>> (32 - shift)))) | 0;
+      A = tmp;
+    }
+    a0 = (a0 + A) | 0; b0 = (b0 + B) | 0; c0 = (c0 + C) | 0; d0 = (d0 + D) | 0;
+  }
+  const out = new Uint8Array(16);
+  [a0, b0, c0, d0].forEach((value, i) => {
+    for (let j = 0; j < 4; j++) out[i * 4 + j] = (value >>> (j * 8)) & 0xff;
+  });
+  return out;
+}
+
 function planHeap() {
-  // The launcher's answer wins when there is one: it owns the cap.
-  if (state.heap) return state.heap;
   const requested = state.data.memory_mib;
   const ceiling = Math.min(Math.floor(state.data.system_memory_mib / 2), 8192);
   return Math.max(512, Math.min(requested, ceiling));
@@ -747,7 +793,19 @@ $("cracked-go").onclick = () => {
     $("login-notice").textContent = "A name needs at least three characters.";
     return;
   }
-  signIn({ name, provider: "Offline", uuid: state.data.uuid_for(name) });
+  if (name.length > 16) {
+    $("login-notice").textContent = "A Minecraft name is at most 16 characters.";
+    return;
+  }
+  if (!/^[A-Za-z0-9_]+$/.test(name)) {
+    $("login-notice").textContent = "Use letters, numbers and underscore only.";
+    return;
+  }
+  // The launcher records the name, so the next start greets the same player.
+  if (window.alpinoxiIpc) {
+    send({ cmd: "set_cracked_name", name });
+  }
+  signIn({ name, provider: "Offline", uuid: offlineUuid(name) });
 };
 
 $("browser-go").onclick = () => {
@@ -845,20 +903,14 @@ $("ram-slider").oninput = (e) => {
   state.data.memory_mib = Number(e.target.value);
   renderHome();
 };
-$("ram-slider").onchange = async (e) => {
-  const reply = await send({ cmd: "set_memory", mib: Number(e.target.value) });
-  if (reply && reply.heap) state.heap = reply.heap;
-  renderHome();
-};
 
-async function toggleMod(id) {
+function toggleMod(id) {
   const list = state.data.instance.enabled_mods;
   const at = list.indexOf(id);
   if (at === -1) list.push(id); else list.splice(at, 1);
   renderHome();
   renderMods();
   toast(at === -1 ? "Added to the instance" : "Removed from the instance");
-  await send({ cmd: "toggle_mod", id });
 }
 
 // ---------- instances ----------
@@ -993,15 +1045,7 @@ function renderMods() {
   }).join("");
   host.querySelectorAll("[data-mod]").forEach((b) => { b.onclick = () => toggleMod(b.dataset.mod); });
   host.querySelectorAll("[data-open]").forEach((b) => {
-    b.onclick = () => {
-      const url = b.dataset.open;
-      if (window.alpinoxiIpc) {
-        send({ cmd: "open_external", url });
-        toast("Opening the project page in your browser");
-      } else {
-        window.open(url, "_blank", "noopener");
-      }
-    };
+    b.onclick = () => toast("The launcher opens this page in your browser");
   });
   document.querySelectorAll("[data-kind]").forEach((b) => {
     b.classList.toggle("sel", b.dataset.kind === state.modKind);
@@ -1149,7 +1193,6 @@ function renderHudEditor() {
       el.visible = !el.visible;
       state.selectedElement = el.id;
       renderHudEditor();
-      send({ cmd: "toggle_hud_element", id: el.id });
     };
     row.onclick = (e) => {
       if (e.target.classList.contains("switch")) return;
@@ -1193,7 +1236,7 @@ async function boot() {
     const info = await window.alpinoxiIpc.boot();
     if (info && info.settings) {
       state.data.memory_mib = info.settings.memory_mib;
-      state.data.system_memory_mib = info.system_memory_mib;
+      state.data.system_memory_mib = info.settings.system_memory_mib;
       state.data.instance.enabled_mods = info.settings.instance.enabled_mods || [];
       state.data.hud.enabled = info.settings.hud.enabled;
       state.data.hud.background = info.settings.hud.background;
@@ -1205,6 +1248,7 @@ async function boot() {
       }
       if (info.heap_mib) state.heap = info.heap_mib;
       if (info.version) state.data.version = info.version;
+      if (info.settings.cracked_name) state.data.cracked_name = info.settings.cracked_name;
     }
     renderAll();
     if (window.alpinoxiIpc.onNotice) {

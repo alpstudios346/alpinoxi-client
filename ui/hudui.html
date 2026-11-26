@@ -348,7 +348,7 @@
     <div class="rule"></div>
     <nav class="nav" id="nav"></nav>
     <div class="rail-foot">
-      <strong>No Electron. No web view.</strong>
+      <strong>Electron. One interface.</strong>
       <span id="rail-version"></span>
     </div>
   </aside>
@@ -676,6 +676,13 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
 }[c]));
 
+// One door to the launcher. The native shell has no bridge, so the call is
+// simply answered with nothing there.
+function send(command) {
+  if (!window.alpinoxiIpc) return Promise.resolve(null);
+  return window.alpinoxiIpc.send(command).catch(() => null);
+}
+
 function toast(text) {
   const el = $("toast");
   el.textContent = text;
@@ -686,6 +693,53 @@ function toast(text) {
 
 function pillClass(provider) {
   return provider === "Microsoft" ? "ms" : provider === "Ely.by" ? "ely" : "crack";
+}
+
+// The vanilla offline UUID: MD5 of "OfflinePlayer:<name>", version 3, variant
+// RFC 4122. Computed here because the launcher's data is JSON and cannot carry
+// a function across.
+function offlineUuid(name) {
+  const bytes = new TextEncoder().encode("OfflinePlayer:" + name);
+  const digest = md5(bytes);
+  digest[6] = (digest[6] & 0x0f) | 0x30;
+  digest[8] = (digest[8] & 0x3f) | 0x80;
+  const hex = Array.from(digest, (b) => b.toString(16).padStart(2, "0")).join("");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
+}
+
+// MD5, only because Minecraft's offline UUID uses it. Not for anything secret.
+function md5(input) {
+  const s = [7, 12, 17, 22, 5, 9, 14, 20, 4, 11, 16, 23, 6, 10, 15, 21];
+  const K = new Array(64).fill(0).map((_, i) => Math.floor(Math.abs(Math.sin(i + 1)) * 2 ** 32) >>> 0);
+  const words = [];
+  const bitLength = input.length * 8;
+  for (let i = 0; i < input.length; i++) words[i >> 2] = (words[i >> 2] || 0) | (input[i] << ((i % 4) * 8));
+  words[bitLength >> 5] = (words[bitLength >> 5] || 0) | (0x80 << (bitLength % 32));
+  words[(((bitLength + 64) >>> 9) << 4) + 14] = bitLength >>> 0;
+  let a0 = 0x67452301, b0 = 0xefcdab89, c0 = 0x98badcfe, d0 = 0x10325476;
+  for (let chunk = 0; chunk < words.length; chunk += 16) {
+    let A = a0, B = b0, C = c0, D = d0;
+    for (let i = 0; i < 64; i++) {
+      let F, g;
+      if (i < 16) { F = (B & C) | (~B & D); g = i; }
+      else if (i < 32) { F = (D & B) | (~D & C); g = (5 * i + 1) % 16; }
+      else if (i < 48) { F = B ^ C ^ D; g = (3 * i + 5) % 16; }
+      else { F = C ^ (B | ~D); g = (7 * i) % 16; }
+      const tmp = D;
+      D = C;
+      C = B;
+      const x = (A + F + K[i] + (words[chunk + g] || 0)) | 0;
+      const shift = s[(i >> 4) * 4 + (i % 4)];
+      B = (B + ((x << shift) | (x >>> (32 - shift)))) | 0;
+      A = tmp;
+    }
+    a0 = (a0 + A) | 0; b0 = (b0 + B) | 0; c0 = (c0 + C) | 0; d0 = (d0 + D) | 0;
+  }
+  const out = new Uint8Array(16);
+  [a0, b0, c0, d0].forEach((value, i) => {
+    for (let j = 0; j < 4; j++) out[i * 4 + j] = (value >>> (j * 8)) & 0xff;
+  });
+  return out;
 }
 
 function planHeap() {
@@ -729,7 +783,19 @@ $("cracked-go").onclick = () => {
     $("login-notice").textContent = "A name needs at least three characters.";
     return;
   }
-  signIn({ name, provider: "Offline", uuid: state.data.uuid_for(name) });
+  if (name.length > 16) {
+    $("login-notice").textContent = "A Minecraft name is at most 16 characters.";
+    return;
+  }
+  if (!/^[A-Za-z0-9_]+$/.test(name)) {
+    $("login-notice").textContent = "Use letters, numbers and underscore only.";
+    return;
+  }
+  // The launcher records the name, so the next start greets the same player.
+  if (window.alpinoxiIpc) {
+    send({ cmd: "set_cracked_name", name });
+  }
+  signIn({ name, provider: "Offline", uuid: offlineUuid(name) });
 };
 
 $("browser-go").onclick = () => {

@@ -127,6 +127,11 @@ const handlers = {
     saveSettings(s);
     return { ok: true };
   },
+  set_cracked_name: (s, cmd) => {
+    s.cracked_name = String(cmd.name || '').slice(0, 16);
+    saveSettings(s);
+    return { cracked_name: s.cracked_name };
+  },
   open_external: (s, cmd) => {
     // Only https, so a page cannot ask the launcher to run a local file.
     if (typeof cmd.url === 'string' && cmd.url.startsWith('https://')) shell.openExternal(cmd.url);
@@ -207,8 +212,17 @@ function createWindow() {
     }
   });
 
-  win.webContents.on('did-fail-load', (_event, code, description) => {
-    log(`load failed: ${code} ${description}`);
+  win.webContents.on('did-fail-load', (_event, code, description, url) => {
+    log(`load failed: ${code} ${description} ${url}`);
+  });
+
+  // A page that throws leaves a blank window, which reads as "nothing
+  // happened". Catch it and say what it was.
+  win.webContents.on('console-message', (event) => {
+    const level = event.level ?? arguments[1];
+    if (level === 'error' || level === 3) {
+      log(`page error: ${event.message ?? ''} ${event.lineNumber ?? ''}`);
+    }
   });
 
   process.on('uncaughtException', (error) => log(`uncaught: ${error.stack || error.message}`));

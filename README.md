@@ -12,7 +12,7 @@ Alpinoxi Client is a fresh, open-source project maintained by **AlpinoxiGD**. It
 
 Every item on this list is in the repository and covered by tests:
 
-- **Native launcher**: `egui` dashboard, no web view, thin LTO and stripped release build.
+- **Electron launcher**: Chromium bundled, so the interface looks the same on every machine. A small native `egui` build is kept beside it.
 - **Three logins as peers**: Microsoft device-code → Xbox Live → XSTS → `login_with_xbox`, Ely.by OAuth 2.0 + PKCE with client id `alpinoxi-client`, and a cracked name with the vanilla offline UUID.
 - **Secure OS credential storage**: refresh tokens go to the Windows Credential Manager through `CredWriteW`/`CredReadW`. No token is ever written to a file Alpinoxi controls.
 - **Skins for all three providers**: provider skins for Microsoft and Ely.by, a local PNG wardrobe for cracked players, 64×64 / 64×32 validation, classic and slim, with an honest note about who can see a skin.
@@ -103,7 +103,7 @@ The idea behind this client/launcher was inspired by the Polyfrost/OneClient pro
 
 ## Türkçe
 
-Alpinoxi Client, AlpinoxiGD tarafından sıfırdan Rust ile yazılan şık ve hafif bir Minecraft Java Edition başlatıcısıdır. Electron kullanmaz; native arayüz sayesinde başlatıcı, Minecraft’ın Java işleminden ayrı ve düşük kaynak tüketimli kalır.
+Alpinoxi Client, AlpinoxiGD tarafından sıfırdan Rust ile yazılan şık ve hafif bir Minecraft Java Edition başlatıcısıdır. Arayüz Electron penceresinde çalışır; aynı sayfa native pencerede de açılır, böylece bir ekran iki kez yazılmaz.
 
 Hazır olanlar: özgün launcher arayüzü; Microsoft (device code → Xbox Live → XSTS → `login_with_xbox`), Ely.by (OAuth 2.0 + PKCE, client id `alpinoxi-client`) ve cracked girişi; Windows Kimlik Bilgisi Yöneticisi'nde tutulan refresh token'lar; üç giriş türü için de skin ve arkadaşlık/sohbet; komutsuz HUD ve keybind'ler; yarım RAM sınırlı bellek profilleri ve Aikar G1GC ayarları; başka launcher'dan (Prism, MultiMC, CurseForge, Modrinth, .minecraft) içe aktarma; lisanslara saygılı mod/kaynak paketi kataloğu; ve Rust çekirdeğiyle çalışan kendi Fabric modlarımız (HUD + performans).
 
@@ -129,7 +129,7 @@ cargo run -p alpinoxi_client
 cargo test --workspace
 ```
 
-The launcher itself stays small on purpose: native `egui`, no web view, `lto = "thin"`, `strip`, and no runtime of its own.
+The native build stays small on purpose: `lto = "thin"`, `strip`, and no runtime of its own. The Electron build trades that size for a renderer that never differs between machines.
 
 ## Fabric mods (in `mods/`)
 
