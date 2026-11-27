@@ -404,13 +404,14 @@ void TestWorlds() {
   // Full beats the invite: a guest with the code is still turned away from a
   // world with no room. Re-opening the world with a lower cap is how a host
   // shrinks it, and it must not also reset who is inside.
-  // A cap of one is below the host, so opening it fills it at once: there is no
-  // room for anyone else at all, and the code does not change that.
+  // A cap of one is below the host, so the world is full at once: there is no
+  // room for anyone else at all, and the code does not change that. The cap
+  // applies to the world that is already open, not only the next one.
   book.SetMaxPlayers(1);
-  book.Open("world-1", "Survival", "owner-key", Access::kCode);
   CHECK(book.Find("world-1")->Full());
   CHECK(book.MayJoin("world-1", "other-guest", true, code) == JoinResult::kFull);
   book.SetMaxPlayers(8);
+  CHECK(!book.Find("world-1")->Full());
   book.Open("world-1", "Survival", "owner-key", Access::kCode);
   CHECK(book.MayJoin("world-1", "other-guest", true, code) == JoinResult::kOk);
   // And re-opening never adds a second host: the count stays where it was.

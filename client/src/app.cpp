@@ -933,6 +933,9 @@ std::string WorldCode(const std::string& world_id) {
 
 void WorldBook::SetMaxPlayers(int players) {
   max_players_ = players < 2 ? 2 : (players > 16 ? 16 : players);
+  // The cap applies to the worlds already open, not only the next one opened:
+  // a host who shrinks the room expects it to be smaller now.
+  for (World& world : worlds_) world.max_players = max_players_;
 }
 
 void WorldBook::Open(const std::string& id, const std::string& name,
