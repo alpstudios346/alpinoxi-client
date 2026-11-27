@@ -1002,9 +1002,12 @@ JoinResult WorldBook::MayJoin(const std::string& id_or_code, const std::string& 
                               bool is_friend, const std::string& code) const {
   const World* world = Find(id_or_code);
   if (world == nullptr) return JoinResult::kNoSuchWorld;
-  if (world->id == current_) return JoinResult::kAlreadyInside;
   if (world->access == Access::kClosed) return JoinResult::kClosed;
   if (world->Full()) return JoinResult::kFull;
+  // Already inside comes after the room: a world that filled up while you were
+  // in it is still the honest answer to "may I join", and a player who is in a
+  // world cannot be told it is full before they are told they are in it.
+  if (world->id == current_) return JoinResult::kAlreadyInside;
   if (world->access == Access::kFriends) {
     return is_friend ? JoinResult::kOk : JoinResult::kNotInvited;
   }
