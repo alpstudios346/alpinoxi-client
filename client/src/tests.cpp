@@ -406,7 +406,10 @@ void TestWorlds() {
   // shrinks it, and it must not also reset who is inside.
   book.SetMaxPlayers(1);
   book.Open("world-1", "Survival", "owner-key", Access::kCode);
+  // One player against a cap of one, with a different guest asking: full.
+  book.Enter("world-1");
   CHECK(book.MayJoin("world-1", "other-guest", true, code) == JoinResult::kFull);
+  book.Leave();
   book.SetMaxPlayers(8);
   book.Open("world-1", "Survival", "owner-key", Access::kCode);
   CHECK(book.MayJoin("world-1", "other-guest", true, code) == JoinResult::kOk);
