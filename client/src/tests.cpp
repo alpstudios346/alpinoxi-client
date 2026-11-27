@@ -413,7 +413,11 @@ void TestWorlds() {
   full.Enter("world-1");
   full.Enter("world-1");
   CHECK(full.Find("world-1")->Full());
-  CHECK(full.MayJoin("world-1", "other-guest", true, code) == JoinResult::kFull);
+  const JoinResult why = full.MayJoin("world-1", "other-guest", true, code);
+  std::printf("    debug join=%s players=%d max=%d cur=[%s] access=%s\n", JoinMessage(why),
+              full.Find("world-1")->players, full.Find("world-1")->max_players,
+              full.Current().c_str(), AccessId(full.Find("world-1")->access));
+  CHECK(why == JoinResult::kFull);
 
   // The cap applies to the world already open, not only the next one opened,
   // and the smallest cap there is is two.
