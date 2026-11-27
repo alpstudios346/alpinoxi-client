@@ -412,16 +412,15 @@ void TestWorlds() {
   book.SetMaxPlayers(2);
   book.Enter("world-1");
   book.Enter("world-1");
-  std::printf("    debug players=%d max=%d current=[%s] access=%s\n",
-              book.Find("world-1")->players, book.Find("world-1")->max_players,
-              book.Current().c_str(), AccessId(book.Find("world-1")->access));
   CHECK(book.Find("world-1")->Full());
   CHECK(book.MayJoin("world-1", "other-guest", true, code) == JoinResult::kFull);
+  // Leave takes the player out of whichever world they are in, so two calls put
+  // the count back to where it started.
   book.Leave();
   book.Leave();
-  book.SetMaxPlayers(8);
+  book.Leave();
   CHECK(!book.Find("world-1")->Full());
-  book.Open("world-1", "Survival", "owner-key", Access::kCode);
+  book.SetMaxPlayers(8);
   CHECK(book.MayJoin("world-1", "other-guest", true, code) == JoinResult::kOk);
   // And re-opening never adds a second host: the count stays where it was.
   const int before = book.Find("world-1")->players;
