@@ -1,0 +1,6 @@
+-nowarn
+-cp "/tmp/stub/out"
+-d "C:/Users/User/.abacusai-bot/session-home/alpinoxi-client/mods/jars/alpinoxi-bridge/classes"
+C:/Users/User/.abacusai-bot/session-home/alpinoxi-client/mods/alpinoxi-bridge/src/main/java/net/alpinoxi/bridge/AlpinoxiBridge.java
+C:/Users/User/.abacusai-bot/session-home/alpinoxi-client/mods/alpinoxi-bridge/src/main/java/net/alpinoxi/bridge/BridgeLog.java
+C:/Users/User/.abacusai-bot/session-home/alpinoxi-client/mods/alpinoxi-bridge/src/main/java/net/alpinoxi/bridge/Native.java

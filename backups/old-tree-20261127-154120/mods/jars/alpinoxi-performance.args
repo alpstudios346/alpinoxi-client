@@ -1,0 +1,10 @@
+-nowarn
+-cp "/tmp/stub/out"
+-d "C:/Users/User/.abacusai-bot/session-home/alpinoxi-client/mods/jars/alpinoxi-performance/classes"
+C:/Users/User/.abacusai-bot/session-home/alpinoxi-client/mods/alpinoxi-performance/src/main/java/net/alpinoxi/perf/AlpinoxiPerformance.java
+C:/Users/User/.abacusai-bot/session-home/alpinoxi-client/mods/alpinoxi-performance/src/main/java/net/alpinoxi/perf/FrameMeter.java
+C:/Users/User/.abacusai-bot/session-home/alpinoxi-client/mods/alpinoxi-performance/src/main/java/net/alpinoxi/perf/InstalledMods.java
+C:/Users/User/.abacusai-bot/session-home/alpinoxi-client/mods/alpinoxi-performance/src/main/java/net/alpinoxi/perf/PerfConfig.java
+C:/Users/User/.abacusai-bot/session-home/alpinoxi-client/mods/alpinoxi-performance/src/main/java/net/alpinoxi/perf/PerfHud.java
+C:/Users/User/.abacusai-bot/session-home/alpinoxi-client/mods/alpinoxi-performance/src/main/java/net/alpinoxi/perf/PerfReport.java
+C:/Users/User/.abacusai-bot/session-home/alpinoxi-client/mods/alpinoxi-performance/src/main/java/net/alpinoxi/perf/PerfScreen.java
