@@ -296,7 +296,7 @@ std::string LoaderTarget::Message(LoaderError error) const {
 }
 
 std::string LoaderTarget::ProfileUrl() const {
-  const std::string version = version.ToString();
+  const std::string version = this->version.ToString();
   switch (loader) {
     case Loader::kFabric:
       return "https://meta.fabricmc.net/v2/versions/loader/" + version + "/0.16.9";
