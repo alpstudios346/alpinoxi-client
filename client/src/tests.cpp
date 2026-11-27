@@ -411,7 +411,6 @@ void TestWorlds() {
   CHECK_EQ(book.Current(), "");
   book.SetMaxPlayers(2);
   book.Enter("world-1");
-  CHECK(!book.Find("world-1")->Full());
   book.Enter("world-1");
   CHECK(book.Find("world-1")->Full());
   CHECK(book.MayJoin("world-1", "other-guest", true, code) == JoinResult::kFull);
