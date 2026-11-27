@@ -412,6 +412,9 @@ void TestWorlds() {
   book.SetMaxPlayers(2);
   book.Enter("world-1");
   book.Enter("world-1");
+  std::printf("    debug players=%d max=%d current=[%s] access=%s\n",
+              book.Find("world-1")->players, book.Find("world-1")->max_players,
+              book.Current().c_str(), AccessId(book.Find("world-1")->access));
   CHECK(book.Find("world-1")->Full());
   CHECK(book.MayJoin("world-1", "other-guest", true, code) == JoinResult::kFull);
   book.Leave();
