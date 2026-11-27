@@ -102,10 +102,12 @@ void TestSnapshotRefusedEverywhere() {
 }
 
 void TestLoadersFor() {
-  Check(LoadersFor("1.8").size() == 1, "1.8 has Forge only");
-  Check(LoadersFor("1.8").front() == Loader::kForge, "and that loader is Forge");
-  Check(LoadersFor("1.14").size() == 3, "1.14 has all three");
-  Check(LoadersFor("1.21.1").size() == 3, "1.21.1 has all three");
+  // Vanilla is always offered: the game runs without a loader, and the player
+  // must be able to choose that.
+  Check(LoadersFor("1.8").size() == 2, "1.8 has vanilla and Forge");
+  Check(LoadersFor("1.8").back() == Loader::kForge, "and the loader there is Forge");
+  Check(LoadersFor("1.14").size() == 4, "1.14 has vanilla and all three loaders");
+  Check(LoadersFor("1.21.1").size() == 4, "1.21.1 has vanilla and all three");
   Check(LoadersFor("snapshot").empty(), "a snapshot has none");
 }
 
@@ -318,7 +320,7 @@ void TestSettingsRoundTrip() {
   CheckEqual(read.version, "1.20.1", "version survives");
   Check(read.heap_mib == 6144, "heap survives");
   Check(!read.hud_enabled, "hud off survives");
-  CheckEqual(read.java_path, "C:\\Java\\bin\\java.exe", "the java path survives");
+  CheckEqual(read.java_path, "C:\\\\Java\\\\bin\\\\java.exe", "the java path survives");
 
   const Settings blank = SettingsFromJson("{}");
   Check(blank.provider == Provider::kOffline, "an empty file is the default");
