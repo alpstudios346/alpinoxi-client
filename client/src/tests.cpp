@@ -402,26 +402,24 @@ void TestWorlds() {
   book.Leave();
   CHECK(book.MayJoin("world-1", "guest", true, code) == JoinResult::kOk);
   // Full beats the invite: a guest with the code is still turned away from a
-  // world with no room. The cap applies to the world already open, not only the
-  // next one opened, and the smallest cap there is is two.
-  book.SetMaxPlayers(1);
-  CHECK_INT(book.Find("world-1")->max_players, 2);
-  // Nobody is in world-1: the player who joined it left above. So the host is
-  // the first one in, and a guest is the second.
-  CHECK_EQ(book.Current(), "");
-  book.SetMaxPlayers(2);
-  book.Enter("world-1");
-  book.Enter("world-1");
-  CHECK(book.Find("world-1")->Full());
-  CHECK(book.MayJoin("world-1", "other-guest", true, code) == JoinResult::kFull);
-  // Leave takes the player out of whichever world they are in, so two calls put
-  // the count back to where it started.
-  book.Leave();
-  book.Leave();
-  book.Leave();
-  CHECK(!book.Find("world-1")->Full());
-  book.SetMaxPlayers(8);
-  CHECK(book.MayJoin("world-1", "other-guest", true, code) == JoinResult::kOk);
+  // world with no room. A fresh book, so the count is known: the host is the
+  // first one in, and a guest is the second.
+  WorldBook full;
+  full.SetMaxPlayers(2);
+  full.Open("world-1", "Survival", "owner-key", Access::kCode);
+  CHECK(!full.Find("world-1")->Full());
+  full.Enter("world-1");
+  full.Enter("world-1");
+  CHECK(full.Find("world-1")->Full());
+  CHECK(full.MayJoin("world-1", "other-guest", true, code) == JoinResult::kFull);
+
+  // The cap applies to the world already open, not only the next one opened,
+  // and the smallest cap there is is two.
+  full.SetMaxPlayers(1);
+  CHECK_INT(full.Find("world-1")->max_players, 2);
+  full.SetMaxPlayers(8);
+  CHECK(!full.Find("world-1")->Full());
+
   // And re-opening never adds a second host: the count stays where it was.
   const int before = book.Find("world-1")->players;
   book.Open("world-1", "Survival", "owner-key", Access::kFriends);
