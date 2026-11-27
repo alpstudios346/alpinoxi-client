@@ -939,6 +939,9 @@ void WorldBook::Open(const std::string& id, const std::string& name,
                      const std::string& owner_key, Access access) {
   for (World& world : worlds_) {
     if (world.id == id) {
+      // Opening a world that is already open changes how people get in, not how
+      // many are inside: re-opening a world must not throw the players out of
+      // it, nor put a second host in it.
       world.name = name.empty() ? "World" : name;
       world.owner_key = owner_key;
       world.access = access;
