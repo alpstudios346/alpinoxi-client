@@ -406,10 +406,12 @@ void TestWorlds() {
   // next one opened, and the smallest cap there is is two.
   book.SetMaxPlayers(1);
   CHECK_INT(book.Find("world-1")->max_players, 2);
-  book.Close("world-1");
-  book.Open("world-1", "Survival", "owner-key", Access::kCode);
+  // Nobody is in world-1: the player who joined it left above. So the host is
+  // the first one in, and a guest is the second.
+  CHECK_EQ(book.Current(), "");
   book.SetMaxPlayers(2);
   book.Enter("world-1");
+  CHECK(!book.Find("world-1")->Full());
   book.Enter("world-1");
   CHECK(book.Find("world-1")->Full());
   CHECK(book.MayJoin("world-1", "other-guest", true, code) == JoinResult::kFull);
