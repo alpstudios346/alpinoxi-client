@@ -173,8 +173,8 @@ void TestPkceMatchesTheSpec() {
   // RFC 7636's own worked example.
   CheckEqual(PkceChallenge("dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"),
              "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM", "RFC 7636 challenge");
-  CheckEqual(RandomUrlSafe(48).size(), 64, "48 bytes are 64 url-safe characters");
-  CheckEqual(RandomUrlSafe(24).size(), 32, "24 bytes are 32 url-safe characters");
+  Check(RandomUrlSafe(48).size() == 64, "48 bytes are 64 url-safe characters");
+  Check(RandomUrlSafe(24).size() == 32, "24 bytes are 32 url-safe characters");
   Check(RandomUrlSafe(32) != RandomUrlSafe(32), "two calls never agree");
 }
 
