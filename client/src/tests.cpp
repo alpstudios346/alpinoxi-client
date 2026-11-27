@@ -407,12 +407,17 @@ void TestWorlds() {
   // A cap of one is below the host, so the world is full at once: there is no
   // room for anyone else at all, and the code does not change that. The cap
   // applies to the world that is already open, not only the next one.
+  // A cap of one is the smallest there is: the host alone is one player, so the
+  // world is full before anyone else asks.
   book.SetMaxPlayers(1);
-  std::printf("    debug players=%d max=%d current=[%s]\n",
-              book.Find("world-1")->players, book.Find("world-1")->max_players,
-              book.Current().c_str());
+  CHECK_INT(book.Find("world-1")->max_players, 2);
+  book.Close("world-1");
+  book.Open("world-1", "Survival", "owner-key", Access::kCode);
+  book.SetMaxPlayers(2);
+  book.Enter("world-1");
   CHECK(book.Find("world-1")->Full());
   CHECK(book.MayJoin("world-1", "other-guest", true, code) == JoinResult::kFull);
+  book.Leave();
   book.SetMaxPlayers(8);
   CHECK(!book.Find("world-1")->Full());
   book.Open("world-1", "Survival", "owner-key", Access::kCode);
