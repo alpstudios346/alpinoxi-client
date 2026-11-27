@@ -412,6 +412,9 @@ void TestWorlds() {
   // Enter() counts the host too, so one Enter is already a world with two
   // players in it: the host who opened it, and this one.
   CHECK(full.Find("world-1")->Full());
+  std::printf("    debug players=%d max=%d full=%d cur=[%s]\n",
+              full.Find("world-1")->players, full.Find("world-1")->max_players,
+              full.Find("world-1")->Full() ? 1 : 0, full.Current().c_str());
   CHECK(full.MayJoin("world-1", "other-guest", true, code) == JoinResult::kFull);
 
   // The cap applies to the world already open, not only the next one opened,
