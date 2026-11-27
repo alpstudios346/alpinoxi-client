@@ -1,4 +1,13 @@
-/target/
+# Build output, never source.
+/build/
+/out/
+/CMakeCache.txt
+/CMakeFiles/
+*.obj
+*.pdb
+*.ilk
+*.exp
+*.lib
 *.log
 .env
 .idea/
@@ -11,18 +20,12 @@ build/
 !mods/*/gradle.properties
 out/
 *.class
-.idea/
 *.iml
 # Compiled jars from mods/jars/build.sh: build output, not source.
 mods/jars/*.jar
 mods/jars/*/classes/
 mods/jars/*.sources
 mods/jars/*.args
-
-# Electron: the launcher window's own node_modules and build output
-apps/alpinoxi-electron/node_modules/
-apps/alpinoxi-electron/dist/
-dist/electron/
 
 # The backup tree is a copy of everything, so the rules above must not carve
 # holes in it: a backup with missing files is worse than none.

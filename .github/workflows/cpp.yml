@@ -1,0 +1,46 @@
+name: cpp
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        timeout-minutes: 5
+        run: cmake -S client -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        timeout-minutes: 15
+        run: cmake --build build --config Release --parallel 4
+
+      - name: Test
+        timeout-minutes: 5
+        working-directory: build
+        run: ctest --build-config Release --output-on-failure
+
+      - name: The launcher exists
+        shell: pwsh
+        run: |
+          $exe = "build/Release/alpinoxi_client.exe"
+          if (-not (Test-Path $exe)) { throw "no $exe" }
+          $size = (Get-Item $exe).Length
+          Write-Host "alpinoxi_client.exe: $size bytes"
+          if ($size -lt 100KB) { throw "the exe is too small to be the launcher" }
+          if (-not (Test-Path "build/Release/assets/icon.ico")) { throw "assets did not travel" }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: alpinoxi-client-windows
+          path: |
+            build/Release/alpinoxi_client.exe
+            build/Release/assets/
+          if-no-files-found: error
