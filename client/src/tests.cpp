@@ -408,6 +408,9 @@ void TestWorlds() {
   book.Open("world-1", "Survival", "owner-key", Access::kCode);
   // One player against a cap of one, with a different guest asking: full.
   book.Enter("world-1");
+  std::printf("    debug players=%d max=%d current=%s\n",
+              book.Find("world-1")->players, book.Find("world-1")->max_players,
+              book.Current().c_str());
   CHECK(book.MayJoin("world-1", "other-guest", true, code) == JoinResult::kFull);
   book.Leave();
   book.SetMaxPlayers(8);
