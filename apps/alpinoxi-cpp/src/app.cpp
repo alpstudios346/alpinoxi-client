@@ -378,7 +378,6 @@ bool ValidPlayerName(const std::string& name) {
 // Everything below was Rust until now. Same decisions, same tests, C++.
 // ============================================================================
 
-namespace alpinoxi {
 namespace {
 
 // ---------- SHA-256, for the PKCE challenge ----------
