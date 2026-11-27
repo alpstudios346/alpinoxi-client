@@ -32,15 +32,16 @@ target_link_libraries(alpinoxi-client PRIVATE
 )
 
 # The logo is the user's own file: it is copied beside the executable, never
-# regenerated.
+# regenerated. The folder is "assets", not "build", because the build directory
+# is called build too and the copy was reading the file it had just written.
 add_custom_command(TARGET alpinoxi-client POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E make_directory
-          "$<TARGET_FILE_DIR:alpinoxi-client>/build"
+          "$<TARGET_FILE_DIR:alpinoxi-client>/assets"
   COMMAND ${CMAKE_COMMAND} -E copy_if_different
-          "${CMAKE_CURRENT_SOURCE_DIR}/build/icon.ico"
-          "${CMAKE_CURRENT_SOURCE_DIR}/build/icon.png"
-          "${CMAKE_CURRENT_SOURCE_DIR}/build/tray.png"
-          "$<TARGET_FILE_DIR:alpinoxi-client>/build"
+          "${CMAKE_CURRENT_SOURCE_DIR}/assets/icon.ico"
+          "${CMAKE_CURRENT_SOURCE_DIR}/assets/icon.png"
+          "${CMAKE_CURRENT_SOURCE_DIR}/assets/tray.png"
+          "$<TARGET_FILE_DIR:alpinoxi-client>/assets"
 )
 
 # ---------- the decisions, tested without a window ----------

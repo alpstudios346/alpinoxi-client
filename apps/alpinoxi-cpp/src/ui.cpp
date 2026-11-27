@@ -388,7 +388,7 @@ int Run(HINSTANCE instance, int show) {
   std::wstring folder(exePath);
   const size_t slash = folder.find_last_of(L'\\');
   if (slash != std::wstring::npos) folder = folder.substr(0, slash);
-  const std::wstring iconPath = folder + L"\\build\\icon.ico";
+  const std::wstring iconPath = folder + L"\\assets\\icon.ico";
   HICON iconLarge = static_cast<HICON>(
       LoadImageW(nullptr, iconPath.c_str(), IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE));
   HICON iconSmall = static_cast<HICON>(
