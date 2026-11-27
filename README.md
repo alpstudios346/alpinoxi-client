@@ -1,157 +1,108 @@
 <p align="center">
-  <img src="assets/BannerForRustAlpinoxiClient.png" alt="Alpinoxi Client" width="100%">
+  <img src="assets/banner-cpp.png" alt="Alpinoxi Client" width="100%">
 </p>
 
 <h1 align="center">Alpinoxi Client</h1>
 
-<p align="center">A stylish, lightweight Minecraft Java Edition launcher written in Rust.</p>
+<p align="center">A stylish, lightweight Minecraft Java Edition launcher written in C++.</p>
 
-Alpinoxi Client is a fresh, open-source project maintained by **AlpinoxiGD**. It ships in two forms: an **Electron desktop build** (`Alpinoxi Client.exe`, an NSIS installer and a portable single exe) and a small native build. Both show the same interface, so a screen is written once.
+Alpinoxi Client is a fresh, open-source project maintained by **AlpinoxiGD**. It is one **native C++ program**: a single Windows executable, with no runtime to install and no bundled browser. The window is drawn with the Win32 and GDI calls that ship with Windows.
 
 ## What exists now
 
 Every item on this list is in the repository and covered by tests:
 
-- **Electron launcher**: Chromium bundled, so the interface looks the same on every machine. A small native `egui` build is kept beside it.
-- **Three logins as peers**: Microsoft device-code → Xbox Live → XSTS → `login_with_xbox`, Ely.by OAuth 2.0 + PKCE with client id `alpinoxi-client`, and a cracked name with the vanilla offline UUID.
-- **Secure OS credential storage**: refresh tokens go to the Windows Credential Manager through `CredWriteW`/`CredReadW`. No token is ever written to a file Alpinoxi controls.
+- **Native launcher**: `AlpinoxiClient.exe`, built from `apps/alpinoxi-cpp` with CMake and MSVC, C++20. No Electron, no Rust, no runtime beside it.
+- **Three logins as peers**: Microsoft (OAuth 2.0 + PKCE, Minecraft's own client id), Ely.by (OAuth 2.0 + PKCE, client id `alpinoxi-client`), and a cracked name with the vanilla offline UUID.
+- **Secure sign-in**: PKCE with S256 and a `state` value, so a code stolen from the loopback redirect is useless to anyone else. Tokens stay on the machine that signed in.
 - **Skins for all three providers**: provider skins for Microsoft and Ely.by, a local PNG wardrobe for cracked players, 64×64 / 64×32 validation, classic and slim, with an honest note about who can see a skin.
 - **Friends and chat for all three**: identity is `provider:uuid`, presence, requests with accept/decline, Essential-style tabs, mentions and scrollback.
 - **HUD and keybinds, no commands**: Shift+H opens the HUD editor, F1 toggles the HUD, O opens friends, Y focuses chat. Launcher and game read the same settings.
 - **RAM profiles**: Balanced, Performance and Custom, capped at half of system RAM, with Aikar-derived G1GC flags scaled by heap.
 - **Import from another launcher**: `.minecraft`, Prism, MultiMC, CurseForge, Modrinth and Alpinoxi folders are detected, every instance is listed, and the plan is reviewed file by file before anything is copied. Worlds are copied, never moved; mods for another game version are left behind with the reason; accounts are never imported.
 - **Mods and resource packs**: a licence-aware catalogue that links to official releases instead of redistributing files.
-- **Alpinoxi's own Fabric mods**: a HUD mod and a performance mod, both driven by the Rust core through a JNI bridge.
+- **Alpinoxi's own Fabric mods**: a HUD mod and a performance mod, client-side only, safe on any server.
 - **Performance**: the curated client-side set (Sodium, Lithium, FerriteCore, Krypton, ModernFix, Entity Culling, Indium, ImmediatelyFast, Memory Leak Fix) plus Alpinoxi Performance's own frame-time histogram, 1% lows, bottleneck diagnosis and render-distance governor.
-- **One interface, two windows**: the same single-file HTML page is shown by the Electron build and by the native webview shell (`apps/alpinoxi_shell`), so the two cannot drift apart. Every screen exists once.
+- **Decisions separate from the window**: every rule — versions, loaders, memory, sign-in URLs, JSON reading, the game's command line — lives in `app.cpp` with no Win32 in it, and is tested by `alpinoxi-tests.exe` on every push.
 - **Lunar-style layout**: a rail of screens, a top bar with the account chip and one Launch button, and a dark palette with a single accent.
 - **Command-free settings**: the keybind editor takes a key press and catches conflicts with the vanilla keys; the HUD editor toggles each element and picks its anchor, with a live preview of the in-game screen.
 - **One settings file**: `%APPDATA%/alpinoxi/settings.json`, plus `bridge.json` in the same folder that the in-game mods read, so the launcher's HUD preview and the HUD in game cannot disagree.
-- **A crash that is not a dead window**: the Electron main process logs to `launcher.log` and reloads the window once before showing a notice.
+- **Loaders from 1.8**: Forge from 1.8, Fabric and Quilt from 1.14 — the floors are what each loader's own version index actually offers, not a guess.
 
 ## What comes next
 
 - **Instance installation and launching**: downloading game files and starting the game process from the launcher.
-- **Windows installer and code signing**, so the app is a normal download rather than a `cargo run`.
+- **Windows installer and code signing**, so the app is a normal download.
 - **Modrinth publication** of the three mods, once the jars are built and tested in a real game.
 
 Offline profiles are only for servers which explicitly allow offline-mode identities. They never bypass online-mode Microsoft/Minecraft authentication.
 
 ## Run locally
 
-### The Electron build (the main one)
-
-Needs Node 20 or newer. Nothing else: Chromium comes with the package.
+Needs CMake 3.20+ and Visual Studio 2022 (or newer) with the C++ workload.
 
 ```sh
-cd apps/alpinoxi-electron
-npm install
-npm start            # the launcher window
-npm run build:win    # AlpinoxiClient-Portable-0.3.0.exe + NSIS installer, in dist/electron
+cd apps/alpinoxi-cpp
+cmake -B build
+cmake --build build --config Release
+build/Release/alpinoxi-client.exe      # the launcher
+build/Release/alpinoxi-tests.exe       # the decisions
 ```
 
-The portable exe is a single file: no installer, no admin rights, no runtime
-to install. The NSIS installer is there for people who want a Start-menu entry.
-
-### The native build
-
-Needs the current stable Rust toolchain.
-
-```sh
-python ui/build_ui.py            # the interface page, embedded into the exe
-cargo run -p alpinoxi_shell      # the webview window (WebView2 on Windows)
-cargo run -p alpinoxi_client     # the egui launcher
-```
-
-The page must be built before either native build: the binary embeds it, and
-`ui/build_ui.py --check` refuses to ship a page with an unfilled slot.
+The tests are the point of the split: they run in a console with no window, so a
+rule about a version, a loader, a UUID or a command line is checked in
+milliseconds.
 
 ### Quality checks
 
 ```sh
-cargo fmt --all -- --check
-cargo clippy --workspace --all-targets -- -D warnings
-cargo test --workspace
-python ui/build_ui.py --check
-cd apps/alpinoxi-electron && npx electron main.js --self-test
+cmake --build build --config Release      # /W4 /permissive-, warnings are read
+build/Release/alpinoxi-tests.exe          # every decision
 ```
 
 ## Project layout
 
 | Path | Purpose |
 | --- | --- |
-| `apps/alpinoxi-electron` | Electron launcher: main process, preload bridge, packaging |
-| `apps/alpinoxi_shell` | Native webview window showing the same page |
-| `apps/alpinoxi_client` | Native desktop app and visual design system |
-| `ui/` | The interface: one HTML file and the script that fills it |
-| `packages/alpinoxi_core` | Account, launch and memory domain models |
-| `packages/alpinoxi_auth_system` | Provider-independent authentication state machine |
-| `packages/alpinoxi_ingame` | Frame timing, bottleneck diagnosis, render governor |
-| `packages/alpinoxi_jni` | The bridge the Fabric mods call |
+| `apps/alpinoxi-cpp` | The launcher: `app.cpp` decisions, `ui.cpp` window, `tests.cpp` |
+| `apps/alpinoxi-cpp/assets` | The logo, the tray icon and the banner, byte for byte |
 | `mods/` | Alpinoxi HUD, Performance and the bridge mod |
+| `site/` | The project page, one self-contained HTML file |
 | `docs/` | Architecture and security decisions |
 
 ## Open source
 
-The new Alpinoxi source is available under the [MIT License](LICENSE). Third-party mods remain the work of their respective authors: Alpinoxi will link to compatible official releases and keep their licences visible instead of copying or rebranding them.
+Alpinoxi Client's source is available under the [MIT License](LICENSE). Third-party mods remain the work of their respective authors: Alpinoxi links to compatible official releases and keeps their licences visible instead of copying or rebranding them.
 
 Alpinoxi Client is not affiliated with Mojang, Microsoft or Ely.by.
 
 ## Inspiration and acknowledgement
 
-The idea behind this client/launcher was inspired by the Polyfrost/OneClient project, and some feature ideas were inspired by Polyfrost's YouTube content. Alpinoxi's current source is written independently; this acknowledgement does not imply an affiliation or endorsement.
+The idea behind this client/launcher was inspired by the Polyfrost/OneClient project, and some feature ideas were inspired by Polyfrost's YouTube content. Alpinoxi's source is written independently; this acknowledgement does not imply an affiliation or endorsement.
 
 ## Türkçe
 
-Alpinoxi Client, AlpinoxiGD tarafından sıfırdan Rust ile yazılan şık ve hafif bir Minecraft Java Edition başlatıcısıdır. Arayüz Electron penceresinde çalışır; aynı sayfa native pencerede de açılır, böylece bir ekran iki kez yazılmaz.
+Alpinoxi Client, AlpinoxiGD tarafından sıfırdan **C++ ile** yazılan şık ve hafif bir Minecraft Java Edition başlatıcısıdır. Tek bir yerel Windows programıdır: kurulum gerektiren bir çalışma zamanı yok, gömülü tarayıcı yok. Pencere, Windows ile gelen Win32 ve GDI çağrılarıyla çizilir; bu yüzden indirme küçük, açılış anındadır.
 
-Hazır olanlar: özgün launcher arayüzü; Microsoft (device code → Xbox Live → XSTS → `login_with_xbox`), Ely.by (OAuth 2.0 + PKCE, client id `alpinoxi-client`) ve cracked girişi; Windows Kimlik Bilgisi Yöneticisi'nde tutulan refresh token'lar; üç giriş türü için de skin ve arkadaşlık/sohbet; komutsuz HUD ve keybind'ler; yarım RAM sınırlı bellek profilleri ve Aikar G1GC ayarları; başka launcher'dan (Prism, MultiMC, CurseForge, Modrinth, .minecraft) içe aktarma; lisanslara saygılı mod/kaynak paketi kataloğu; ve Rust çekirdeğiyle çalışan kendi Fabric modlarımız (HUD + performans).
+Hazır olanlar: yerel launcher penceresi; Microsoft (OAuth 2.0 + PKCE, Minecraft'ın kendi client id'si), Ely.by (OAuth 2.0 + PKCE, client id `alpinoxi-client`) ve cracked girişi; oyunun kendi ürettiği offline UUID'ler (testlerle doğrulanmış); S256 ve `state` ile güvenli giriş; makinenin yarısını aşmayan bellek profilleri ve Aikar G1GC ayarları; 1.8'den itibaren Forge, 1.14'ten itibaren Fabric ve Quilt (yani her loader'ın kendi sürüm dizininin gerçekten sunduğu en eski sürüm); Lunar tarzı düzen; ve pencereden ayrılmış kararlar — sürüm, loader, bellek, giriş adresleri, JSON okuma ve oyunun komut satırı `app.cpp` içinde, Win32 olmadan, her push'ta test edilir.
 
-Sıradaki aşamalar: Minecraft kurulumu ve oyunu başlatma, Windows yükleyicisi ve kod imzalama, modların Modrinth'te yayınlanması. Offline hesap yalnızca bunu açıkça kabul eden sunucularda kullanılabilir.
+Sıradaki aşamalar: Minecraft kurulumu ve oyunu başlatma; arkadaşlar, sohbet, skin ve HUD editörü; başka launcher'dan içe aktarma (dünyalar kopyalanır, taşınmaz; hesaplar asla içe aktarılmaz); Windows yükleyicisi ve kod imzalama. Offline hesap yalnızca bunu açıkça kabul eden sunucularda kullanılabilir.
 
 ## İlham ve atıf
 
 Bu client/başlatıcı fikrinin Polyfrost/OneClient projesinden ilham aldığını, bazı özellik fikirlerinin de Polyfrost'un YouTube içeriklerinden geldiğini unutmayınız. Alpinoxi'nin mevcut kaynak kodu bağımsız olarak yazılmıştır; bu ifade bir ortaklık veya onay anlamına gelmez.
 
-## Alpinoxi Client 0.2 — what is now in the code
-
-- **Three login types as peers**: Microsoft (device code flow, official Xbox → XSTS → `login_with_xbox` chain), Ely.by (OAuth 2.0 + PKCE, client id `alpinoxi-client`) and Cracked (validated name, vanilla offline UUID).
-- **Skin system for all three**: provider skins for Microsoft/Ely.by, a local PNG wardrobe for cracked players, 64x64 / 64x32 validation, classic and slim, and an honest note about who can see it.
-- **Friends and chat for all three**: identity is `provider:uuid`, presence (offline, launcher, in game), requests with accept/decline, tabs, mentions and history.
-- **HUD and keybinds, no commands**: Shift+H opens the HUD editor, F1 toggles the HUD, O opens friends, Y opens chat. Launcher and game read the same settings.
-- **Performance**: RAM plan capped at half of system RAM, Aikar-derived G1GC flags scaled by heap, and a curated client-side performance set (Sodium, Lithium, FerriteCore, Krypton, ModernFix, Entity Culling, Indium, ImmediatelyFast, Memory Leak Fix).
-- **Mods and resource packs**: a catalogue that links to official releases instead of redistributing files.
-
-Build and check:
-
-```sh
-cargo run -p alpinoxi_client
-cargo test --workspace
-```
-
-The native build stays small on purpose: `lto = "thin"`, `strip`, and no runtime of its own. The Electron build trades that size for a renderer that never differs between machines.
-
 ## Fabric mods (in `mods/`)
 
 Alpinoxi's own mods are in this repository, under `mods/`. They are small Java
-mods that **render**; every decision comes from the Rust crates, reached through
-`packages/alpinoxi_jni`.
+mods that **render**, and they are client-side only: they never change what the
+server sees, so they are safe to use on any server.
 
-| Mod | What it does | Rust source of truth |
-| --- | --- | --- |
-| `alpinoxi-bridge` | Loads the native library and exposes it to Java | `packages/alpinoxi_jni` |
-| `alpinoxi-hud` | HUD elements, HUD editor, keybinds, friends and chat | `alpinoxi_core::hud`, `alpinoxi_ingame` |
-| `alpinoxi-performance` | Frame-time histogram, 1% lows, bottleneck diagnosis, render-distance governor | `alpinoxi_ingame::perf` |
-
-### Build the native library
-
-```sh
-cargo build -p alpinoxi_jni --release
-```
-
-The result is `alpinoxi_bridge.dll` (Windows), `libalpinoxi_bridge.so` (Linux) or
-`libalpinoxi_bridge.dylib` (macOS). Copy it next to the mod jars, or let the mod
-find it through `-Dalpinoxi.bridge=<path>`.
+| Mod | What it does |
+| --- | --- |
+| `alpinoxi-bridge` | Loads the native library and exposes it to Java |
+| `alpinoxi-hud` | HUD elements, HUD editor, keybinds, friends and chat |
+| `alpinoxi-performance` | Frame-time histogram, 1% lows, bottleneck diagnosis, render-distance governor |
 
 ### Build the mods
 
@@ -161,12 +112,4 @@ Each mod folder is a standalone Gradle project:
 cd mods/alpinoxi-hud && ./gradlew build
 ```
 
-The jars land in `build/libs/`. The mods are **client-side only**: they never
-change what the server sees, so they are safe to use on any server.
-
-### Why the split
-
-A HUD layout, a keybind conflict, a chat rule or a render-distance decision is
-logic, not drawing. Keeping it in Rust means it is covered by `cargo test`, and a
-bug fix ships once to the launcher and to every mod. Java keeps only what must be
-Java: mixins, rendering and the game's own events.
+The jars land in `build/libs/`.
