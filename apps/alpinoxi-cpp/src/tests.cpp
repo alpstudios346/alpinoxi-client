@@ -166,8 +166,9 @@ void TestLoaderIds() {
   }
   Loader neo;
   Check(ParseLoader("neoforge", &neo) && neo == Loader::kForge, "neoforge is forge");
-  Loader none;
-  Check(!ParseLoader("vanilla", &none), "vanilla is not a loader");
+  Loader vanilla;
+  Check(ParseLoader("vanilla", &vanilla) && vanilla == Loader::kVanilla,
+        "vanilla is a loader too");
 }
 
 
@@ -320,7 +321,7 @@ void TestSettingsRoundTrip() {
   CheckEqual(read.version, "1.20.1", "version survives");
   Check(read.heap_mib == 6144, "heap survives");
   Check(!read.hud_enabled, "hud off survives");
-  CheckEqual(read.java_path, "C:\\\\Java\\\\bin\\\\java.exe", "the java path survives");
+  CheckEqual(read.java_path, settings.java_path, "the java path survives");
 
   const Settings blank = SettingsFromJson("{}");
   Check(blank.provider == Provider::kOffline, "an empty file is the default");

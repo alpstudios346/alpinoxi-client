@@ -841,15 +841,30 @@ std::string LoaderTarget::Label() const {
 
 // ---------- settings ----------
 
+namespace {
+
+// The file is JSON, so a Windows path's backslashes have to be doubled.
+std::string EscapeForJson(const std::string& text) {
+  std::string out;
+  out.reserve(text.size() + 8);
+  for (char c : text) {
+    if (c == '\\' || c == '"') out.push_back('\\');
+    out.push_back(c);
+  }
+  return out;
+}
+
+}  // namespace
+
 std::string SettingsToJson(const Settings& settings) {
   std::string json = "{\n";
   json += "  \"provider\": \"" + std::string(ProviderId(settings.provider)) + "\",\n";
-  json += "  \"playerName\": \"" + settings.player_name + "\",\n";
+  json += "  \"playerName\": \"" + EscapeForJson(settings.player_name) + "\",\n";
   json += "  \"loader\": \"" + std::string(LoaderId(settings.loader)) + "\",\n";
-  json += "  \"version\": \"" + settings.version + "\",\n";
+  json += "  \"version\": \"" + EscapeForJson(settings.version) + "\",\n";
   json += "  \"heapMiB\": " + std::to_string(settings.heap_mib) + ",\n";
   json += std::string("  \"hudEnabled\": ") + (settings.hud_enabled ? "true" : "false") + ",\n";
-  json += "  \"javaPath\": \"" + settings.java_path + "\"\n";
+  json += "  \"javaPath\": \"" + EscapeForJson(settings.java_path) + "\"\n";
   json += "}\n";
   return json;
 }
