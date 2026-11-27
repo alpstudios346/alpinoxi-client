@@ -408,6 +408,9 @@ void TestWorlds() {
   // room for anyone else at all, and the code does not change that. The cap
   // applies to the world that is already open, not only the next one.
   book.SetMaxPlayers(1);
+  std::printf("    debug players=%d max=%d current=[%s]\n",
+              book.Find("world-1")->players, book.Find("world-1")->max_players,
+              book.Current().c_str());
   CHECK(book.Find("world-1")->Full());
   CHECK(book.MayJoin("world-1", "other-guest", true, code) == JoinResult::kFull);
   book.SetMaxPlayers(8);
