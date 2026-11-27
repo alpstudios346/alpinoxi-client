@@ -28,7 +28,7 @@ struct GameVersion {
 
 // ---------- loaders ----------
 
-enum class Loader { kForge, kFabric, kQuilt };
+enum class Loader { kVanilla, kForge, kFabric, kQuilt };
 
 const std::vector<Loader>& AllLoaders();
 const char* LoaderId(Loader loader);
@@ -47,12 +47,14 @@ enum class LoaderError {
 };
 
 struct LoaderTarget {
-  Loader loader = Loader::kForge;
+  Loader loader = Loader::kVanilla;
   GameVersion version;
 
   static LoaderError Make(Loader loader, const std::string& version, LoaderTarget* out);
   std::string Message(LoaderError error) const;
   std::string ProfileUrl() const;
+  // What the rail and the instance card show: "Fabric 1.21.1".
+  std::string Label() const;
 };
 
 std::vector<Loader> LoadersFor(const std::string& version);
@@ -126,12 +128,47 @@ bool JsonNumber(const std::string& json, const std::string& key, double* out);
 // Counts the objects in an array: {"a":[{...},{...}]} for key "a" is 2.
 int JsonArrayCount(const std::string& json, const std::string& key);
 
+// ---------- settings ----------
+// One file, %APPDATA%/alpinoxi/settings.json, and the launcher reads it back
+// the same way every time.
+
+struct Settings {
+  Provider provider = Provider::kOffline;
+  std::string player_name;
+  Loader loader = Loader::kVanilla;
+  std::string version = "1.21.1";
+  uint32_t heap_mib = 4096;
+  bool hud_enabled = true;
+  std::string java_path;  // empty means "find one"
+};
+
+std::string SettingsToJson(const Settings& settings);
+// Reads what it can, and leaves every field it cannot read at its default.
+Settings SettingsFromJson(const std::string& json);
+
+// ---------- instances ----------
+// One folder per instance under %APPDATA%/alpinoxi/instances/<id>, with the
+// game, mods and saves inside it.
+
+struct Instance {
+  std::string id;       // "fabric-1.21.1"
+  std::string name;     // "Fabric 1.21.1"
+  LoaderTarget target;
+  uint32_t heap_mib = 4096;
+  bool installed = false;
+};
+
+// The id an instance is stored under.
+std::string InstanceId(Loader loader, const GameVersion& version);
+
 // ---------- the command line the game is started with ----------
 
 struct LaunchCommand {
   std::string java;                     // path to java.exe
   std::vector<std::string> arguments;   // everything after it
   std::string working_dir;
+  // The whole line, quoted, for CreateProcessW.
+  std::string command_line() const;
 };
 
 // Builds the command for one instance: heap flags, the loader's main class, the

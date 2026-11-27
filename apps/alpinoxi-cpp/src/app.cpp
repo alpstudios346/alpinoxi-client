@@ -187,12 +187,15 @@ bool GameVersion::AtLeast(uint16_t wantMajor, uint16_t wantMinor) const {
 // ---------- Loader ----------
 
 const std::vector<Loader>& AllLoaders() {
-  static const std::vector<Loader> kLoaders = {Loader::kForge, Loader::kFabric, Loader::kQuilt};
+  static const std::vector<Loader> kLoaders = {Loader::kVanilla, Loader::kForge, Loader::kFabric,
+                                               Loader::kQuilt};
   return kLoaders;
 }
 
 const char* LoaderId(Loader loader) {
   switch (loader) {
+    case Loader::kVanilla:
+      return "vanilla";
     case Loader::kForge:
       return "forge";
     case Loader::kFabric:
@@ -205,6 +208,8 @@ const char* LoaderId(Loader loader) {
 
 const char* LoaderLabel(Loader loader) {
   switch (loader) {
+    case Loader::kVanilla:
+      return "Vanilla";
     case Loader::kForge:
       return "Forge";
     case Loader::kFabric:
@@ -218,6 +223,10 @@ const char* LoaderLabel(Loader loader) {
 bool ParseLoader(const std::string& text, Loader* out) {
   std::string lower;
   for (char c : text) lower.push_back(static_cast<char>(std::tolower(static_cast<unsigned char>(c))));
+  if (lower == "vanilla" || lower == "none" || lower == "release") {
+    *out = Loader::kVanilla;
+    return true;
+  }
   if (lower == "forge" || lower == "neoforge") {
     *out = Loader::kForge;
     return true;
@@ -235,6 +244,8 @@ bool ParseLoader(const std::string& text, Loader* out) {
 
 GameVersion LoaderEarliest(Loader loader) {
   switch (loader) {
+    case Loader::kVanilla:
+      return GameVersion{1, 8, 0};
     case Loader::kForge:
       return GameVersion{1, 1, 0};
     case Loader::kFabric:
@@ -247,6 +258,8 @@ GameVersion LoaderEarliest(Loader loader) {
 
 const char* LoaderMainClass(Loader loader) {
   switch (loader) {
+    case Loader::kVanilla:
+      return "net.minecraft.client.main.Main";
     case Loader::kForge:
       return "net.minecraftforge.client.loading.ClientModLoader";
     case Loader::kFabric:
@@ -259,6 +272,8 @@ const char* LoaderMainClass(Loader loader) {
 
 const char* LoaderVersionsUrl(Loader loader) {
   switch (loader) {
+    case Loader::kVanilla:
+      return "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
     case Loader::kForge:
       return "https://files.minecraftforge.net/net/minecraftforge/forge/promotions_slim.json";
     case Loader::kFabric:
@@ -358,7 +373,6 @@ bool ValidPlayerName(const std::string& name) {
   return true;
 }
 
-}  // namespace alpinoxi
 
 // ============================================================================
 // Everything below was Rust until now. Same decisions, same tests, C++.
@@ -805,6 +819,68 @@ LaunchCommand BuildLaunchCommand(const std::string& java, const std::string& gam
   command.arguments.push_back("--versionType");
   command.arguments.push_back("release");
   return command;
+}
+
+std::string LaunchCommand::command_line() const {
+  std::string line = QuoteForWindows(java);
+  for (const std::string& argument : arguments) {
+    line += " ";
+    // The arguments that carry a path are quoted where they are built; the
+    // rest cannot contain a space, so quoting them again would show up in game.
+    line += argument.find(' ') != std::string::npos && argument.front() != '"'
+                ? QuoteForWindows(argument)
+                : argument;
+  }
+  return line;
+}
+
+std::string LoaderTarget::Label() const {
+  const std::string tag = version.ToString();
+  if (loader == Loader::kVanilla) return tag;
+  return std::string(LoaderLabel(loader)) + " " + tag;
+}
+
+// ---------- settings ----------
+
+std::string SettingsToJson(const Settings& settings) {
+  std::string json = "{\n";
+  json += "  \"provider\": \"" + std::string(ProviderId(settings.provider)) + "\",\n";
+  json += "  \"playerName\": \"" + settings.player_name + "\",\n";
+  json += "  \"loader\": \"" + std::string(LoaderId(settings.loader)) + "\",\n";
+  json += "  \"version\": \"" + settings.version + "\",\n";
+  json += "  \"heapMiB\": " + std::to_string(settings.heap_mib) + ",\n";
+  json += std::string("  \"hudEnabled\": ") + (settings.hud_enabled ? "true" : "false") + ",\n";
+  json += "  \"javaPath\": \"" + settings.java_path + "\"\n";
+  json += "}\n";
+  return json;
+}
+
+Settings SettingsFromJson(const std::string& json) {
+  Settings settings;
+  std::string text;
+
+  if (JsonString(json, "provider", &text)) ParseProvider(text, &settings.provider);
+  if (JsonString(json, "playerName", &text)) settings.player_name = text;
+  if (JsonString(json, "loader", &text)) ParseLoader(text, &settings.loader);
+  if (JsonString(json, "version", &text)) settings.version = text;
+  if (JsonString(json, "javaPath", &text)) settings.java_path = text;
+
+  double number = 0;
+  if (JsonNumber(json, "heapMiB", &number) && number >= 512 && number <= 65536) {
+    settings.heap_mib = static_cast<uint32_t>(number);
+  }
+  const size_t hud = json.find("\"hudEnabled\"");
+  if (hud != std::string::npos) {
+    const size_t value = json.find(':', hud);
+    if (value != std::string::npos) settings.hud_enabled = json.compare(value + 1, 4, "true") == 0;
+  }
+  return settings;
+}
+
+// ---------- instances ----------
+
+std::string InstanceId(Loader loader, const GameVersion& version) {
+  return std::string(LoaderId(loader)) + "-" + version.ToString();
 }
 
 }  // namespace alpinoxi

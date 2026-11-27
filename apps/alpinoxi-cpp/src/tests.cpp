@@ -279,6 +279,62 @@ void TestOfflineAccount() {
   Check(!ValidPlayerName(MakeOfflineAccount("x").name), "a bad name makes no account");
 }
 
+
+void TestVanillaIsALoader() {
+  CheckEqual(LoaderLabel(Loader::kVanilla), "Vanilla", "vanilla has a label");
+  CheckEqual(LoaderId(Loader::kVanilla), "vanilla", "and an id");
+  CheckEqual(LoaderMainClass(Loader::kVanilla), "net.minecraft.client.main.Main",
+             "vanilla starts the game itself");
+  Loader parsed;
+  Check(ParseLoader("vanilla", &parsed) && parsed == Loader::kVanilla, "parses");
+  Check(AllLoaders().size() == 4, "four loaders, vanilla first");
+  Check(AllLoaders().front() == Loader::kVanilla, "and it is first");
+}
+
+void TestTargetLabel() {
+  LoaderTarget fabric;
+  LoaderTarget::Make(Loader::kFabric, "1.21.1", &fabric);
+  CheckEqual(fabric.Label(), "Fabric 1.21.1", "the rail shows the loader and the version");
+
+  LoaderTarget vanilla;
+  LoaderTarget::Make(Loader::kVanilla, "1.21.1", &vanilla);
+  CheckEqual(vanilla.Label(), "1.21.1", "vanilla is just the version");
+}
+
+void TestSettingsRoundTrip() {
+  Settings settings;
+  settings.provider = Provider::kElyBy;
+  settings.player_name = "Alpinoxi";
+  settings.loader = Loader::kQuilt;
+  settings.version = "1.20.1";
+  settings.heap_mib = 6144;
+  settings.hud_enabled = false;
+  settings.java_path = "C:\\Java\\bin\\java.exe";
+
+  const Settings read = SettingsFromJson(SettingsToJson(settings));
+  Check(read.provider == Provider::kElyBy, "provider survives the file");
+  CheckEqual(read.player_name, "Alpinoxi", "name survives");
+  Check(read.loader == Loader::kQuilt, "loader survives");
+  CheckEqual(read.version, "1.20.1", "version survives");
+  Check(read.heap_mib == 6144, "heap survives");
+  Check(!read.hud_enabled, "hud off survives");
+  CheckEqual(read.java_path, "C:\\Java\\bin\\java.exe", "the java path survives");
+
+  const Settings blank = SettingsFromJson("{}");
+  Check(blank.provider == Provider::kOffline, "an empty file is the default");
+  Check(blank.heap_mib == 4096, "with 4 GiB");
+  Check(blank.hud_enabled, "and the HUD on");
+}
+
+void TestInstanceIds() {
+  GameVersion version;
+  GameVersion::Parse("1.21.1", &version);
+  CheckEqual(InstanceId(Loader::kFabric, version), "fabric-1.21.1", "fabric id");
+  CheckEqual(InstanceId(Loader::kVanilla, version), "vanilla-1.21.1", "vanilla id");
+  Check(InstanceId(Loader::kFabric, version) != InstanceId(Loader::kQuilt, version),
+        "two loaders never share a folder");
+}
+
 }  // namespace
 
 int main() {
@@ -302,6 +358,10 @@ int main() {
   TestCommandLine();
   TestProviders();
   TestOfflineAccount();
+  TestVanillaIsALoader();
+  TestTargetLabel();
+  TestSettingsRoundTrip();
+  TestInstanceIds();
 
   if (gFailures == 0) {
     std::printf("OK: %d checks, the loader rules and the offline UUID hold\n", gChecks);
