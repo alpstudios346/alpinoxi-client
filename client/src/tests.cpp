@@ -404,23 +404,19 @@ void TestWorlds() {
   // Full beats the invite: a guest with the code is still turned away from a
   // world with no room. Re-opening the world with a lower cap is how a host
   // shrinks it, and it must not also reset who is inside.
+  // A cap of one is below the host, so opening it fills it at once: there is no
+  // room for anyone else at all, and the code does not change that.
   book.SetMaxPlayers(1);
   book.Open("world-1", "Survival", "owner-key", Access::kCode);
-  // One player against a cap of one, with a different guest asking: full.
-  book.Enter("world-1");
-  std::printf("    debug players=%d max=%d current=%s\n",
-              book.Find("world-1")->players, book.Find("world-1")->max_players,
-              book.Current().c_str());
+  CHECK(book.Find("world-1")->Full());
   CHECK(book.MayJoin("world-1", "other-guest", true, code) == JoinResult::kFull);
-  book.Leave();
   book.SetMaxPlayers(8);
   book.Open("world-1", "Survival", "owner-key", Access::kCode);
   CHECK(book.MayJoin("world-1", "other-guest", true, code) == JoinResult::kOk);
   // And re-opening never adds a second host: the count stays where it was.
-  book.Enter("world-1");
+  const int before = book.Find("world-1")->players;
   book.Open("world-1", "Survival", "owner-key", Access::kFriends);
-  CHECK_INT(book.Find("world-1")->players, 2);
-  book.Leave();
+  CHECK_INT(book.Find("world-1")->players, before);
 
   // An invite is the owner's to give.
   CHECK(book.Invite("world-1", "owner-key", "guest"));
