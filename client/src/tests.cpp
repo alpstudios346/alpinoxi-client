@@ -389,13 +389,20 @@ void TestWorlds() {
   book.Open("world-1", "Survival", "owner-key", Access::kCode);
   CHECK(book.MayJoin("world-1", "guest", false, code) == JoinResult::kOk);
   CHECK(book.MayJoin("world-1", "guest", false, "") == JoinResult::kNotInvited);
+  // The host already counts as one player, so a 2-player world is full once a
+  // guest is inside it. Full is checked before the invite, or the guest would
+  // be told they are welcome into a world with no room.
   book.SetMaxPlayers(2);
   book.Open("world-1", "Survival", "owner-key", Access::kCode);
+  CHECK(book.MayJoin("world-1", "guest", true, code) == JoinResult::kOk);
   book.Enter("world-1");
+  CHECK(book.MayJoin("world-1", "guest", true, code) == JoinResult::kAlreadyInside);
   book.Leave();
+  CHECK(book.MayJoin("world-1", "guest", true, code) == JoinResult::kOk);
+  book.Enter("world-1");
   book.Enter("world-1");
   CHECK(book.MayJoin("world-1", "guest", true, code) == JoinResult::kFull);
-  CHECK(book.MayJoin("world-1", "guest", true, code) == JoinResult::kAlreadyInside);
+  book.Leave();
   book.Leave();
 
   // An invite is the owner's to give.
@@ -590,10 +597,20 @@ void TestLaunchCommand() {
   // A cracked account is "legacy", or the game tries to validate the token.
   CHECK(line.find("--userType legacy") != std::string::npos);
   CHECK(line.find("--version 1.21.1") != std::string::npos);
-  // A path with a space has to be quoted exactly once.
-  CHECK(line.find("--gameDir \"C:\\Users\\User\\game\"") != std::string::npos);
-  CHECK(line.find("--assetsDir \"C:\\Users\\User\\game\\assets\"") != std::string::npos);
-  CHECK(line.find("\"C:\\Users\\User\\game\\libraries\\a.jar;") != std::string::npos);
+  // A path with no space is left bare, and a path with one is quoted exactly
+  // once. Quoting a bare path puts the quote marks into the game's own
+  // arguments.
+  CHECK(line.find("--gameDir C:\\Users\\User\\game ") != std::string::npos);
+  CHECK(line.find("--assetsDir C:\\Users\\User\\game\\assets ") != std::string::npos);
+  CHECK(line.find("C:\\Users\\User\\game\\libraries\\a.jar;C:") != std::string::npos);
+
+  // And the one path that always has a space, the java.exe itself, is quoted.
+  LoaderTarget spaces;
+  LoaderTarget::Make(Loader::kVanilla, "1.21.1", &spaces);
+  const LaunchCommand spaced = BuildLaunchCommand("java", "C:\\My Games\\alpinoxi",
+                                                  "C:\\My Games\\alpinoxi\\assets", "17", "a.jar",
+                                                  spaces, account, 2048);
+  CHECK(spaced.command_line().find("--gameDir \"C:\\My Games\\alpinoxi\"") != std::string::npos);
 
   // The vanilla main class, when that is the loader.
   LoaderTarget vanilla;
