@@ -409,10 +409,8 @@ void TestWorlds() {
   full.Open("world-1", "Survival", "owner-key", Access::kCode);
   CHECK(!full.Find("world-1")->Full());
   full.Enter("world-1");
-  full.Enter("world-1");
-  std::printf("    debug players=%d max=%d current=[%s] full=%d\n",
-              full.Find("world-1")->players, full.Find("world-1")->max_players,
-              full.Current().c_str(), full.Find("world-1")->Full() ? 1 : 0);
+  // Enter() counts the host too, so one Enter is already a world with two
+  // players in it: the host who opened it, and this one.
   CHECK(full.Find("world-1")->Full());
   CHECK(full.MayJoin("world-1", "other-guest", true, code) == JoinResult::kFull);
 
