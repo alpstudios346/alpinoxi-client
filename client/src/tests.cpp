@@ -409,9 +409,12 @@ void TestWorlds() {
   CHECK(!full.Find("world-1")->Full());
   full.Enter("world-1");
   CHECK(full.Find("world-1")->Full());
+  const JoinResult why = full.MayJoin("world-1", "other-guest", true, code);
+  std::printf("    debug join=%d expected=%d\n", static_cast<int>(why),
+              static_cast<int>(JoinResult::kFull));
   // The guest asking is not the one inside: the one inside is told they are
   // already there, which is a different answer.
-  CHECK(full.MayJoin("world-1", "other-guest", true, code) == JoinResult::kFull);
+  CHECK(why == JoinResult::kFull);
 
   // The cap applies to the world already open, not only the next one opened,
   // and the smallest cap there is is two.
