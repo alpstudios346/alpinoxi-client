@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "alpinoxi-hud",
+  "version": "${version}",
+  "name": "Alpinoxi HUD",
+  "description": "HUD, HUD editor, friends and chat for Alpinoxi Client. No commands: everything is a keybind.",
+  "authors": ["AlpinoxiGD"],
+  "contact": {
+    "homepage": "https://github.com/alpstudios346/alpinoxi-client",
+    "sources": "https://github.com/alpstudios346/alpinoxi-client"
+  },
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["net.alpinoxi.hud.AlpinoxiHud"]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.9",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*",
+    "alpinoxi-bridge": ">=0.2.0"
+  }
+}

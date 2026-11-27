@@ -86,6 +86,9 @@ struct Account {
   // What the sign-in flow left behind for next time.
   std::string refresh_token;
   int64_t expires_at = 0;  // unix seconds; 0 means "no expiry"
+
+  // "provider:uuid": the identity friends and worlds are keyed by.
+  std::string Key() const;
 };
 
 // The offline UUID Minecraft itself computes: an MD5 of "OfflinePlayer:<name>"
@@ -121,12 +124,99 @@ SignInRequest StartSignIn(Provider provider, const std::string& redirect_uri);
 // worth its size; these read the fields it needs, and say so when a field is
 // missing instead of inventing one.
 
-// Finds "key": "value" at any depth and returns the unescaped value.
 bool JsonString(const std::string& json, const std::string& key, std::string* out);
-// Finds "key": number and returns it.
 bool JsonNumber(const std::string& json, const std::string& key, double* out);
-// Counts the objects in an array: {"a":[{...},{...}]} for key "a" is 2.
 int JsonArrayCount(const std::string& json, const std::string& key);
+
+// ---------- friends ----------
+
+enum class Presence { kOffline, kLauncher, kInGame };
+
+const char* PresenceId(Presence presence);
+bool ParsePresence(const std::string& text, Presence* out);
+
+struct Friend {
+  Provider provider = Provider::kOffline;
+  std::string uuid;
+  std::string name;
+  Presence presence = Presence::kOffline;
+  // The world they are in, when they are hosting one that can be joined.
+  std::string world_id;
+
+  std::string Key() const;
+  // True only when there is somewhere to go: in game, in a shared world.
+  bool Joinable() const;
+};
+
+// The friend book. Presence is pushed in by whoever learns it; nothing here
+// talks to a network.
+class FriendBook {
+ public:
+  void Replace(std::vector<Friend> friends);
+  void SetPresence(const std::string& key, Presence presence, const std::string& world_id);
+  const std::vector<Friend>& All() const;
+  std::vector<Friend> Joinable() const;
+  int OnlineCount() const;
+  // Empty when nobody is around, so the HUD draws nothing.
+  std::string OnlineLabel() const;
+  void Remove(const std::string& key);
+  const Friend* Find(const std::string& key) const;
+
+ private:
+  std::vector<Friend> friends_;
+};
+
+// ---------- hosted worlds ----------
+
+enum class Access { kClosed, kFriends, kCode };
+
+const char* AccessId(Access access);
+bool ParseAccess(const std::string& text, Access* out);
+
+struct World {
+  std::string id;
+  std::string name;
+  std::string owner_key;
+  Access access = Access::kClosed;
+  int players = 1;
+  int max_players = 8;
+
+  bool Full() const;
+  // The shareable code, derived from the id so it never changes.
+  std::string Code() const;
+};
+
+enum class JoinResult { kOk, kClosed, kFull, kNotInvited, kNoSuchWorld, kAlreadyInside };
+
+const char* JoinMessage(JoinResult result);
+
+// Four letters and four digits from the world id's own bytes. Derived rather
+// than random: the same world hands out the same code next week.
+std::string WorldCode(const std::string& world_id);
+
+// The worlds that are open right now, and the rules for joining one.
+class WorldBook {
+ public:
+  void Open(const std::string& id, const std::string& name, const std::string& owner_key,
+            Access access);
+  void Close(const std::string& id);
+  bool Invite(const std::string& id, const std::string& owner_key, const std::string& guest_key);
+  const World* Find(const std::string& id_or_code) const;
+  // Whether one player may join, and why not when they may not.
+  JoinResult MayJoin(const std::string& id_or_code, const std::string& guest_key, bool is_friend,
+                     const std::string& code) const;
+  void Enter(const std::string& id);
+  void Leave();
+  const std::string& Current() const;
+  const std::vector<World>& All() const;
+  void SetMaxPlayers(int players);
+
+ private:
+  std::vector<World> worlds_;
+  std::vector<std::pair<std::string, std::string>> invites_;  // id|guest -> code
+  std::string current_;
+  int max_players_ = 8;
+};
 
 // ---------- settings ----------
 // One file, %APPDATA%/alpinoxi/settings.json, and the launcher reads it back
@@ -147,8 +237,6 @@ std::string SettingsToJson(const Settings& settings);
 Settings SettingsFromJson(const std::string& json);
 
 // ---------- instances ----------
-// One folder per instance under %APPDATA%/alpinoxi/instances/<id>, with the
-// game, mods and saves inside it.
 
 struct Instance {
   std::string id;       // "fabric-1.21.1"
@@ -171,8 +259,6 @@ struct LaunchCommand {
   std::string command_line() const;
 };
 
-// Builds the command for one instance: heap flags, the loader's main class, the
-// game directory and the account. Every path is quoted for Windows.
 LaunchCommand BuildLaunchCommand(const std::string& java, const std::string& game_dir,
                                  const std::string& assets_dir, const std::string& asset_index,
                                  const std::string& classpath, const LoaderTarget& target,

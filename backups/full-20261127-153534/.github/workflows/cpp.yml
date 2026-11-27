@@ -1,0 +1,74 @@
+name: C++ client
+
+# The launcher is a Windows program with no runtime to install, so the build
+# machine needs nothing but a compiler and CMake.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/alpinoxi-cpp/**'
+      - '.github/workflows/cpp.yml'
+  pull_request:
+    paths:
+      - 'apps/alpinoxi-cpp/**'
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        working-directory: apps/alpinoxi-cpp
+        timeout-minutes: 5
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          Write-Host "--- configured ---"
+          Get-Content build/CMakeCache.txt | Select-String "CMAKE_GENERATOR:|CMAKE_CXX_COMPILER:"
+
+      - name: Build
+        working-directory: apps/alpinoxi-cpp
+        timeout-minutes: 12
+        run: cmake --build build --config Release --parallel 4
+
+      - name: Test the decisions
+        working-directory: apps/alpinoxi-cpp
+        run: |
+          $exe = Get-ChildItem -Recurse -Filter alpinoxi-tests.exe build | Select-Object -First 1
+          if (-not $exe) { throw "alpinoxi-tests.exe was not built" }
+          & $exe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "the decisions do not hold" }
+
+      - name: Check the window starts and answers
+        working-directory: apps/alpinoxi-cpp
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem -Recurse -Filter alpinoxi-client.exe build | Select-Object -First 1
+          if (-not $exe) { throw "alpinoxi-client.exe was not built" }
+          $process = Start-Process -FilePath $exe.FullName -PassThru
+          Start-Sleep -Seconds 4
+          $process.Refresh()
+          if ($process.HasExited) { throw "the launcher exited on its own: $($process.ExitCode)" }
+          $process.CloseMainWindow() | Out-Null
+          Start-Sleep -Seconds 2
+          if (-not $process.HasExited) { $process.Kill() }
+          Write-Host "the window opened and stayed up"
+
+      - name: Package
+        working-directory: apps/alpinoxi-cpp
+        shell: pwsh
+        run: |
+          $out = "dist/AlpinoxiClient-Cpp"
+          New-Item -ItemType Directory -Force -Path $out | Out-Null
+          $exe = Get-ChildItem -Recurse -Filter alpinoxi-client.exe build | Select-Object -First 1
+          Copy-Item $exe.FullName "$out/AlpinoxiClient.exe"
+          Copy-Item -Recurse assets "$out/assets"
+          Compress-Archive -Path "$out/*" -DestinationPath "dist/AlpinoxiClient-Cpp-windows.zip" -Force
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AlpinoxiClient-Cpp-windows
+          path: apps/alpinoxi-cpp/dist/AlpinoxiClient-Cpp-windows.zip
+          if-no-files-found: error

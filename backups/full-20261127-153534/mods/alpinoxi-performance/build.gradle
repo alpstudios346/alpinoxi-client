@@ -1,0 +1,68 @@
+plugins {
+    id 'fabric-loom' version '1.9-SNAPSHOT'
+    id 'maven-publish'
+}
+
+// Loom ships as a Gradle plugin from Fabric's own Maven, not from the Gradle
+// Plugin Portal, so the repository has to be declared in settings.gradle.
+// Each mod folder is its own project, hence one settings file per folder.
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+}
+
+// The bridge is a separate mod, so its classes are not on this project's
+// classpath. Compiling the bridge's sources in as an extra source set puts them
+// there, while the bridge jar still provides them at runtime (declared in
+// fabric.mod.json). Compile-only, so they are not duplicated into this jar.
+sourceSets {
+    bridge {
+        java.srcDir '../alpinoxi-bridge/src/main/java'
+        // Not `+= main.compileClasspath`: `main` depends on this set's output,
+        // and that turns the two into a cycle Gradle refuses to run.
+    }
+}
+
+dependencies {
+    // Minecraft and Fabric, which the bridge's own sources need to compile.
+    bridgeCompileOnly "net.fabricmc:fabric-loader:${project.loader_version}"
+    bridgeCompileOnly "org.slf4j:slf4j-api:2.0.9"
+    compileOnly sourceSets.bridge.output
+}
+
+processResources {
+    inputs.property "version", project.version
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 21
+}
+
+java {
+    withSourcesJar()
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.base.archivesName.get()}" }
+    }
+}

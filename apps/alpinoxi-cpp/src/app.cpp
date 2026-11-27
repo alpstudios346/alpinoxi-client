@@ -644,6 +644,10 @@ bool ParseProvider(const std::string& text, Provider* out) {
   return false;
 }
 
+std::string Account::Key() const {
+  return std::string(ProviderId(provider)) + ":" + uuid;
+}
+
 Account MakeOfflineAccount(const std::string& name) {
   Account account;
   if (!ValidPlayerName(name)) return account;
@@ -695,6 +699,296 @@ SignInRequest StartSignIn(Provider provider, const std::string& redirect_uri) {
         challenge + "&code_challenge_method=S256";
   }
   return request;
+}
+
+// ---------- friends ----------
+
+const char* PresenceId(Presence presence) {
+  switch (presence) {
+    case Presence::kOffline:
+      return "offline";
+    case Presence::kLauncher:
+      return "launcher";
+    case Presence::kInGame:
+      return "in_game";
+  }
+  return "offline";
+}
+
+bool ParsePresence(const std::string& text, Presence* out) {
+  if (text == "offline") {
+    *out = Presence::kOffline;
+    return true;
+  }
+  if (text == "launcher") {
+    *out = Presence::kLauncher;
+    return true;
+  }
+  if (text == "in_game") {
+    *out = Presence::kInGame;
+    return true;
+  }
+  return false;
+}
+
+std::string Friend::Key() const {
+  return std::string(ProviderId(provider)) + ":" + uuid;
+}
+
+bool Friend::Joinable() const {
+  return presence == Presence::kInGame && !world_id.empty();
+}
+
+void FriendBook::Replace(std::vector<Friend> friends) {
+  friends_ = std::move(friends);
+}
+
+void FriendBook::SetPresence(const std::string& key, Presence presence,
+                             const std::string& world_id) {
+  for (Friend& friend : friends_) {
+    if (friend.Key() == key) {
+      friend.presence = presence;
+      friend.world_id = world_id;
+      return;
+    }
+  }
+  // A presence for someone not in the book still adds them: the book may be a
+  // refresh behind, and dropping the news loses a friend who is right there.
+  Friend fresh;
+  const size_t colon = key.find(':');
+  if (colon != std::string::npos) {
+    ParseProvider(key.substr(0, colon), &fresh.provider);
+    fresh.uuid = key.substr(colon + 1);
+    fresh.name = fresh.uuid;
+    fresh.presence = presence;
+    fresh.world_id = world_id;
+    friends_.push_back(fresh);
+  }
+}
+
+const std::vector<Friend>& FriendBook::All() const {
+  return friends_;
+}
+
+std::vector<Friend> FriendBook::Joinable() const {
+  std::vector<Friend> list;
+  for (const Friend& friend : friends_) {
+    if (friend.Joinable()) list.push_back(friend);
+  }
+  return list;
+}
+
+int FriendBook::OnlineCount() const {
+  int online = 0;
+  for (const Friend& friend : friends_) {
+    if (friend.presence != Presence::kOffline) ++online;
+  }
+  return online;
+}
+
+std::string FriendBook::OnlineLabel() const {
+  const int online = OnlineCount();
+  return online == 0 ? std::string() : "friends " + std::to_string(online);
+}
+
+void FriendBook::Remove(const std::string& key) {
+  for (auto it = friends_.begin(); it != friends_.end(); ++it) {
+    if (it->Key() == key) {
+      friends_.erase(it);
+      return;
+    }
+  }
+}
+
+const Friend* FriendBook::Find(const std::string& key) const {
+  for (const Friend& friend : friends_) {
+    if (friend.Key() == key) return &friend;
+  }
+  return nullptr;
+}
+
+// ---------- hosted worlds ----------
+
+const char* AccessId(Access access) {
+  switch (access) {
+    case Access::kClosed:
+      return "closed";
+    case Access::kFriends:
+      return "friends";
+    case Access::kCode:
+      return "code";
+  }
+  return "closed";
+}
+
+bool ParseAccess(const std::string& text, Access* out) {
+  if (text == "closed") {
+    *out = Access::kClosed;
+    return true;
+  }
+  if (text == "friends") {
+    *out = Access::kFriends;
+    return true;
+  }
+  if (text == "code") {
+    *out = Access::kCode;
+    return true;
+  }
+  return false;
+}
+
+bool World::Full() const {
+  return players >= max_players;
+}
+
+std::string World::Code() const {
+  return WorldCode(id);
+}
+
+const char* JoinMessage(JoinResult result) {
+  switch (result) {
+    case JoinResult::kOk:
+      return "Joining...";
+    case JoinResult::kClosed:
+      return "That world is not open.";
+    case JoinResult::kFull:
+      return "That world is full.";
+    case JoinResult::kNotInvited:
+      return "You need an invite for that world.";
+    case JoinResult::kNoSuchWorld:
+      return "That world is no longer open.";
+    case JoinResult::kAlreadyInside:
+      return "You are already in that world.";
+  }
+  return "";
+}
+
+std::string WorldCode(const std::string& world_id) {
+  if (world_id.empty()) return std::string();
+  // Letters from a set with no look-alikes: no O/0, no I/1.
+  static const char* kLetters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+  // The code must not depend on how a UUID is spelled, so the id is hashed the
+  // same way the game does it: MD5 with the version bits set.
+  const std::array<uint8_t, 16> digest = Md5(world_id);
+  uint64_t bits = 0;
+  for (int i = 0; i < 8; ++i) bits = (bits << 8) | digest[i];
+
+  std::string code;
+  code.reserve(8);
+  for (int i = 0; i < 4; ++i) {
+    code.push_back(kLetters[(bits >> (i * 5)) % 24]);
+  }
+  for (int i = 4; i < 8; ++i) {
+    code.push_back(static_cast<char>('0' + (bits >> (i * 5)) % 10));
+  }
+  return code;
+}
+
+void WorldBook::SetMaxPlayers(int players) {
+  max_players_ = players < 2 ? 2 : (players > 16 ? 16 : players);
+}
+
+void WorldBook::Open(const std::string& id, const std::string& name,
+                     const std::string& owner_key, Access access) {
+  for (World& world : worlds_) {
+    if (world.id == id) {
+      world.name = name.empty() ? "World" : name;
+      world.owner_key = owner_key;
+      world.access = access;
+      world.max_players = max_players_;
+      return;
+    }
+  }
+  World world;
+  world.id = id;
+  world.name = name.empty() ? "World" : name;
+  world.owner_key = owner_key;
+  world.access = access;
+  world.players = 1;
+  world.max_players = max_players_;
+  worlds_.push_back(world);
+}
+
+void WorldBook::Close(const std::string& id) {
+  for (auto it = worlds_.begin(); it != worlds_.end(); ++it) {
+    if (it->id == id) {
+      worlds_.erase(it);
+      break;
+    }
+  }
+  invites_.erase(std::remove_if(invites_.begin(), invites_.end(),
+                                [&id](const auto& invite) { return invite.first == id; }),
+                 invites_.end());
+  if (current_ == id) current_.clear();
+}
+
+bool WorldBook::Invite(const std::string& id, const std::string& owner_key,
+                       const std::string& guest_key) {
+  const World* world = Find(id);
+  if (world == nullptr || world->owner_key != owner_key || guest_key.empty()) return false;
+  invites_.emplace_back(id, guest_key);
+  return true;
+}
+
+const World* WorldBook::Find(const std::string& id_or_code) const {
+  for (const World& world : worlds_) {
+    if (world.id == id_or_code) return &world;
+  }
+  // A code is matched without its case: a player typing it is not precise.
+  std::string upper = id_or_code;
+  for (char& c : upper) c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+  for (const World& world : worlds_) {
+    if (world.Code() == upper) return &world;
+  }
+  return nullptr;
+}
+
+JoinResult WorldBook::MayJoin(const std::string& id_or_code, const std::string& guest_key,
+                              bool is_friend, const std::string& code) const {
+  const World* world = Find(id_or_code);
+  if (world == nullptr) return JoinResult::kNoSuchWorld;
+  if (world->id == current_) return JoinResult::kAlreadyInside;
+  if (world->access == Access::kClosed) return JoinResult::kClosed;
+  if (world->Full()) return JoinResult::kFull;
+  if (world->access == Access::kFriends) {
+    return is_friend ? JoinResult::kOk : JoinResult::kNotInvited;
+  }
+
+  std::string typed = code;
+  for (char& c : typed) c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+  if (!typed.empty() && typed == world->Code()) return JoinResult::kOk;
+  for (const auto& invite : invites_) {
+    if (invite.first == world->id && invite.second == guest_key) return JoinResult::kOk;
+  }
+  return JoinResult::kNotInvited;
+}
+
+void WorldBook::Enter(const std::string& id) {
+  current_ = id;
+  for (World& world : worlds_) {
+    if (world.id == id) {
+      ++world.players;
+      return;
+    }
+  }
+}
+
+void WorldBook::Leave() {
+  for (World& world : worlds_) {
+    if (world.id == current_ && world.players > 0) {
+      --world.players;
+      break;
+    }
+  }
+  current_.clear();
+}
+
+const std::string& WorldBook::Current() const {
+  return current_;
+}
+
+const std::vector<World>& WorldBook::All() const {
+  return worlds_;
 }
 
 // ---------- JSON ----------

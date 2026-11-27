@@ -130,6 +130,103 @@ public final class Native {
         return "{\"mentions\":" + mentioned + ",\"unread\":" + HudState.unread() + "}";
     }
 
+    // ---------- friends and hosted worlds ----------
+
+    /**
+     * The friend book as JSON, one row per friend: {provider, uuid, name,
+     * presence, world}. Presence is offline, launcher or in_game.
+     */
+    public static String friends() {
+        if (ensureLoaded()) {
+            try {
+                return nativeFriends();
+            } catch (Throwable error) {
+                BridgeLog.warn("native friends failed, using Java ({})", error.toString());
+            }
+        }
+        StringBuilder json = new StringBuilder(256);
+        json.append("{\"online\":").append(Friends.onlineCount()).append(",\"joinable\":")
+                .append(Friends.joinable().size()).append(",\"friends\":[");
+        boolean first = true;
+        for (Friends.Friend friend : Friends.all()) {
+            if (!first) {
+                json.append(',');
+            }
+            first = false;
+            json.append("{\"provider\":\"").append(friend.provider()).append("\",\"uuid\":\"")
+                    .append(friend.uuid()).append("\",\"name\":\"").append(friend.name())
+                    .append("\",\"presence\":\"").append(friend.presence().id())
+                    .append("\",\"world\":\"").append(friend.worldId() == null ? "" : friend.worldId())
+                    .append("\"}");
+        }
+        json.append("]}");
+        return json.toString();
+    }
+
+    /** Every open world as JSON, with the code each one hands out. */
+    public static String worlds() {
+        if (ensureLoaded()) {
+            try {
+                return nativeWorlds();
+            } catch (Throwable error) {
+                BridgeLog.warn("native worlds failed, using Java ({})", error.toString());
+            }
+        }
+        StringBuilder json = new StringBuilder(256);
+        json.append("{\"current\":\"").append(HostWorld.current() == null ? "" : HostWorld.current())
+                .append("\",\"worlds\":[");
+        boolean first = true;
+        for (HostWorld.World world : HostWorld.openWorlds()) {
+            if (!first) {
+                json.append(',');
+            }
+            first = false;
+            json.append("{\"id\":\"").append(world.id()).append("\",\"name\":\"")
+                    .append(world.name()).append("\",\"owner\":\"").append(world.ownerKey())
+                    .append("\",\"access\":\"").append(world.access().id())
+                    .append("\",\"code\":\"").append(world.code()).append("\",\"players\":")
+                    .append(world.players()).append(",\"max\":").append(world.maxPlayers())
+                    .append('}');
+        }
+        json.append("]}");
+        return json.toString();
+    }
+
+    /** Opens, closes or re-opens this player's world. Returns the code, or "". */
+    public static String hostWorld(String worldId, String name, String access) {
+        if (ensureLoaded()) {
+            try {
+                return nativeHostWorld(worldId, name, access);
+            } catch (Throwable error) {
+                BridgeLog.warn("native hostWorld failed, using Java ({})", error.toString());
+            }
+        }
+        HostWorld.Access mode = HostWorld.Access.byId(access);
+        if (mode == HostWorld.Access.CLOSED) {
+            HostWorld.close(worldId);
+            return "";
+        }
+        return HostWorld.open(worldId, name, HudState.Settings.instance(), mode).code();
+    }
+
+    /** Asks to join a world by id or code. Returns OK, or the reason it is not. */
+    public static String joinWorld(String worldIdOrCode, String code) {
+        if (ensureLoaded()) {
+            try {
+                return nativeJoinWorld(worldIdOrCode, code);
+            } catch (Throwable error) {
+                BridgeLog.warn("native joinWorld failed, using Java ({})", error.toString());
+            }
+        }
+        HostWorld.JoinResult result =
+                HostWorld.mayJoin(worldIdOrCode, HudState.Settings.instance(), true, code);
+        if (result == HostWorld.JoinResult.OK) {
+            HostWorld.World world = HostWorld.find(worldIdOrCode);
+            HostWorld.enter(world == null ? worldIdOrCode : world.id());
+        }
+        return result.message();
+    }
+
     // ---------- performance ----------
 
     /**
@@ -199,4 +296,12 @@ public final class Native {
     private static native String nativeSnapshot();
 
     private static native String nativeBridgeVersion();
+
+    private static native String nativeFriends();
+
+    private static native String nativeWorlds();
+
+    private static native String nativeHostWorld(String worldId, String name, String access);
+
+    private static native String nativeJoinWorld(String worldIdOrCode, String code);
 }

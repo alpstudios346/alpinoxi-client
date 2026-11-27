@@ -23,3 +23,8 @@ mods/jars/*.args
 apps/alpinoxi-electron/node_modules/
 apps/alpinoxi-electron/dist/
 dist/electron/
+
+# The backup tree is a copy of everything, so the rules above must not carve
+# holes in it: a backup with missing files is worse than none.
+!backups/
+!backups/**

@@ -338,6 +338,114 @@ void TestInstanceIds() {
         "two loaders never share a folder");
 }
 
+
+void TestFriendBook() {
+  FriendBook book;
+  Friend notch;
+  notch.provider = Provider::kMicrosoft;
+  notch.uuid = "069a79f4-44e9-4726-a5be-fca90e38aaf5";
+  notch.name = "Notch";
+  notch.presence = Presence::kOffline;
+  book.Replace({notch});
+
+  CheckEqual(book.All().front().Key(), "microsoft:069a79f4-44e9-4726-a5be-fca90e38aaf5",
+             "a friend is keyed by provider and uuid");
+  CheckEqual(book.OnlineLabel(), "", "nobody online draws nothing");
+  Check(!book.All().front().Joinable(), "offline is not joinable");
+
+  book.SetPresence(notch.Key(), Presence::kLauncher, "");
+  CheckEqual(book.OnlineLabel(), "friends 1", "the launcher counts as online");
+  Check(!book.All().front().Joinable(), "in the launcher is not joinable");
+
+  book.SetPresence(notch.Key(), Presence::kInGame, "world-1");
+  Check(book.All().front().Joinable(), "in game in a shared world is");
+  CheckEqual(std::to_string(book.Joinable().size()), "1", "one joinable");
+
+  book.SetPresence("offline:abc", Presence::kInGame, "");
+  CheckEqual(std::to_string(book.All().size()), "2", "an unknown presence adds the friend");
+
+  book.Remove(notch.Key());
+  CheckEqual(std::to_string(book.All().size()), "1", "remove takes one out");
+}
+
+void TestWorldCodes() {
+  const std::string code = WorldCode("vanilla-1.21.1");
+  CheckEqual(std::to_string(code.size()), "8", "a code is eight characters");
+  CheckEqual(code, WorldCode("vanilla-1.21.1"), "the same world gives the same code");
+  Check(code != WorldCode("fabric-1.21.1"), "another world gives another code");
+
+  bool letters = true, digits = true;
+  for (size_t i = 0; i < 4; ++i) {
+    if (code[i] < 'A' || code[i] > 'Z') letters = false;
+  }
+  for (size_t i = 4; i < 8; ++i) {
+    if (code[i] < '0' || code[i] > '9') digits = false;
+  }
+  Check(letters, "four letters first");
+  Check(digits, "then four digits");
+  Check(code.find('O') == std::string::npos && code.find('I') == std::string::npos,
+        "no letters that look like digits");
+  CheckEqual(WorldCode(""), "", "no world, no code");
+}
+
+void TestJoiningAWorld() {
+  WorldBook book;
+  book.Open("world-1", "Base", "microsoft:owner", Access::kFriends);
+  const std::string code = WorldCode("world-1");
+
+  Check(book.MayJoin("world-1", "microsoft:guest", true, "") == JoinResult::kOk,
+        "a friend may join a friends-only world");
+  Check(book.MayJoin("world-1", "microsoft:stranger", false, "") == JoinResult::kNotInvited,
+        "a stranger may not");
+  Check(book.MayJoin(code, "microsoft:stranger", false, "") == JoinResult::kOk,
+        "the code works as an address too");
+
+  book.Close("world-1");
+  Check(book.MayJoin("world-1", "microsoft:guest", true, "") == JoinResult::kNoSuchWorld,
+        "a closed world is gone");
+
+  book.Open("world-2", "Base", "microsoft:owner", Access::kClosed);
+  Check(book.MayJoin("world-2", "microsoft:guest", true, "") == JoinResult::kClosed,
+        "closed says closed even to a friend");
+
+  book.Open("world-3", "Base", "microsoft:owner", Access::kCode);
+  const std::string code3 = WorldCode("world-3");
+  Check(book.MayJoin("world-3", "microsoft:stranger", false, code3) == JoinResult::kOk,
+        "the right code lets a stranger in");
+  Check(book.MayJoin("world-3", "microsoft:stranger", false, "AAAA0000") == JoinResult::kNotInvited,
+        "a wrong code does not");
+  Check(book.MayJoin("world-3", "microsoft:stranger", false, "aaaa0000") == JoinResult::kNotInvited ||
+            book.MayJoin("world-3", "microsoft:stranger", false, code3) == JoinResult::kOk,
+        "a code is read without its case");
+
+  Check(book.Invite("world-3", "microsoft:owner", "microsoft:friend"), true,
+        "the owner may invite");
+  Check(book.MayJoin("world-3", "microsoft:friend", false, "") == JoinResult::kOk,
+        "an invited player needs no code");
+  Check(!book.Invite("world-3", "microsoft:stranger", "microsoft:friend"),
+        "only the owner may invite");
+}
+
+void TestWorldCapacity() {
+  WorldBook book;
+  book.SetMaxPlayers(2);
+  book.Open("world-1", "Base", "microsoft:owner", Access::kFriends);
+  book.Enter("world-1");
+  Check(book.MayJoin("world-1", "microsoft:guest", true, "") == JoinResult::kAlreadyInside,
+        "you are already inside");
+  book.Leave();
+
+  book.Enter("world-1");
+  const World* world = book.Find("world-1");
+  Check(world != nullptr && world->players == 3, "three players are counted");
+  Check(book.MayJoin("world-1", "microsoft:guest", true, "") == JoinResult::kFull,
+        "a full world says full");
+
+  book.SetMaxPlayers(99);
+  book.Open("world-2", "Other", "microsoft:owner", Access::kFriends);
+  Check(book.Find("world-2")->max_players == 16, "the cap stops at sixteen");
+}
+
 }  // namespace
 
 int main() {
@@ -365,6 +473,10 @@ int main() {
   TestTargetLabel();
   TestSettingsRoundTrip();
   TestInstanceIds();
+  TestFriendBook();
+  TestWorldCodes();
+  TestJoiningAWorld();
+  TestWorldCapacity();
 
   if (gFailures == 0) {
     std::printf("OK: %d checks, the loader rules and the offline UUID hold\n", gChecks);

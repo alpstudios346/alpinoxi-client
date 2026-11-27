@@ -1,0 +1,9 @@
+{
+  "category.alpinoxi": "Alpinoxi",
+  "key.alpinoxi.hud_editor": "Open HUD editor",
+  "key.alpinoxi.friends": "Open friends",
+  "key.alpinoxi.chat": "Focus chat",
+  "screen.alpinoxi.hud_editor": "HUD editor",
+  "screen.alpinoxi.friends": "Friends",
+  "screen.alpinoxi.friends.hint": "Type a name to add a friend, or press Y to chat."
+}

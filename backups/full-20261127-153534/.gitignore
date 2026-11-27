@@ -1,0 +1,25 @@
+/target/
+*.log
+.env
+.idea/
+.vscode/
+
+# Gradle / Java mod builds
+.gradle/
+build/
+!mods/*/build.gradle*
+!mods/*/gradle.properties
+out/
+*.class
+.idea/
+*.iml
+# Compiled jars from mods/jars/build.sh: build output, not source.
+mods/jars/*.jar
+mods/jars/*/classes/
+mods/jars/*.sources
+mods/jars/*.args
+
+# Electron: the launcher window's own node_modules and build output
+apps/alpinoxi-electron/node_modules/
+apps/alpinoxi-electron/dist/
+dist/electron/

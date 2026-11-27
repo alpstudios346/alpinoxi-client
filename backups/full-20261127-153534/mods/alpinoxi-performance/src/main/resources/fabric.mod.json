@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "alpinoxi-performance",
+  "version": "${version}",
+  "name": "Alpinoxi Performance",
+  "description": "Honest frame-time stats, bottleneck diagnosis and a render-distance governor for Alpinoxi Client.",
+  "authors": ["AlpinoxiGD"],
+  "contact": {
+    "homepage": "https://github.com/alpstudios346/alpinoxi-client",
+    "sources": "https://github.com/alpstudios346/alpinoxi-client"
+  },
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["net.alpinoxi.perf.AlpinoxiPerformance"]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.9",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "alpinoxi-bridge": ">=0.2.0"
+  },
+  "recommends": {
+    "sodium": "*"
+  }
+}
