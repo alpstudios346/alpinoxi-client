@@ -406,9 +406,6 @@ void TestWorlds() {
   WorldBook full;
   full.SetMaxPlayers(2);
   full.Open("world-1", "Survival", "owner-key", Access::kCode);
-  std::printf("    debug code=[%s] access=%s players=%d max=%d full=%d\n", code.c_str(),
-              AccessId(full.Find("world-1")->access), full.Find("world-1")->players,
-              full.Find("world-1")->max_players, full.Find("world-1")->Full() ? 1 : 0);
   CHECK(!full.Find("world-1")->Full());
   full.Enter("world-1");
   CHECK(full.Find("world-1")->Full());
