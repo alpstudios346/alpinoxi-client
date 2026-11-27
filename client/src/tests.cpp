@@ -3,6 +3,9 @@
 
 #include "app.h"
 
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
 #include <cstdio>
 #include <string>
 
@@ -70,12 +73,15 @@ void TestVersions() {
   GameVersion older{1, 20, 6};
   GameVersion newer{1, 21, 1};
   CHECK(older < newer);
-  CHECK(newer < GameVersion{1, 21, 2});
+  const GameVersion later{1, 21, 2};
+  CHECK(newer < later);
   CHECK(!(newer < older));
-  CHECK(newer == GameVersion{1, 21, 1});
+  const GameVersion same{1, 21, 1};
+  CHECK(newer == same);
   // 1.21.0 and 1.21 are the same release, so they must compare equal.
-  GameVersion zeroPatch{1, 21, 0};
-  CHECK(zeroPatch == GameVersion{1, 21, 0});
+  const GameVersion zeroPatch{1, 21, 0};
+  const GameVersion alsoZero{1, 21, 0};
+  CHECK(zeroPatch == alsoZero);
   CHECK(newer.AtLeast(1, 14));
   CHECK(!older.AtLeast(1, 21));
 }
@@ -446,9 +452,12 @@ void TestKeys() {
     }
   }
 
-  CHECK_EQ(KeyCombo{VK_TAB, true, false, false}.ToString(), "Shift+Tab");
-  CHECK_EQ(KeyCombo{VK_ESCAPE, false, false, false}.ToString(), "Esc");
-  CHECK_EQ(KeyCombo{'H', false, true, false}.ToString(), "Ctrl+H");
+  const KeyCombo shiftTab{VK_TAB, true, false, false};
+  const KeyCombo escapeKey{VK_ESCAPE, false, false, false};
+  const KeyCombo ctrlH{'H', false, true, false};
+  CHECK_EQ(shiftTab.ToString(), "Shift+Tab");
+  CHECK_EQ(escapeKey.ToString(), "Esc");
+  CHECK_EQ(ctrlH.ToString(), "Ctrl+H");
 
   // A rebound key is refused when it is already taken, and says by whom.
   Action holder;
@@ -600,10 +609,10 @@ void TestLaunchCommand() {
   microsoft.name = "Alex";
   microsoft.uuid = "11111111-1111-1111-1111-111111111111";
   microsoft.access_token = "token";
-  const LaunchCommand signed = BuildLaunchCommand("java", "game", "game/assets", "17", "a.jar",
+  const LaunchCommand microsoftLaunch = BuildLaunchCommand("java", "game", "game/assets", "17", "a.jar",
                                                   vanilla, microsoft, 2048);
-  CHECK(signed.command_line().find("--userType msa") != std::string::npos);
-  CHECK(signed.command_line().find("--accessToken token") != std::string::npos);
+  CHECK(microsoftLaunch.command_line().find("--userType msa") != std::string::npos);
+  CHECK(microsoftLaunch.command_line().find("--accessToken token") != std::string::npos);
 }
 
 }  // namespace

@@ -3,6 +3,15 @@
 #include <commctrl.h>
 #include <shellapi.h>
 
+// windows.h defines min and max as macros, which turns std::min(a, b) into
+// nonsense. The launcher uses std::min and std::max, so the macros go.
+#ifdef min
+#undef min
+#endif
+#ifdef max
+#undef max
+#endif
+
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
@@ -461,12 +470,15 @@ void Window::OnMouseMove(int x, int y) {
       hot = CardAt(x, y);
       break;
     case Screen::kFriends:
+      // The two lists are painted on different cards, so one index is enough:
+      // a point is in at most one of them.
       hot = FriendAt(x, y);
-      if (hot < 0) hot = WorldAt(x, y) >= 0 ? 1000 + WorldAt(x, y) : -1;
+      if (hot < 0) hot = WorldAt(x, y);
       break;
     case Screen::kSettings:
+      // The same: one index for both lists, which never overlap.
       hot = BindingRowAt(x, y);
-      if (hot < 0) hot = HudRowAt(x, y) >= 0 ? 2000 + HudRowAt(x, y) : -1;
+      if (hot < 0) hot = HudRowAt(x, y);
       break;
     default:
       break;
@@ -967,7 +979,7 @@ void Window::Paint(HDC dc) {
              empty, kDim, Scale(hwnd_, 12), false, DT_LEFT | DT_WORDBREAK | DT_NOPREFIX);
       }
       for (size_t i = 0; i < friends_.All().size(); ++i) {
-        const Friend& entry = friends_[i];
+        const Friend& entry = friends_.All()[i];
         const int top = listTop + static_cast<int>(i) * rowHeight;
         RECT row = MakeRect(leftCard.left + Scale(hwnd_, 10), top, leftCard.right - Scale(hwnd_, 10),
                             top + rowHeight - Scale(hwnd_, 6));
@@ -1025,11 +1037,11 @@ void Window::Paint(HDC dc) {
              empty, kDim, Scale(hwnd_, 12), false, DT_LEFT | DT_WORDBREAK | DT_NOPREFIX);
       }
       for (size_t i = 0; i < worlds_.All().size(); ++i) {
-        const World& world = worlds_[i];
+        const World& world = worlds_.All()[i];
         const int top = worldTop + static_cast<int>(i) * Scale(hwnd_, 76);
         RECT row = MakeRect(rightCard.left + Scale(hwnd_, 10), top, rightCard.right - Scale(hwnd_, 10),
                             top + Scale(hwnd_, 66));
-        RoundRect2(dc, row, hot_ == 1000 + static_cast<int>(i) ? kCardHot : kPanel, kBorder,
+        RoundRect2(dc, row, hot_ == static_cast<int>(i) ? kCardHot : kPanel, kBorder,
                    Scale(hwnd_, 10));
         RECT nameRect = row;
         nameRect.left += Scale(hwnd_, 14);
@@ -1136,7 +1148,7 @@ void Window::Paint(HDC dc) {
         const int top = hudRowTop + static_cast<int>(i) * hudRowHeight;
         RECT row = MakeRect(hudCard.left + Scale(hwnd_, 10), top, hudCard.right - Scale(hwnd_, 10),
                             top + hudRowHeight - Scale(hwnd_, 4));
-        if (hot_ == 2000 + static_cast<int>(i)) RoundRect2(dc, row, kCardHot, kBorder, Scale(hwnd_, 8));
+        if (hot_ == static_cast<int>(i)) RoundRect2(dc, row, kCardHot, kBorder, Scale(hwnd_, 8));
         RECT label = row;
         label.left += Scale(hwnd_, 10);
         Text(dc, Widen(element.label), label, element.visible ? kText : kDim, Scale(hwnd_, 12), false);
