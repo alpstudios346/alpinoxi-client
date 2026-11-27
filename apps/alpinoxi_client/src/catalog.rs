@@ -149,9 +149,24 @@ mod tests {
         let packs = search(&entries, "", Some(Kind::ResourcePack), false);
         assert!(packs.iter().all(|entry| entry.kind == Kind::ResourcePack));
 
+        // Search covers summaries as well as names, so "SODIUM" also finds
+        // Iris ("on top of Sodium"). Narrowing to the mod named Sodium is the
+        // search that has exactly one answer.
         let sodium = search(&entries, "SODIUM", None, true);
-        assert_eq!(sodium.len(), 1);
-        assert_eq!(sodium[0].name, "Sodium");
+        assert!(
+            sodium.iter().any(|entry| entry.name == "Sodium"),
+            "Sodium itself must be found"
+        );
+        let by_name: Vec<&CatalogEntry> = sodium
+            .iter()
+            .copied()
+            .filter(|entry| entry.name.eq_ignore_ascii_case("Sodium"))
+            .collect();
+        assert_eq!(by_name.len(), 1);
+        assert!(
+            PERFORMANCE_MODS.iter().any(|m| m.id == by_name[0].id),
+            "the one match is the curated Sodium entry"
+        );
 
         assert!(search(&entries, "nothing-matches-this", None, false).is_empty());
     }

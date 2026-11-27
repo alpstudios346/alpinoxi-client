@@ -210,11 +210,8 @@ mod tests {
     use super::*;
 
     fn solid_skin(width: u32, height: u32, colour: [u8; 4]) -> Vec<u8> {
-        let mut bytes = vec![0x89, b'P', b'N', b'G', 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 13];
-        bytes.extend_from_slice(b"IHDR");
-        bytes.extend_from_slice(&width.to_be_bytes());
-        bytes.extend_from_slice(&height.to_be_bytes());
-        bytes.extend_from_slice(&[8, 6, 0, 0, 0]);
+        // A PNG is header, chunks with CRCs, and data: hand-writing the header
+        // produced a file every decoder rejects. The encoder writes all of it.
         let mut image = image::RgbaImage::new(width, height);
         for pixel in image.pixels_mut() {
             *pixel = image::Rgba(colour);
@@ -223,8 +220,7 @@ mod tests {
         image::DynamicImage::ImageRgba8(image)
             .write_to(&mut cursor, image::ImageFormat::Png)
             .unwrap();
-        bytes.extend_from_slice(&cursor.into_inner()[8..]);
-        bytes
+        cursor.into_inner()
     }
 
     #[test]
