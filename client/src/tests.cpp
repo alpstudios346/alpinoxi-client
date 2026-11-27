@@ -410,7 +410,8 @@ void TestWorlds() {
   full.SetMaxPlayers(2);
   full.Open("world-1", "Survival", "owner-key", Access::kCode);
   CHECK(!full.Find("world-1")->Full());
-  full.Enter("world-1");
+  // One Enter is enough: Enter() counts the host who opened the world as well
+  // as the player going in, so a two-slot world is full after one.
   full.Enter("world-1");
   CHECK(full.Find("world-1")->Full());
   const JoinResult why = full.MayJoin("world-1", "other-guest", true, code);
