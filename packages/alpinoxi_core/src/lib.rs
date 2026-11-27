@@ -8,6 +8,7 @@ pub mod friends;
 pub mod hud;
 pub mod import;
 pub mod launcher;
+pub mod loader;
 pub mod skin;
 pub mod slogan;
 
@@ -22,6 +23,7 @@ pub use launcher::{
     Instance, LaunchPlan, MemoryProfile, MemoryProfileError, PerformanceMod, PERFORMANCE_MODS,
     SLOGANS,
 };
+pub use loader::{GameVersion, Loader, LoaderError, LoaderTarget};
 pub use skin::{Skin, SkinModel, SkinSource};
 pub use slogan::{Slogan, SloganPicker};
 
