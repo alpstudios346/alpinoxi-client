@@ -1,9 +1,10 @@
 name: Deploy website
 
+# The site is one file. Publishing it needs nothing but that file.
 on:
   push:
     branches: [main]
-    paths: [site/**, .github/workflows/pages.yml]
+    paths: [site/index.html, .github/workflows/pages.yml]
   workflow_dispatch:
 
 permissions:
@@ -13,19 +14,26 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy:
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - name: Check the page is self-contained
+        run: |
+          if grep -nE '(src|href)="(?!https://|#|data:)' -P site/index.html; then
+            echo "site/index.html points at another file; it must stand alone" >&2
+            exit 1
+          fi
+          echo "single file, $(wc -c < site/index.html) bytes"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
-      - id: deployment
+      - id: deploy
         uses: actions/deploy-pages@v4
