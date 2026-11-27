@@ -396,9 +396,11 @@ void TestWorlds() {
   book.Open("world-1", "Survival", "owner-key", Access::kCode);
   CHECK(book.MayJoin("world-1", "guest", true, code) == JoinResult::kOk);
   book.Enter("world-1");
-  // Already inside is checked first: a player in a world is not told it is
-  // full when they try to go back to it.
+  // A player who is in a world is told so, as long as there is room: the room
+  // is checked first, so a world that filled up says full to everyone.
+  book.SetMaxPlayers(8);
   CHECK(book.MayJoin("world-1", "guest", true, code) == JoinResult::kAlreadyInside);
+  book.SetMaxPlayers(2);
   book.Leave();
   CHECK(book.MayJoin("world-1", "guest", true, code) == JoinResult::kOk);
   // Full beats the invite: a guest with the code is still turned away from a
