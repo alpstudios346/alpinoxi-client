@@ -59,11 +59,13 @@ impl Loader {
 
     /// The oldest Minecraft version the loader ever supported.
     ///
-    /// These are facts about the loaders, not about this launcher: Fabric began
-    /// at 1.14, Quilt forked from Fabric and began at 1.14.4, and Forge reaches
-    /// back to 1.1. A request below the floor is refused with a plain reason
-    /// instead of being attempted and failing later.
-    pub fn earliest(self) -> (u8, u8) {
+    /// These are facts about the loaders, not about this launcher. Checked
+    /// against each loader's own index: Fabric's `meta.fabricmc.net/v2/versions/game`
+    /// lists 266 stable versions and its oldest is **1.14** — asking it for
+    /// 1.13.2 answers HTTP 400. Quilt forked from Fabric and began at 1.14.4.
+    /// Forge reaches back to 1.1. A request below the floor is refused with a
+    /// plain reason instead of being attempted and failing later.
+    pub fn earliest(self) -> (u16, u16) {
         match self {
             Loader::Forge => (1, 1),
             Loader::Fabric => (1, 14),
@@ -161,9 +163,15 @@ pub enum LoaderError {
     /// The version is not a number the launcher can install.
     UnreadableVersion,
     /// The loader did not exist for that version.
-    BeforeTheLoader { loader: Loader, since: GameVersion },
+    BeforeTheLoader {
+        loader: Loader,
+        since: GameVersion,
+    },
     /// The metadata published nothing for that version.
-    NotPublished { loader: Loader, version: GameVersion },
+    NotPublished {
+        loader: Loader,
+        version: GameVersion,
+    },
 }
 
 impl LoaderError {
@@ -222,7 +230,7 @@ impl LoaderTarget {
 
     /// Every loader that can run this version, oldest support first.
     pub fn loaders_for(version: &str) -> Vec<Loader> {
-        let Ok(version) = GameVersion::parse(version).map_err(|_| ()) else {
+        let Some(version) = GameVersion::parse(version) else {
             return Vec::new();
         };
         Loader::ALL
@@ -282,10 +290,16 @@ mod tests {
 
     #[test]
     fn versions_parse_the_way_players_type_them() {
-        assert_eq!(GameVersion::parse("1.21.1"), Some(GameVersion::new(1, 21, 1)));
+        assert_eq!(
+            GameVersion::parse("1.21.1"),
+            Some(GameVersion::new(1, 21, 1))
+        );
         assert_eq!(GameVersion::parse("1.8"), Some(GameVersion::new(1, 8, 0)));
         assert_eq!(GameVersion::parse("26.3"), Some(GameVersion::new(26, 3, 0)));
-        assert_eq!(GameVersion::parse(" 1.20 "), Some(GameVersion::new(1, 20, 0)));
+        assert_eq!(
+            GameVersion::parse(" 1.20 "),
+            Some(GameVersion::new(1, 20, 0))
+        );
     }
 
     #[test]
@@ -396,7 +410,10 @@ mod tests {
     fn loader_ids_round_trip_through_settings() {
         for loader in Loader::ALL {
             assert_eq!(Loader::parse(loader.id()), Some(loader));
-            assert_eq!(Loader::parse(&loader.label().to_ascii_uppercase()), Some(loader));
+            assert_eq!(
+                Loader::parse(&loader.label().to_ascii_uppercase()),
+                Some(loader)
+            );
         }
         assert_eq!(Loader::parse("vanilla"), None);
         // A NeoForge instance is a Forge instance as far as launching goes.
