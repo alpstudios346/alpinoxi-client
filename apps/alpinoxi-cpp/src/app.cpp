@@ -721,23 +721,22 @@ int JsonArrayCount(const std::string& json, const std::string& key) {
   while (pos < json.size() && std::isspace(static_cast<unsigned char>(json[pos]))) ++pos;
   if (pos >= json.size() || json[pos] != '[') return 0;
 
+  // Count the objects directly inside the array: a "{" that opens while the
+  // array is one level deep. SkipString returns the position after the closing
+  // quote, so the loop must not step past it.
   int depth = 0;
   int count = 0;
-  bool any = false;
   for (size_t i = pos; i < json.size(); ++i) {
     const char c = json[i];
     if (c == '"') {
-      i = SkipString(json, i);
-      if (i == std::string::npos) return count;
-      any = true;
+      const size_t after = SkipString(json, i);
+      if (after == std::string::npos) return count;
+      i = after - 1;
       continue;
     }
     if (c == '{' || c == '[') {
       ++depth;
-      if (depth == 2 && c == '{') {
-        ++count;
-        any = true;
-      }
+      if (c == '{' && depth == 2) ++count;
       continue;
     }
     if (c == '}' || c == ']') {
@@ -745,7 +744,6 @@ int JsonArrayCount(const std::string& json, const std::string& key) {
       if (depth == 0) return count;
       continue;
     }
-    if (depth == 1 && !any && !std::isspace(static_cast<unsigned char>(c))) any = true;
   }
   return count;
 }
