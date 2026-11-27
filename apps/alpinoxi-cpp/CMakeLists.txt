@@ -34,8 +34,12 @@ target_link_libraries(alpinoxi-client PRIVATE
 # The logo is the user's own file: it is copied beside the executable, never
 # regenerated.
 add_custom_command(TARGET alpinoxi-client POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory
-          "${CMAKE_CURRENT_SOURCE_DIR}/build"
+  COMMAND ${CMAKE_COMMAND} -E make_directory
+          "$<TARGET_FILE_DIR:alpinoxi-client>/build"
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+          "${CMAKE_CURRENT_SOURCE_DIR}/build/icon.ico"
+          "${CMAKE_CURRENT_SOURCE_DIR}/build/icon.png"
+          "${CMAKE_CURRENT_SOURCE_DIR}/build/tray.png"
           "$<TARGET_FILE_DIR:alpinoxi-client>/build"
 )
 

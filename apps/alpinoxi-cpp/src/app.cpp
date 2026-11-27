@@ -296,16 +296,16 @@ std::string LoaderTarget::Message(LoaderError error) const {
 }
 
 std::string LoaderTarget::ProfileUrl() const {
-  const std::string version = this->version.ToString();
+  const std::string tag = version.ToString();
   switch (loader) {
     case Loader::kFabric:
-      return "https://meta.fabricmc.net/v2/versions/loader/" + version + "/0.16.9";
+      return "https://meta.fabricmc.net/v2/versions/loader/" + tag + "/0.16.9";
     case Loader::kQuilt:
-      return "https://meta.quiltmc.org/v3/versions/loader/" + version + "/0.27.0";
+      return "https://meta.quiltmc.org/v3/versions/loader/" + tag + "/0.27.0";
     case Loader::kForge:
       // Forge has no per-version profile endpoint: its installer writes one.
-      return "https://maven.minecraftforge.net/net/minecraftforge/forge/" + version + "/forge-" +
-             version + "-installer.jar";
+      return "https://maven.minecraftforge.net/net/minecraftforge/forge/" + tag + "/forge-" + tag +
+             "-installer.jar";
   }
   return "";
 }
