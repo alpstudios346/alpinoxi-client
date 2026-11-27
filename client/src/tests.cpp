@@ -402,23 +402,16 @@ void TestWorlds() {
   book.Leave();
   CHECK(book.MayJoin("world-1", "guest", true, code) == JoinResult::kOk);
   // Full beats the invite: a guest with the code is still turned away from a
-  // world with no room. A fresh book, so the count is known: the host is the
-  // first one in, and a guest is the second.
-  // The guest asking is not the one inside: the one inside is told they are
-  // already there, which is a different answer.
+  // world with no room.
   WorldBook full;
   full.SetMaxPlayers(2);
   full.Open("world-1", "Survival", "owner-key", Access::kCode);
   CHECK(!full.Find("world-1")->Full());
-  // One Enter is enough: Enter() counts the host who opened the world as well
-  // as the player going in, so a two-slot world is full after one.
   full.Enter("world-1");
   CHECK(full.Find("world-1")->Full());
-  const JoinResult why = full.MayJoin("world-1", "other-guest", true, code);
-  std::printf("    debug join=%s players=%d max=%d cur=[%s] access=%s\n", JoinMessage(why),
-              full.Find("world-1")->players, full.Find("world-1")->max_players,
-              full.Current().c_str(), AccessId(full.Find("world-1")->access));
-  CHECK(why == JoinResult::kFull);
+  // The guest asking is not the one inside: the one inside is told they are
+  // already there, which is a different answer.
+  CHECK(full.MayJoin("world-1", "other-guest", true, code) == JoinResult::kFull);
 
   // The cap applies to the world already open, not only the next one opened,
   // and the smallest cap there is is two.
