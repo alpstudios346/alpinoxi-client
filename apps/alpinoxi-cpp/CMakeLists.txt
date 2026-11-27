@@ -28,7 +28,7 @@ add_executable(alpinoxi-client WIN32
 )
 target_include_directories(alpinoxi-client PRIVATE src)
 target_link_libraries(alpinoxi-client PRIVATE
-  comctl32 user32 gdi32 shell32 advapi32 ole32
+  comctl32 user32 gdi32 shell32 advapi32 ole32 winhttp
 )
 
 # The logo is the user's own file: it is copied beside the executable, never
@@ -50,6 +50,7 @@ add_executable(alpinoxi-tests
   src/app.cpp
 )
 target_include_directories(alpinoxi-tests PRIVATE src)
+target_link_libraries(alpinoxi-tests PRIVATE advapi32)
 
 enable_testing()
 add_test(NAME decisions COMMAND alpinoxi-tests)

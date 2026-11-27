@@ -168,6 +168,117 @@ void TestLoaderIds() {
   Check(!ParseLoader("vanilla", &none), "vanilla is not a loader");
 }
 
+
+void TestPkceMatchesTheSpec() {
+  // RFC 7636's own worked example.
+  CheckEqual(PkceChallenge("dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"),
+             "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM", "RFC 7636 challenge");
+  CheckEqual(RandomUrlSafe(48).size(), 64, "48 bytes are 64 url-safe characters");
+  CheckEqual(RandomUrlSafe(24).size(), 32, "24 bytes are 32 url-safe characters");
+  Check(RandomUrlSafe(32) != RandomUrlSafe(32), "two calls never agree");
+}
+
+void TestSignInUrls() {
+  SignInRequest ms = StartSignIn(Provider::kMicrosoft, "http://127.0.0.1:51234/callback");
+  Check(ms.authorize_url.find("login.live.com") != std::string::npos, "Microsoft host");
+  Check(ms.authorize_url.find("code_challenge_method=S256") != std::string::npos, "PKCE S256");
+  Check(ms.authorize_url.find(ms.state) != std::string::npos, "state is in the URL");
+  Check(ms.authorize_url.find("00000000402b5328") != std::string::npos, "Minecraft's client id");
+
+  SignInRequest ely = StartSignIn(Provider::kElyBy, "http://127.0.0.1:51234/callback");
+  Check(ely.authorize_url.find("account.ely.by") != std::string::npos, "Ely.by host");
+  Check(ely.authorize_url.find("alpinoxi-client") != std::string::npos, "our client id");
+
+  Check(StartSignIn(Provider::kOffline, "x").authorize_url.empty(), "offline opens no browser");
+}
+
+void TestJvmFlags() {
+  const auto small = JvmFlags(4096);
+  bool hasG1 = false;
+  for (const auto& flag : small) {
+    if (flag == "-XX:+UseG1GC") hasG1 = true;
+  }
+  Check(hasG1, "G1 is on");
+  Check(small.back().find("aikars.flags") != std::string::npos, "the flags name their source");
+
+  bool pretouchSmall = false;
+  for (const auto& flag : small) {
+    if (flag == "-XX:+AlwaysPreTouch") pretouchSmall = true;
+  }
+  Check(!pretouchSmall, "4 GiB does not pre-touch");
+
+  bool pretouchBig = false;
+  for (const auto& flag : JvmFlags(8192)) {
+    if (flag == "-XX:+AlwaysPreTouch") pretouchBig = true;
+  }
+  Check(pretouchBig, "8 GiB does");
+}
+
+void TestJson() {
+  const std::string profile =
+      R"({"id":"1.21.1","libraries":[{"name":"a"},{"name":"b"}],"mainClass":"KnotClient","n":42})";
+  std::string text;
+  Check(JsonString(profile, "mainClass", &text) && text == "KnotClient", "reads a string");
+  Check(JsonString(profile, "id", &text) && text == "1.21.1", "reads the first key too");
+  Check(!JsonString(profile, "missing", &text), "a missing key says so");
+  double number = 0;
+  Check(JsonNumber(profile, "n", &number) && number == 42, "reads a number");
+  Check(JsonArrayCount(profile, "libraries") == 2, "counts the libraries");
+  Check(JsonArrayCount(profile, "nothing") == 0, "an absent array is zero");
+
+  const std::string escaped = R"({"msg":"he said \"hi\"\n"})";
+  Check(JsonString(escaped, "msg", &text) && text == "he said \"hi\"\n", "unescapes quotes");
+}
+
+void TestCommandLine() {
+  LoaderTarget target;
+  LoaderTarget::Make(Loader::kFabric, "1.21.1", &target);
+  Account account = MakeOfflineAccount("Alpinoxi");
+
+  const LaunchCommand command =
+      BuildLaunchCommand("C:\\Java\\bin\\java.exe", "C:\\Games\\My Instance",
+                         "C:\\Games\\assets", "17", "a.jar;b.jar", target, account, 4096);
+
+  Check(command.java.find("java.exe") != std::string::npos, "the java path");
+  Check(command.arguments[0] == "-Xms4096M", "the initial heap");
+  Check(command.arguments[1] == "-Xmx4096M", "the maximum heap");
+
+  bool mainClass = false, username = false, uuid = false, token = false;
+  for (size_t i = 0; i < command.arguments.size(); ++i) {
+    if (command.arguments[i] == "net.fabricmc.loader.impl.launch.knot.KnotClient") mainClass = true;
+    if (command.arguments[i] == "--username" && command.arguments[i + 1] == "Alpinoxi") username = true;
+    if (command.arguments[i] == "--uuid" && command.arguments[i + 1] == account.uuid) uuid = true;
+    if (command.arguments[i] == "--accessToken" && command.arguments[i + 1] == "0") token = true;
+  }
+  Check(mainClass, "the loader's main class");
+  Check(username, "the player name");
+  Check(uuid, "the offline UUID");
+  Check(token, "a cracked client sends token 0");
+
+  CheckEqual(QuoteForWindows("a b"), "\"a b\"", "a space is quoted");
+  CheckEqual(QuoteForWindows("plain"), "plain", "a plain argument is not");
+}
+
+void TestProviders() {
+  CheckEqual(ProviderLabel(Provider::kMicrosoft), "Microsoft", "Microsoft label");
+  CheckEqual(ProviderLabel(Provider::kElyBy), "Ely.by", "Ely.by label");
+  CheckEqual(ProviderLabel(Provider::kOffline), "Cracked", "offline is shown as Cracked");
+  for (Provider provider : AllProviders()) {
+    Provider parsed;
+    Check(ParseProvider(ProviderId(provider), &parsed) && parsed == provider, "id round-trips");
+  }
+  Provider parsed;
+  Check(ParseProvider("cracked", &parsed) && parsed == Provider::kOffline, "cracked is offline");
+}
+
+void TestOfflineAccount() {
+  Account account = MakeOfflineAccount("Alpinoxi");
+  CheckEqual(account.name, "Alpinoxi", "the name is kept");
+  CheckEqual(account.uuid, "7cce3372-aec0-3d25-9588-23579d5fcd8a", "and its UUID");
+  CheckEqual(account.access_token, "0", "a cracked account carries token 0");
+  Check(!ValidPlayerName(MakeOfflineAccount("x").name), "a bad name makes no account");
+}
+
 }  // namespace
 
 int main() {
@@ -184,6 +295,13 @@ int main() {
   TestOfflineUuid();
   TestPlayerName();
   TestLoaderIds();
+  TestPkceMatchesTheSpec();
+  TestSignInUrls();
+  TestJvmFlags();
+  TestJson();
+  TestCommandLine();
+  TestProviders();
+  TestOfflineAccount();
 
   if (gFailures == 0) {
     std::printf("OK: %d checks, the loader rules and the offline UUID hold\n", gChecks);
